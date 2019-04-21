@@ -1,0 +1,112 @@
+version: "3.7"
+
+volumes:
+  wiki-http-deps:
+  wiki-kafka-deps:
+
+services:
+  wiki-db:
+    build:
+      dockerfile: ./build/package/dev/wiki-db/Dockerfile
+      context: .
+      args:
+        PG_USER: ${WIKI_PG_USER?}
+        PG_DB: ${WIKI_PG_DB?}
+        PG_BACKUP: ${WIKI_PG_BACKUP?}
+    env_file:
+      - ./build/package/dev/wiki-db/.env
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wiki-db"]
+      interval: 1m
+      retries: 3
+      timeout: 30s
+    volumes:
+      - ".:/backup"
+  wiki-cache:
+    image: redis:5-alpine
+    healthcheck:
+      test: ["CMD", "nc", "-w", "1", "-z", "localhost", "6379"]
+      interval: 1m
+      retries: 3
+      timeout: 30s
+    ports:
+      - "6379:6379"
+  zookeeper:
+    image: zookeeper
+    restart: always
+    healthcheck:
+      test: ["CMD","echo", "stat", "|", "nc", "localhost", "2181"]
+      interval: 1m
+      retries: 3
+      timeout: 30s
+    ports:
+      - "2181:2181"
+  kafka:
+    build:
+      dockerfile: ./build/package/dev/kafka/Dockerfile
+      context: .
+    healthcheck:
+      test: ["CMD","./healthcheck.sh"]
+      interval: 1m
+      retries: 3
+      timeout: 30s
+    environment:
+      KAFKA_PORT: ${KAFKA_PORT?err}
+    depends_on:
+      - zookeeper
+    volumes:
+      - ./build/package/shared:/shared
+      - /var/run/docker.sock:/var/run/docker.sock
+  wiki-http:
+    build:
+      dockerfile: ./build/package/dev/wiki-http/Dockerfile
+      context: .
+    entrypoint:
+      - "/debug.sh"
+    ports:
+      - ${WIKI_HTTP_PORT?err}:${WIKI_HTTP_PORT?err}
+      - ${WIKI_DEBUG_PORT?err}:${WIKI_DEBUG_PORT?err}
+    env_file:
+      - ./build/package/dev/wiki-http/.env
+    environment:
+      PROJECT_PATH: $PWD
+      KAFKA_BROKERS: ${KAFKA_BROKERS?err}
+    volumes:
+      - ./build/package/shared:/shared
+      - $PWD:$PWD
+      - wiki-http-deps:/go
+    depends_on:
+      - wiki-db
+      - wiki-cache
+    security_opt:
+      - apparmor=unconfined
+    cap_add:
+      - SYS_PTRACE
+  wiki-kafka:
+    build:
+      dockerfile: ./build/package/dev/wiki-kafka/Dockerfile
+      context: .
+    entrypoint:
+      - "/debug.sh"
+    ports:
+      - ${WIKI_DEBUG_PORT?}:${WIKI_DEBUG_PORT?}
+    env_file:
+      - ./build/package/dev/wiki-kafka/.env
+      - ./build/package/dev/.env
+    environment:
+      PROJECT_PATH: $PWD
+      KAFKA_BROKERS: ${KAFKA_BROKERS?err}
+    volumes:
+      - ./build/package/shared:/shared
+      - $PWD:$PWD
+      - wiki-kafka-deps:/go
+    depends_on:
+      - wiki-db
+      - wiki-cache
+      - kafka
+    security_opt:
+      - apparmor=unconfined
+    cap_add:
+      - SYS_PTRACE
