@@ -1,42 +1,42 @@
-id,name,classification,average_height,average_lifespan,homeworld,spoken_language,description
-1,Human,mammal,180,120,9,Galactic Basic,"Modern humans (Homo sapiens, primarily ssp. Homo sapiens sapiens) are the only extant members of the subtribe Hominina, a branch of the tribe Hominini belonging to the family of great apes. They are characterized by erect posture and bipedal locomotion; high manual dexterity and heavy tool use compared to other animals; and a general trend toward larger, more complex brains and societies.[3][4]
+id,name,classification,average_height,average_lifespan,homeworld,spoken_language,eye_colors,hair_colors,skin_colors,description
+1,Human,mammal,180,120,9,Galactic Basic,"{""BROWN"",""BLUE"",""GREEN"",""HAZEL"",""GREY"",""AMBER""}","{""BLONDE"",""BROWN"",""BLACK"",""RED""}","{""CAUCASIAN"",""BLACK"",""ASIAN"",""HISPANIC""}","Modern humans (Homo sapiens, primarily ssp. Homo sapiens sapiens) are the only extant members of the subtribe Hominina, a branch of the tribe Hominini belonging to the family of great apes. They are characterized by erect posture and bipedal locomotion; high manual dexterity and heavy tool use compared to other animals; and a general trend toward larger, more complex brains and societies.[3][4]
 Early hominins—particularly the australopithecines, whose brains and anatomy are in many ways more similar to ancestral non-human apes—are less often referred to as ""human"" than hominins of the genus Homo.[5] Several of these hominins used fire, occupied much of Eurasia, and gave rise to anatomically modern Homo sapiens in Africa about 200,000 years ago.[6][7] They began to exhibit evidence of behavioral modernity around 50,000 years ago. In several waves of migration, anatomically modern humans ventured out of Africa and populated most of the world.[8]
 The spread of humans and their large and increasing population has had a profound impact on large areas of the environment and millions of native species worldwide. Advantages that explain this evolutionary success include a relatively larger brain with a particularly well-developed neocortex, prefrontal cortex and temporal lobes, which enable high levels of abstract reasoning, language, problem solving, sociality, and culture through social learning. Humans use tools to a much higher degree than any other animal, are the only extant species known to build fires and cook their food, and are the only extant species to clothe themselves and create and use numerous other technologies and arts.
 Humans are uniquely adept at using systems of symbolic communication (such as language and art) for self-expression and the exchange of ideas, and for organizing themselves into purposeful groups. Humans create complex social structures composed of many cooperating and competing groups, from families and kinship networks to political states. Social interactions between humans have established an extremely wide variety of values,[9] social norms, and rituals, which together form the basis of human society. Curiosity and the human desire to understand and influence the environment and to explain and manipulate phenomena (or events) has provided the foundation for developing science, philosophy, mythology, religion, anthropology, and numerous other fields of knowledge.
 Though most of human existence has been sustained by hunting and gathering in band societies,[10] increasing numbers of human societies began to practice sedentary agriculture approximately some 10,000 years ago,[11] domesticating plants and animals, thus allowing for the growth of civilization. These human societies subsequently expanded in size, establishing various forms of government, religion, and culture around the world, unifying people within regions to form states and empires. The rapid advancement of scientific and medical understanding in the 19th and 20th centuries led to the development of fuel-driven technologies and increased lifespans, causing the human population to rise exponentially. Today the global human population is estimated by the United Nations to be near 7.6 billion.[12]"
-2,Droid,artificial,,10000,,,"A droid is a fictional robot possessing some degree of artificial intelligence in the Star Wars science fiction franchise. Coined by special effects artist John Stears, the term is a clipped form of ""android"",[1] a word originally reserved for robots designed to look and act like a human.[2] The word ""droid"" has been a registered trademark of Lucasfilm Ltd since 1977.[3][4][5][6]"
-3,Wookiee,mammal,210,400,14,Shyriiwook,"Wookiees (/ˈwʊkiːz/) are a fictional species of intelligent bipeds from the planet Kashyyyk in the Star Wars universe. They are taller, stronger, and hairier than humans and most (if not all) other humanoid species. The most notable Wookiee is Chewbacca, the copilot of Han Solo, who first appeared in the 1977 film Star Wars Episode IV: A New Hope."
-4,Rodian,sentient,170,,23,Galactic Basic,
-5,Hutt,gastropod,300,1000,24,Huttese,"The Hutts are a fictional alien race in the Star Wars universe. They appear in The Phantom Menace, Return of the Jedi and The Clone Wars, as well as the special edition release of A New Hope. They also appear in various Star Wars games, including those based on the movies, and the Knights of the Old Republic series. None of these are very friendly and all are criminally involved.[1] In the comic book series Tales of the Jedi: Golden Age of the Sith and Tales of the Jedi: The Fall of the Sith Empire, however, there is a Hutt character named Aarrba who is sympathetic to the main characters, Gav and Jori Daragon."
-6,Yoda's species,mammal,66,900,,Galactic basic,
-7,Trandoshan,reptile,200,,29,Dosh,
-8,Mon Calamari,amphibian,160,,31,Mon Calamarian,
-9,Ewok,mammal,100,,7,Ewokese,"Ewoks are a fictional race of small, mammaloid bipeds that appear in the Star Wars universe. They are hunter-gatherers resembling teddy bears that inhabit the forest moon of Endor and live in various arboreal huts and other simple dwellings. They first appeared in the 1983 film Return of the Jedi and have since appeared in two made-for-television films, Caravan of Courage: An Ewok Adventure (1984) and Ewoks: The Battle for Endor (1985), as well as a short-lived animated series and several books and games."
-10,Sullustan,mammal,180,,33,Sullutese,
-11,Neimodian,,180,,18,Neimoidia,
-12,Gungan,amphibian,190,,8,Gungan basic,
-13,Toydarian,mammal,120,91,34,Toydarian,
-14,Dug,mammal,100,,35,Dugese,
-15,Twi'lek,mammals,200,,37,Twi'leki,
-16,Aleena,reptile,80,79,38,Aleena,
-17,Vulptereen,,100,,39,vulpterish,
-18,Xexto,,125,,40,Xextese,
-19,Toong,,200,,41,Tundan,
-20,Cerean,mammal,200,,43,Cerean,
-21,Nautolan,amphibian,180,70,44,Nautila,
-22,Zabrak,mammal,180,,45,Zabraki,
-23,Tholothian,mammal,,,46,,
-24,Iktotchi,,180,,47,Iktotchese,
-25,Quermian,mammal,240,86,48,Quermian,
-26,Kel Dor,,180,70,49,Kel Dor,
-27,Chagrian,amphibian,190,,50,Chagria,
-28,Geonosian,insectoid,178,,11,Geonosian,
-29,Mirialan,mammal,180,,51,Mirialan,
-30,Clawdite,reptilian,180,70,54,Clawdite,
-31,Besalisk,amphibian,178,75,55,besalisk,
-32,Kaminoan,amphibian,220,80,10,Kaminoan,
-33,Skakoan,mammal,,,56,Skakoan,
-34,Muun,mammal,190,100,57,Muun,
-35,Togruta,mammal,180,94,58,Togruti,
-36,Kaleesh,reptile,170,80,59,Kaleesh,
-37,Pau'an,mammal,190,700,12,Utapese,"The Pau'ans were a species of gaunt humanoids with gray, furrowed skin, and sunken eyes. Their arms ended in long, pentadactyl hands with an opposable thumb and sharp nails. Being carnivores with a preference for raw meat, they also had sharp, jagged teeth. In addition to those intimidating features, Pau'ans were tall—Tion Medon, a Port Administrator during the Clone Wars, stood at about 2.06 meters. Their speech organ allowed them to speak Galactic Basic. They had hypersensitive hearing, which prompted them to wear special coverings to protect their fragile ears. Their life-span was measured in centuries, which earned them the nickname of ""Ancients."" The Pau'ans' native language was Utapese, however they were also capable of speaking Basic."
+2,Droid,artificial,,10000,,,,,,"A droid is a fictional robot possessing some degree of artificial intelligence in the Star Wars science fiction franchise. Coined by special effects artist John Stears, the term is a clipped form of ""android"",[1] a word originally reserved for robots designed to look and act like a human.[2] The word ""droid"" has been a registered trademark of Lucasfilm Ltd since 1977.[3][4][5][6]"
+3,Wookiee,mammal,210,400,14,Shyriiwook,"{""BLUE"",""GREEN"",""YELLOW"",""BROWN"",""GOLDEN"",""RED""}","{""BLACK"",""BROWN""}","{""GRAY""}","Wookiees (/ˈwʊkiːz/) are a fictional species of intelligent bipeds from the planet Kashyyyk in the Star Wars universe. They are taller, stronger, and hairier than humans and most (if not all) other humanoid species. The most notable Wookiee is Chewbacca, the copilot of Han Solo, who first appeared in the 1977 film Star Wars Episode IV: A New Hope."
+4,Rodian,sentient,170,,23,Galactic Basic,"{""BLACK""}",,"{""GREEN"",""BLUE""}",
+5,Hutt,gastropod,300,1000,24,Huttese,"{""YELLOW"",""RED""}",,"{""GREEN"",""BROWN"",""TAN""}","The Hutts are a fictional alien race in the Star Wars universe. They appear in The Phantom Menace, Return of the Jedi and The Clone Wars, as well as the special edition release of A New Hope. They also appear in various Star Wars games, including those based on the movies, and the Knights of the Old Republic series. None of these are very friendly and all are criminally involved.[1] In the comic book series Tales of the Jedi: Golden Age of the Sith and Tales of the Jedi: The Fall of the Sith Empire, however, there is a Hutt character named Aarrba who is sympathetic to the main characters, Gav and Jori Daragon."
+6,Yoda's species,mammal,66,900,,Galactic basic,"{""BROWN"",""GREEN"",""YELLOW""}","{""BROWN"",""WHITE""}","{""GREEN"",""YELLOW""}",
+7,Trandoshan,reptile,200,,29,Dosh,"{""YELLOW"",""ORANGE""}","{""NONE""}","{""BROWN"",""GREEN""}",
+8,Mon Calamari,amphibian,160,,31,Mon Calamarian,"{""YELLOW""}","{""NONE""}","{""RED"",""BLUE"",""BROWN"",""MAGENTA""}",
+9,Ewok,mammal,100,,7,Ewokese,"{""ORANGE"",""BROWN""}","{""WHITE"",""BROWN"",""BLACK""}","{""BROWN""}","Ewoks are a fictional race of small, mammaloid bipeds that appear in the Star Wars universe. They are hunter-gatherers resembling teddy bears that inhabit the forest moon of Endor and live in various arboreal huts and other simple dwellings. They first appeared in the 1983 film Return of the Jedi and have since appeared in two made-for-television films, Caravan of Courage: An Ewok Adventure (1984) and Ewoks: The Battle for Endor (1985), as well as a short-lived animated series and several books and games."
+10,Sullustan,mammal,180,,33,Sullutese,"{""BLACK""}","{""NONE""}","{""PALE""}",
+11,Neimodian,,180,,18,Neimoidia,"{""RED"",""PINK""}","{""NONE""}","{""GREY"",""GREEN""}",
+12,Gungan,amphibian,190,,8,Gungan basic,"{""ORANGE""}","{""NONE""}","{""BROWN"",""GREEN""}",
+13,Toydarian,mammal,120,91,34,Toydarian,"{""YELLOW""}","{""NONE""}","{""BLUE"",""GREEN"",""GREY""}",
+14,Dug,mammal,100,,35,Dugese,"{""YELLOW"",""BLUE""}","{""NONE""}","{""BROWN"",""PURPLE"",""GREY"",""RED""}",
+15,Twi'lek,mammals,200,,37,Twi'leki,"{""BLUE"",""BROWN"",""ORANGE"",""PINK""}","{""NONE""}","{""ORANGE"",""YELLOW"",""BLUE"",""GREEN"",""PINK"",""PURPLE"",""TAN""}",
+16,Aleena,reptile,80,79,38,Aleena,,"{""NONE""}","{""BLUE"",""GRAY""}",
+17,Vulptereen,,100,,39,vulpterish,"{""YELLOW""}","{""NONE""}","{""GREY""}",
+18,Xexto,,125,,40,Xextese,"{""BLACK""}","{""NONE""}","{""GREY"",""YELLOW"",""PURPLE""}",
+19,Toong,,200,,41,Tundan,"{""ORANGE""}","{""NONE""}","{""GREY"",""GREEN"",""YELLOW""}",
+20,Cerean,mammal,200,,43,Cerean,"{""HAZEL""}","{""RED"",""BLOND"",""BLACK"",""WHITE""}","{""PALE PINK""}",
+21,Nautolan,amphibian,180,70,44,Nautila,"{""BLACK""}","{""NONE""}","{""GREEN"",""BLUE"",""BROWN"",""RED""}",
+22,Zabrak,mammal,180,,45,Zabraki,"{""BROWN"",""ORANGE""}","{""BLACK""}","{""PALE"",""BROWN"",""RED"",""ORANGE"",""YELLOW""}",
+23,Tholothian,mammal,,,46,,"{""BLUE"",""INDIGO""}",,"{""DARK""}",
+24,Iktotchi,,180,,47,Iktotchese,"{""ORANGE""}","{""NONE""}","{""PINK""}",
+25,Quermian,mammal,240,86,48,Quermian,"{""YELLOW""}","{""NONE""}","{""WHITE""}",
+26,Kel Dor,,180,70,49,Kel Dor,"{""BLACK"",""SILVER""}","{""NONE""}","{""PEACH"",""ORANGE"",""RED""}",
+27,Chagrian,amphibian,190,,50,Chagria,"{""BLUE""}","{""NONE""}","{""BLUE""}",
+28,Geonosian,insectoid,178,,11,Geonosian,"{""GREEN"",""HAZEL""}","{""NONE""}","{""GREEN"",""BROWN""}",
+29,Mirialan,mammal,180,,51,Mirialan,"{""BLUE"",""GREEN"",""RED"",""YELLOW"",""BROWN"",""ORANGE""}","{""BLACK"",""BROWN""}","{""YELLOW"",""GREEN""}",
+30,Clawdite,reptilian,180,70,54,Clawdite,"{""YELLOW""}","{""NONE""}","{""GREEN"",""YELLOW""}",
+31,Besalisk,amphibian,178,75,55,besalisk,"{""YELLOW""}","{""NONE""}","{""BROWN""}",
+32,Kaminoan,amphibian,220,80,10,Kaminoan,"{""BLACK""}","{""NONE""}","{""GREY"",""BLUE""}",
+33,Skakoan,mammal,,,56,Skakoan,,"{""NONE""}","{""GREY"",""GREEN""}",
+34,Muun,mammal,190,100,57,Muun,"{""BLACK""}","{""NONE""}","{""GREY"",""WHITE""}",
+35,Togruta,mammal,180,94,58,Togruti,"{""RED"",""ORANGE"",""YELLOW"",""GREEN"",""BLUE"",""BLACK""}","{""NONE""}","{""RED"",""WHITE"",""ORANGE"",""YELLOW"",""GREEN"",""BLUE""}",
+36,Kaleesh,reptile,170,80,59,Kaleesh,"{""YELLOW""}","{""NONE""}","{""BROWN"",""ORANGE"",""TAN""}",
+37,Pau'an,mammal,190,700,12,Utapese,,,,"The Pau'ans were a species of gaunt humanoids with gray, furrowed skin, and sunken eyes. Their arms ended in long, pentadactyl hands with an opposable thumb and sharp nails. Being carnivores with a preference for raw meat, they also had sharp, jagged teeth. In addition to those intimidating features, Pau'ans were tall—Tion Medon, a Port Administrator during the Clone Wars, stood at about 2.06 meters. Their speech organ allowed them to speak Galactic Basic. They had hypersensitive hearing, which prompted them to wear special coverings to protect their fragile ears. Their life-span was measured in centuries, which earned them the nickname of ""Ancients."" The Pau'ans' native language was Utapese, however they were also capable of speaking Basic."
