@@ -1,0 +1,16 @@
+vendor
+assets
+!assets/nuke.sql
+!assets/create.sql
+!assets/dump.sql
+!assets/server*
+
+.env
+.env.*
+
+.git
+.gitignore
+.gitattributes
+
+LICENSE
+*.md
