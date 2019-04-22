@@ -10,11 +10,13 @@ services:
       dockerfile: ./build/package/dev/wiki-db/Dockerfile
       context: .
       args:
-        PG_USER: ${WIKI_PG_USER?}
-        PG_DB: ${WIKI_PG_DB?}
-        PG_BACKUP: ${WIKI_PG_BACKUP?}
-    env_file:
-      - ./build/package/dev/wiki-db/.env
+        PG_USER: ${WIKI_PG_USER?err}
+        PG_DB: ${WIKI_PG_DB?err}
+        PG_BACKUP: ${WIKI_PG_BACKUP?err}
+    environment:
+      PG_USER: ${WIKI_PG_USER?err}
+      PG_DB: ${WIKI_PG_DB?err}
+      PG_BACKUP: ${WIKI_PG_BACKUP?err}
     ports:
       - "5433:5432"
     healthcheck:

@@ -519,7 +519,7 @@ func (kafka *Kafka) Stop(ctx context.Context) error {
 
 	select {
 	case <-ctx.Done():
-		logger.Error(`failed to close kafka consumer or producer, timedout`)
+		logger.Error(`failed to close kafka consumer or producer, timed out`)
 		return ctx.Err()
 	case e, ok := <-err:
 		if !ok {
