@@ -59,7 +59,7 @@ func GetVehicle(storage types.Storage, logger types.Logger, tracker types.TimeTr
 			definedTopics[topics.WikiResponseTopic],
 			resourceDefinitionGet.GetArgValidators(),
 			resourceDefinitionGet.GetArgNormalizers(),
-			resourceDefinitionGet.DataRequired,
+			true,
 		),
 	)
 

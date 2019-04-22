@@ -6,7 +6,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/validate"
 )
 
-func ValidateArgs(logger types.Logger, responseTopic string, validators map[string][]types.Validator, normalizors map[string]types.Normalizor, strict bool) kafka.Middleware {
+func ValidateArgs(logger types.Logger, responseTopic string, validators map[string][]types.Validator, normalizors map[string]types.Normalizor, argsRequired bool) kafka.Middleware {
 	return func(next kafka.HandleEvent) kafka.HandleEvent {
 		return func(event kafka.Event, instance *kafka.Kafka) {
 			response := kafka.Event{
@@ -16,7 +16,7 @@ func ValidateArgs(logger types.Logger, responseTopic string, validators map[stri
 			}
 			args := event.Args
 			if args == nil {
-				if strict {
+				if argsRequired {
 					response.Error = map[string]string{
 						`args`: `args is required`,
 					}
@@ -24,6 +24,9 @@ func ValidateArgs(logger types.Logger, responseTopic string, validators map[stri
 					if err != nil {
 						logger.Error(err)
 					}
+					return
+				} else {
+					next(event, instance)
 					return
 				}
 			}

@@ -59,7 +59,7 @@ func GetPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTra
 			definedTopics[topics.WikiResponseTopic],
 			resourceDefinitionGet.GetArgValidators(),
 			resourceDefinitionGet.GetArgNormalizers(),
-			resourceDefinitionGet.DataRequired,
+			true,
 		),
 	)
 

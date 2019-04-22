@@ -59,7 +59,7 @@ func GetFilm(storage types.Storage, logger types.Logger, tracker types.TimeTrack
 			definedTopics[topics.WikiResponseTopic],
 			resourceDefinitionGet.GetArgValidators(),
 			resourceDefinitionGet.GetArgNormalizers(),
-			resourceDefinitionGet.DataRequired,
+			true,
 		),
 	)
 

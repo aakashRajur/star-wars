@@ -59,7 +59,7 @@ func GetCharacter(storage types.Storage, logger types.Logger, tracker types.Time
 			definedTopics[topics.WikiResponseTopic],
 			resourceDefinitionGet.GetArgValidators(),
 			resourceDefinitionGet.GetArgNormalizers(),
-			resourceDefinitionGet.DataRequired,
+			true,
 		),
 	)
 
