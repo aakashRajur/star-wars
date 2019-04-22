@@ -13,11 +13,11 @@ const (
 var ResourceDefinitionGet = resource_definition.ResourceDefinition{
 	HttpURI:  HttpURI,
 	HttpVerb: resource_definition.VerbGet,
-	Type:     `CHARACTER_GET`,
+	Type:     `VEHICLE_GET`,
 	Args: []resource_definition.Arg{
 		{
 			Key:      ParamVehicleId,
-			Type:     resource_definition.TypeString,
+			Type:     resource_definition.TypeInt,
 			Required: true,
 		},
 	},
@@ -33,11 +33,11 @@ func ProvideResourceDefinitionGet() di.ResourceDefinitionProvider {
 var ResourceDefinitionPatch = resource_definition.ResourceDefinition{
 	HttpURI:  HttpURI,
 	HttpVerb: resource_definition.VerbPatch,
-	Type:     `CHARACTER_PATCH`,
+	Type:     `VEHICLE_PATCH`,
 	Args: []resource_definition.Arg{
 		{
 			Key:      ParamVehicleId,
-			Type:     resource_definition.TypeString,
+			Type:     resource_definition.TypeInt,
 			Required: true,
 		},
 	},

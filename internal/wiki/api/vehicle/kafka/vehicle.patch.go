@@ -9,7 +9,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourceDefinitionPatch = vehicle.ResourceDefinitionGet
+var resourceDefinitionPatch = vehicle.ResourceDefinitionPatch
 
 func PatchVehicle(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {

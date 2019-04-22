@@ -17,7 +17,7 @@ var ResourceDefinitionGet = resource_definition.ResourceDefinition{
 	Args: []resource_definition.Arg{
 		{
 			Key:      ParamSpecieId,
-			Type:     resource_definition.TypeString,
+			Type:     resource_definition.TypeInt,
 			Required: true,
 		},
 	},
@@ -37,7 +37,7 @@ var ResourceDefinitionPatch = resource_definition.ResourceDefinition{
 	Args: []resource_definition.Arg{
 		{
 			Key:      ParamSpecieId,
-			Type:     resource_definition.TypeString,
+			Type:     resource_definition.TypeInt,
 			Required: true,
 		},
 	},
