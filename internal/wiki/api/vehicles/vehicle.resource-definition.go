@@ -18,12 +18,12 @@ var ResourceDefinitionGet = resource_definition.ResourceDefinition{
 		{
 			Key:      types.QueryPaginationId,
 			Type:     resource_definition.TypeInt,
-			Required: true,
+			Required: false,
 		},
 		{
 			Key:      types.QueryLimit,
 			Type:     resource_definition.TypeInt,
-			Required: true,
+			Required: false,
 		},
 	},
 	DataRequired: false,
