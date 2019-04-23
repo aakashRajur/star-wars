@@ -64,6 +64,7 @@ func GetFilms(storage types.Storage, logger types.Logger, tracker types.TimeTrac
 			resourceDefinitionGet.GetArgNormalizers(),
 			false,
 		),
+		middleware.Pagination(),
 	)
 
 	subscription := kafka.Subscription{

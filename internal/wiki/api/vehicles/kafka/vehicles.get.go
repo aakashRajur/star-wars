@@ -64,6 +64,7 @@ func GetVehicles(storage types.Storage, logger types.Logger, tracker types.TimeT
 			resourceDefinitionGet.GetArgNormalizers(),
 			false,
 		),
+		middleware.Pagination(),
 	)
 
 	subscription := kafka.Subscription{

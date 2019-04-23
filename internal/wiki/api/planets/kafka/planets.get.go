@@ -64,6 +64,7 @@ func GetPlanets(storage types.Storage, logger types.Logger, tracker types.TimeTr
 			resourceDefinitionGet.GetArgNormalizers(),
 			false,
 		),
+		middleware.Pagination(),
 	)
 
 	subscription := kafka.Subscription{

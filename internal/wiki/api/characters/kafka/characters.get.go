@@ -64,6 +64,7 @@ func GetCharacters(storage types.Storage, logger types.Logger, tracker types.Tim
 			resourceDefinitionGet.GetArgNormalizers(),
 			false,
 		),
+		middleware.Pagination(),
 	)
 
 	subscription := kafka.Subscription{
