@@ -32,7 +32,7 @@ func PatchCharacter(storage types.Storage, logger types.Logger, tracker types.Ti
 			return
 		}
 
-		data := event.Data
+		data := event.Data.(map[string]interface{})
 
 		err := character.QueryUpdateCharacter(storage, tracker, id, data)
 		if err != nil {

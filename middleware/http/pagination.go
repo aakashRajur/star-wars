@@ -12,11 +12,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-const (
-	PAGINATION = "PAGINATION"
-)
-
-func ParseQuery(query url.Values) (types.Pagination, error) {
+func parseQueryForPagination(query url.Values) (types.Pagination, error) {
 	pagination := types.Pagination{}
 
 	paginationIdString := query.Get(types.QueryPaginationId)
@@ -45,12 +41,12 @@ func ParseQuery(query url.Values) (types.Pagination, error) {
 var Pagination http.Middleware = func(next http.HandleRequest) http.HandleRequest {
 	return func(response http.Response, request *http.Request) {
 		query := request.URL.Query()
-		pagination, err := ParseQuery(query)
+		pagination, err := parseQueryForPagination(query)
 		if err != nil {
 			response.Error(nativeHttp.StatusBadRequest, err)
 		}
 
-		withPagination := context.WithValue(request.Context(), PAGINATION, pagination)
+		withPagination := context.WithValue(request.Context(), types.PAGINATION, pagination)
 		next(response, request.WithContext(withPagination))
 	}
 }

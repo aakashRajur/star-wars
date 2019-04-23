@@ -32,7 +32,7 @@ func PatchPlanet(storage types.Storage, logger types.Logger, tracker types.TimeT
 			return
 		}
 
-		data := event.Data
+		data := event.Data.(map[string]interface{})
 
 		err := planet.QueryUpdatePlanet(storage, tracker, id, data)
 		if err != nil {

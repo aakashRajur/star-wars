@@ -14,7 +14,7 @@ import (
 func GetSpecies(storage types.Storage, logger types.Logger, tracker types.TimeTracker, cacheKey string) http.WithMiddleware {
 	requestHandler := func(response http.Response, request *http.Request) {
 		ctx := request.Context()
-		oldPagination := ctx.Value(middleware.PAGINATION).(types.Pagination)
+		oldPagination := ctx.Value(types.PAGINATION).(types.Pagination)
 		result, newPagination, err := species.QuerySelectSpecies(
 			storage,
 			tracker,
@@ -32,7 +32,7 @@ func GetSpecies(storage types.Storage, logger types.Logger, tracker types.TimeTr
 		}
 
 		headers := make(map[string]string, 1)
-		headers[middleware.PAGINATION] = string(marshaled)
+		headers[types.PAGINATION] = string(marshaled)
 
 		err = response.WriteJSONObject(result, &headers)
 		if err != nil {

@@ -8,6 +8,7 @@ const (
 	QueryTotalCount   = "total_count"
 	QueryPaginationId = "pagination_id"
 	QueryLimit        = "limit"
+	PAGINATION        = "PAGINATION"
 )
 
 type Pagination struct {

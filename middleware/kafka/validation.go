@@ -70,6 +70,7 @@ func ValidateData(logger types.Logger, eventType string, validators map[string][
 				Type:  eventType,
 				Id:    event.Id,
 			}
+
 			data := event.Data
 			if data == nil {
 				if dataRequired {
@@ -83,8 +84,19 @@ func ValidateData(logger types.Logger, eventType string, validators map[string][
 					return
 				}
 			}
+			casted, ok := data.(map[string]interface{})
+			if !ok {
+				response.Error = map[string]string{
+					`data`: `data should be an object`,
+				}
+				err := instance.Emit(response)
+				if err != nil {
+					logger.Error(err)
+				}
+				return
+			}
 
-			err := validate.ValidateMapped(validators, data)
+			err := validate.ValidateMapped(validators, casted)
 			if err != nil {
 				response.Error = err
 				err := instance.Emit(response)
@@ -99,7 +111,7 @@ func ValidateData(logger types.Logger, eventType string, validators map[string][
 				return
 			}
 
-			normalized, err := validate.NormalizeMapped(normalizors, data)
+			normalized, err := validate.NormalizeMapped(normalizors, casted)
 			if err != nil {
 				response.Error = err
 				err := instance.Emit(response)

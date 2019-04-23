@@ -32,7 +32,7 @@ func PatchFilm(storage types.Storage, logger types.Logger, tracker types.TimeTra
 			return
 		}
 
-		data := event.Data
+		data := event.Data.(map[string]interface{})
 
 		err := film.QueryUpdateFilm(storage, tracker, id, data)
 

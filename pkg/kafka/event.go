@@ -16,7 +16,7 @@ type Event struct {
 	Id        string                 `json:"id" xml:"id"`
 	Source    string                 `json:"source" xml:"source"`
 	Args      map[string]interface{} `json:"args" xml:"args"`
-	Data      map[string]interface{} `json:"data" xml:"data"`
+	Data      interface{}            `json:"data" xml:"data"`
 	Error     map[string]string      `json:"error" xml:"error"`
 	Timestamp time.Time              `json:"timestamp" xml:"timestamp"`
 	Ctx       context.Context        `json:"-"`

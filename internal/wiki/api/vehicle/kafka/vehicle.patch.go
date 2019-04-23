@@ -32,7 +32,7 @@ func PatchVehicle(storage types.Storage, logger types.Logger, tracker types.Time
 			return
 		}
 
-		data := event.Data
+		data := event.Data.(map[string]interface{})
 
 		err := vehicle.QueryUpdateVehicle(storage, tracker, id, data)
 		if err != nil {
