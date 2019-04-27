@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
 
-ENV_FILE='/root/.bashrc'
 SERVER_PROPERTIES_PATH="/tmp/server.properties"
 
-source ${ENV_FILE}
+KAFKA_DOCKER_PROTOCOL="kafka_docker"
+KAFKA_DOCKER="${KAFKA_DOCKER_PROTOCOL}://${CONTAINER_HOST_NAME}:${CONTAINER_PORT}"
 
-rm -f ${SERVER_PROPERTIES_PATH}
-
+rm -f ${SERVER_PROPERTIES_PATH} && \
 printf "# kafka broker properties
 broker.id=${CONTAINER_NO}
 
-listeners=${KAFKA_DOCKER_PROTOCOL}://:${KAFKA_PORT}
+listeners=${KAFKA_DOCKER_PROTOCOL}://:${CONTAINER_PORT}
 listener.security.protocol.map=${KAFKA_DOCKER_PROTOCOL}:PLAINTEXT
 advertised.listeners=${KAFKA_DOCKER}
 inter.broker.listener.name=${KAFKA_DOCKER_PROTOCOL}

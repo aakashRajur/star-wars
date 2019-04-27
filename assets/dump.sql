@@ -15,61 +15,61 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET row_security = off;
 
-ALTER TABLE ONLY public.species DROP CONSTRAINT species_home_world;
-ALTER TABLE ONLY public.characters DROP CONSTRAINT character_species;
-ALTER TABLE ONLY public.characters DROP CONSTRAINT character_home_world;
-DROP TRIGGER vehicles_update_updated ON public.vehicles;
-DROP TRIGGER vehicles_notify_updated ON public.vehicles;
-DROP TRIGGER vehicles_notify_deleted ON public.vehicles;
-DROP TRIGGER vehicles_insert_created ON public.vehicles;
-DROP TRIGGER species_update_updated ON public.species;
-DROP TRIGGER species_notify_updated ON public.species;
-DROP TRIGGER species_notify_deleted ON public.species;
-DROP TRIGGER species_insert_created ON public.species;
-DROP TRIGGER planets_update_updated ON public.planets;
-DROP TRIGGER planets_notify_updated ON public.planets;
-DROP TRIGGER planets_notify_deleted ON public.planets;
-DROP TRIGGER planets_insert_created ON public.planets;
-DROP TRIGGER films_update_updated ON public.films;
-DROP TRIGGER films_notify_updated ON public.films;
-DROP TRIGGER films_notify_deleted ON public.films;
-DROP TRIGGER films_insert_created ON public.films;
-DROP TRIGGER constants_update_updated ON public.constants;
-DROP TRIGGER constants_insert_created ON public.constants;
-DROP TRIGGER characters_update_updated ON public.characters;
-DROP TRIGGER characters_notify_updated ON public.characters;
-DROP TRIGGER characters_notify_deleted ON public.characters;
-DROP TRIGGER characters_insert_created ON public.characters;
-ALTER TABLE ONLY public.vehicles DROP CONSTRAINT vehicles_pkey;
-ALTER TABLE ONLY public.species DROP CONSTRAINT species_pkey;
-ALTER TABLE ONLY public.planets DROP CONSTRAINT planets_pkey;
-ALTER TABLE ONLY public.films DROP CONSTRAINT films_pkey;
-ALTER TABLE ONLY public.constants DROP CONSTRAINT constants_unique;
-ALTER TABLE ONLY public.constants DROP CONSTRAINT constants_pkey;
-ALTER TABLE ONLY public.characters DROP CONSTRAINT characters_pkey;
-ALTER TABLE public.vehicles ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.species ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.planets ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.films ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.constants ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.characters ALTER COLUMN id DROP DEFAULT;
-DROP SEQUENCE public.vehicles_id_seq;
-DROP TABLE public.vehicles;
-DROP SEQUENCE public.species_id_seq;
-DROP TABLE public.species;
-DROP SEQUENCE public.planets_id_seq;
-DROP TABLE public.planets;
-DROP SEQUENCE public.films_id_seq;
-DROP TABLE public.films;
-DROP SEQUENCE public.constants_id_seq;
-DROP TABLE public.constants;
-DROP SEQUENCE public.characters_id_seq;
-DROP TABLE public.characters;
-DROP FUNCTION public.notify_updated();
-DROP FUNCTION public.notify_deleted();
-DROP FUNCTION public.create_verify_normalized_relations();
-DROP FUNCTION public.create_update_updated();
-DROP FUNCTION public.create_insert_created();
+ALTER TABLE IF EXISTS ONLY public.species DROP CONSTRAINT IF EXISTS species_home_world;
+ALTER TABLE IF EXISTS ONLY public.characters DROP CONSTRAINT IF EXISTS character_species;
+ALTER TABLE IF EXISTS ONLY public.characters DROP CONSTRAINT IF EXISTS character_home_world;
+DROP TRIGGER IF EXISTS vehicles_update_updated ON public.vehicles;
+DROP TRIGGER IF EXISTS vehicles_notify_updated ON public.vehicles;
+DROP TRIGGER IF EXISTS vehicles_notify_deleted ON public.vehicles;
+DROP TRIGGER IF EXISTS vehicles_insert_created ON public.vehicles;
+DROP TRIGGER IF EXISTS species_update_updated ON public.species;
+DROP TRIGGER IF EXISTS species_notify_updated ON public.species;
+DROP TRIGGER IF EXISTS species_notify_deleted ON public.species;
+DROP TRIGGER IF EXISTS species_insert_created ON public.species;
+DROP TRIGGER IF EXISTS planets_update_updated ON public.planets;
+DROP TRIGGER IF EXISTS planets_notify_updated ON public.planets;
+DROP TRIGGER IF EXISTS planets_notify_deleted ON public.planets;
+DROP TRIGGER IF EXISTS planets_insert_created ON public.planets;
+DROP TRIGGER IF EXISTS films_update_updated ON public.films;
+DROP TRIGGER IF EXISTS films_notify_updated ON public.films;
+DROP TRIGGER IF EXISTS films_notify_deleted ON public.films;
+DROP TRIGGER IF EXISTS films_insert_created ON public.films;
+DROP TRIGGER IF EXISTS constants_update_updated ON public.constants;
+DROP TRIGGER IF EXISTS constants_insert_created ON public.constants;
+DROP TRIGGER IF EXISTS characters_update_updated ON public.characters;
+DROP TRIGGER IF EXISTS characters_notify_updated ON public.characters;
+DROP TRIGGER IF EXISTS characters_notify_deleted ON public.characters;
+DROP TRIGGER IF EXISTS characters_insert_created ON public.characters;
+ALTER TABLE IF EXISTS ONLY public.vehicles DROP CONSTRAINT IF EXISTS vehicles_pkey;
+ALTER TABLE IF EXISTS ONLY public.species DROP CONSTRAINT IF EXISTS species_pkey;
+ALTER TABLE IF EXISTS ONLY public.planets DROP CONSTRAINT IF EXISTS planets_pkey;
+ALTER TABLE IF EXISTS ONLY public.films DROP CONSTRAINT IF EXISTS films_pkey;
+ALTER TABLE IF EXISTS ONLY public.constants DROP CONSTRAINT IF EXISTS constants_unique;
+ALTER TABLE IF EXISTS ONLY public.constants DROP CONSTRAINT IF EXISTS constants_pkey;
+ALTER TABLE IF EXISTS ONLY public.characters DROP CONSTRAINT IF EXISTS characters_pkey;
+ALTER TABLE IF EXISTS public.vehicles ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.species ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.planets ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.films ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.constants ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.characters ALTER COLUMN id DROP DEFAULT;
+DROP SEQUENCE IF EXISTS public.vehicles_id_seq;
+DROP TABLE IF EXISTS public.vehicles;
+DROP SEQUENCE IF EXISTS public.species_id_seq;
+DROP TABLE IF EXISTS public.species;
+DROP SEQUENCE IF EXISTS public.planets_id_seq;
+DROP TABLE IF EXISTS public.planets;
+DROP SEQUENCE IF EXISTS public.films_id_seq;
+DROP TABLE IF EXISTS public.films;
+DROP SEQUENCE IF EXISTS public.constants_id_seq;
+DROP TABLE IF EXISTS public.constants;
+DROP SEQUENCE IF EXISTS public.characters_id_seq;
+DROP TABLE IF EXISTS public.characters;
+DROP FUNCTION IF EXISTS public.notify_updated();
+DROP FUNCTION IF EXISTS public.notify_deleted();
+DROP FUNCTION IF EXISTS public.create_verify_normalized_relations();
+DROP FUNCTION IF EXISTS public.create_update_updated();
+DROP FUNCTION IF EXISTS public.create_insert_created();
 --
 -- Name: create_insert_created(); Type: FUNCTION; Schema: public; Owner: -
 --
@@ -510,7 +510,6 @@ ALTER TABLE ONLY public.vehicles ALTER COLUMN id SET DEFAULT nextval('public.veh
 --
 
 COPY public.characters (id, name, height, mass, hair_color, skin_color, eye_color, birth_year, gender, home_world, species, vehicles, description, created, updated) FROM stdin;
-1	Luke Skywalker	172	77	{BLONDE}	{FAIR}	BLUE	19BBY	male	1	1	{14,30,12,22}	Luke Skywalker is a fictional character and the main protagonist of the original film trilogy of the Star Wars franchise created by George Lucas. The character, portrayed by Mark Hamill, is an important figure in the Rebel Alliance's struggle against the Galactic Empire. He is the twin brother of Rebellion leader Princess Leia Organa of Alderaan, a friend and brother-in-law of smuggler Han Solo, an apprentice to Jedi Masters Obi-Wan "Ben" Kenobi and Yoda, the son of fallen Jedi Anakin Skywalker (Darth Vader) and Queen of Naboo/Republic Senator Padmé Amidala and maternal uncle of Kylo Ren / Ben Solo. The now non-canon Star Wars expanded universe depicts him as a powerful Jedi Master, husband of Mara Jade, the father of Ben Skywalker and maternal uncle of Jaina, Jacen and Anakin Solo.\nIn 2015, the character was selected by Empire magazine as the 50th greatest movie character of all time.[2] On their list of the 100 Greatest Fictional Characters, Fandomania.com ranked the character at number 14.[3]	2019-03-21 19:14:47.000687	2019-03-21 19:14:47.000687
 2	C-3PO	167	75	\N	{GOLD}	YELLOW	112BBY	\N	1	2	{}	C-3PO (/siːˈθriːpi.oʊ/) or See-Threepio is a humanoid robot character from the Star Wars franchise who appears in the original trilogy, the prequel trilogy and the sequel trilogy. Built by Anakin Skywalker, C-3PO was designed as a protocol droid intended to assist in etiquette, customs, and translation, boasting that he is "fluent in over six million forms of communication". Along with his astromech droid counterpart and friend R2-D2, C-3PO provides comic relief within the narrative structure of the films, and serves as a foil. Anthony Daniels has portrayed the character in all nine Star Wars cinematic films released to date, including Rogue One and the animated The Clone Wars; C-3PO and R2-D2 are the only characters to appear in every film.\nDespite his oblivious nature, C-3PO has played a pivotal role in the Galaxy's history, appearing under the service of Shmi Skywalker, the Lars homestead, Padmé Amidala, Raymus Antilles, Luke Skywalker, and Leia Organa. In the majority of depictions, C-3PO's physical appearance is primarily a polished gold plating, although his appearance varies throughout the films; including the absence of metal coverings in The Phantom Menace, a dull copper plating in Attack of the Clones, a silver lower right leg introduced in A New Hope, and a red left arm in The Force Awakens.[1] C-3PO also appears frequently in the Star Wars Canon and Star Wars Legends continuities of novels, comic books, and video games, and was the protagonist in the ABC television show Droids.	2019-03-21 19:14:47.000687	2019-03-21 19:14:47.000687
 3	R2-D2	96	32	\N	{WHITE,BLUE}	RED	33BBY	\N	8	2	{}	R2-D2 is a fictional robot character in the Star Wars franchise created by George Lucas, who appears in the original trilogy, the prequel trilogy, the sequel trilogy, and Rogue One. A small astromech droid, R2-D2 is a major character and appears in all Star Wars films to date. Throughout the course of the films, he joins or supports Padmé Amidala, Anakin Skywalker, Leia Organa, Luke Skywalker, and Obi-Wan Kenobi in various points in the saga.\nEnglish actor Kenny Baker played R2-D2 in all three original Star Wars films, and received billing credit for the character in the prequel trilogy, where Baker's role was reduced, as R2-D2 was portrayed mainly by radio controlled props and CGI models. In the sequel trilogy, Baker was credited as consultant for The Force Awakens, however Jimmy Vee also co-performed the character in some scenes. Vee later took over the role beginning in The Last Jedi.[1] R2-D2's sounds and vocal effects were created by Ben Burtt. R2-D2 was designed in artwork by Ralph McQuarrie, co-developed by John Stears and built by Tony Dyson.	2019-03-21 19:14:47.000687	2019-03-21 19:14:47.000687
 4	Darth Vader	202	136	{NONE}	{WHITE}	YELLOW	41.9BBY	male	1	1	{13}	Darth Vader, also known by his birth name Anakin Skywalker, is a fictional character in the Star Wars franchise.[1][2][3] Vader appears in the original film trilogy as a pivotal antagonist whose actions drive the plot, while his past as Anakin Skywalker and the story of his corruption are central to the narrative of the prequel trilogy.\nThe character was created by George Lucas and has been portrayed by numerous actors. His appearances span the first six Star Wars films, as well as Rogue One, and his character is heavily referenced in Star Wars: The Force Awakens. He is also an important character in the Star Wars expanded universe of television series, video games, novels, literature and comic books. Originally a Jedi prophesied to bring balance to the Force, he falls to the dark side of the Force and serves the evil Galactic Empire at the right hand of his Sith master, Emperor Palpatine (also known as Darth Sidious).[4] He is also the father of Luke Skywalker and Princess Leia Organa, secret husband of Padmé Amidala and grandfather of Kylo Ren.\nDarth Vader has become one of the most iconic villains in popular culture, and has been listed among the greatest villains and fictional characters ever.[5][6] The American Film Institute listed him as the third greatest movie villain in cinema history on 100 Years... 100 Heroes and Villains, behind Hannibal Lecter and Norman Bates.[7] However, other critics consider him a tragic hero, citing his original motivations for the greater good before his fall to the dark side.[8][9]	2019-03-21 19:14:47.000687	2019-03-21 19:14:47.000687
@@ -597,6 +596,7 @@ COPY public.characters (id, name, height, mass, hair_color, skin_color, eye_colo
 86	Poe Dameron	\N	\N	{BROWN}	{LIGHT}	BROWN	\N	male	\N	1	{77}	Poe Dameron is a fictional character in the Star Wars franchise. Introduced in the 2015 film Star Wars: The Force Awakens, he is portrayed by Oscar Isaac. Poe is an X-wing fighter pilot for the Resistance who inadvertently brings renegade stormtrooper Finn (John Boyega) and Jakku scavenger Rey (Daisy Ridley) into the fight against—and eventually a victory over—the sinister First Order. He is featured in The Force Awakens media and merchandising as well as an eponymous comic book series, and will appear in the film's forthcoming sequel, Star Wars: The Last Jedi. Isaac and the character have received positive reviews, with Poe being compared to the characterization of Han Solo (Harrison Ford) in the original Star Wars film trilogy.	2019-03-21 19:14:47.000687	2019-03-21 19:14:47.000687
 87	BB8	\N	\N	{NONE}	{NONE}	BLACK	\N	none	\N	2	{}	BB-8 (or Beebee-Ate) is a droid character in the Star Wars franchise, first appearing in the 2015 film Star Wars: The Force Awakens. Spherical with a free-moving domed head, BB-8 is portrayed by both a rod puppet and a remote-controlled robotic unit.	2019-03-21 19:14:47.000687	2019-03-21 19:14:47.000687
 88	Captain Phasma	\N	\N	\N	\N	\N	\N	female	\N	\N	{}	Captain Phasma is a fictional character in the Star Wars franchise, portrayed by Gwendoline Christie. Introduced in Star Wars: The Force Awakens (2015), the first film in the Star Wars sequel trilogy, Phasma is the commander of the First Order's force of stormtroopers. Christie confirmed that the character would reappear in the next of the trilogy's films, Star Wars: The Last Jedi. The character also made an additional appearance in Before the Awakening, an anthology book set before the events of The Force Awakens.\nJ. J. Abrams created Phasma from an armor design originally developed for Kylo Ren and named her after the 1979 horror film Phantasm. The character was originally conceived as male before being changed to female. Phasma appeared prominently in promotion and marketing for The Force Awakens, but the character's ultimately minor role in the film was the subject of criticism. Nonetheless, merchandise featuring the character found success and her figure was the bestselling of all Force Awakens action figures on Amazon.co.uk.[3]	2019-03-21 19:14:47.000687	2019-03-21 19:14:47.000687
+1	Luke Skywalker	172	77	{BLONDE}	{FAIR}	BLUE	19BBY	male	1	1	{14,30,12,22}	Luke Skywalker is a fictional character and the main protagonist of the original film trilogy of the Star Wars franchise created by George Lucas. The character, portrayed by Mark Hamill, is an important figure in the Rebel Alliance's struggle against the Galactic Empire. He is the twin brother of Rebellion leader Princess Leia Organa of Alderaan, a friend and brother-in-law of smuggler Han Solo, an apprentice to Jedi Masters Obi-Wan "Ben" Kenobi and Yoda, the son of fallen Jedi Anakin Skywalker (Darth Vader) and Queen of Naboo/Republic Senator Padmé Amidala and maternal uncle of Kylo Ren / Ben Solo. The now non-canon Star Wars expanded universe depicts him as a powerful Jedi Master, husband of Mara Jade, the father of Ben Skywalker and maternal uncle of Jaina, Jacen and Anakin Solo.\nIn 2015, the character was selected by Empire magazine as the 50th greatest movie character of all time.[2] On their list of the 100 Greatest Fictional Characters, Fandomania.com ranked the character at number 14.[3]	2019-03-21 19:14:47.000687	2019-03-23 05:43:14.057662
 \.
 
 

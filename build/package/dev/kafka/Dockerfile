@@ -5,10 +5,10 @@ RUN apk add --no-cache curl bash nano jq && \
     mkdir /kafka && \
     tar -xzf kafka --strip-components=1 -C /kafka/ && \
     rm kafka
+COPY /build/package/shared/ /
 WORKDIR /kafka
-COPY ./build/package/dev/kafka/init.sh \
-./build/package/dev/kafka/get-env.sh \
-./build/package/dev/kafka/healthcheck.sh \
-./build/package/dev/kafka/config.sh \
+COPY /build/package/dev/kafka/start.sh \
+/build/package/dev/kafka/config.sh \
+/build/package/dev/kafka/broker-connected.sh \
 ./
-CMD ["./init.sh"]
+ENTRYPOINT ["./start.sh"]

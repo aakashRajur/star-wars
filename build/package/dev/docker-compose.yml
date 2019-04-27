@@ -5,110 +5,157 @@ volumes:
   wiki-kafka-deps:
 
 services:
-  wiki-db:
-    build:
-      dockerfile: ./build/package/dev/wiki-db/Dockerfile
-      context: .
-      args:
-        PG_USER: ${WIKI_PG_USER?err}
-        PG_DB: ${WIKI_PG_DB?err}
-        PG_BACKUP: ${WIKI_PG_BACKUP?err}
-    environment:
-      PG_USER: ${WIKI_PG_USER?err}
-      PG_DB: ${WIKI_PG_DB?err}
-      PG_BACKUP: ${WIKI_PG_BACKUP?err}
+  consul:
+    image: bitnami/consul:latest
     ports:
-      - "5433:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U wiki-db"]
-      interval: 1m
-      retries: 3
-      timeout: 30s
-    volumes:
-      - ".:/backup"
-  wiki-cache:
-    image: redis:5-alpine
-    healthcheck:
-      test: ["CMD", "nc", "-w", "1", "-z", "localhost", "6379"]
-      interval: 1m
-      retries: 3
-      timeout: 30s
-    ports:
-      - "6379:6379"
+#      - '8300:8300'
+#      - '8301:8301'
+#      - '8301:8301/udp'
+      - '8500:8500'
+#      - '8600:8600'
+#      - '8600:8600/udp'
   zookeeper:
-    image: zookeeper
+    build:
+      dockerfile: ./build/package/dev/zookeeper/Dockerfile
+      context: .
     restart: always
     healthcheck:
       test: ["CMD","echo", "stat", "|", "nc", "localhost", "2181"]
       interval: 1m
       retries: 3
       timeout: 30s
-    ports:
-      - "2181:2181"
+      start_period: 30s
+    env_file:
+      - ./build/package/dev/.env
+      - ./build/package/dev/zookeeper/.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - consul
   kafka:
     build:
       dockerfile: ./build/package/dev/kafka/Dockerfile
       context: .
+    restart: always
     healthcheck:
-      test: ["CMD","./healthcheck.sh"]
+      test: ["CMD", "./broker-connected.sh"]
       interval: 1m
       retries: 3
       timeout: 30s
-    environment:
-      KAFKA_PORT: ${KAFKA_PORT?err}
+      start_period: 35s
+    env_file:
+      - ./build/package/dev/.env
+      - ./build/package/dev/kafka/.env
     depends_on:
       - zookeeper
     volumes:
-      - ./build/package/shared:/shared
-      - /var/run/docker.sock:/var/run/docker.sock
-  wiki-http:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+  kafka-manager:
     build:
-      dockerfile: ./build/package/dev/wiki-http/Dockerfile
+      dockerfile: ./build/package/dev/kafka-manager/Dockerfile
       context: .
-    entrypoint:
-      - "/debug.sh"
     ports:
-      - ${WIKI_HTTP_PORT?err}:${WIKI_HTTP_PORT?err}
-      - ${WIKI_DEBUG_PORT?err}:${WIKI_DEBUG_PORT?err}
+      - "9000:9000"
+    healthcheck:
+      test: ["CMD", "nc", "-z", "-w", "30", "localhost", "9000"]
+      interval: 1m
+      retries: 3
+      timeout: 30s
+      start_period: 35s
     env_file:
-      - ./build/package/dev/wiki-http/.env
-    environment:
-      PROJECT_PATH: $PWD
-      KAFKA_BROKERS: ${KAFKA_BROKERS?err}
-    volumes:
-      - ./build/package/shared:/shared
-      - $PWD:$PWD
-      - wiki-http-deps:/go
-    depends_on:
-      - wiki-db
-      - wiki-cache
-    security_opt:
-      - apparmor=unconfined
-    cap_add:
-      - SYS_PTRACE
-  wiki-kafka:
-    build:
-      dockerfile: ./build/package/dev/wiki-kafka/Dockerfile
-      context: .
-    entrypoint:
-      - "/debug.sh"
-    ports:
-      - ${WIKI_DEBUG_PORT?}:${WIKI_DEBUG_PORT?}
-    env_file:
-      - ./build/package/dev/wiki-kafka/.env
       - ./build/package/dev/.env
-    environment:
-      PROJECT_PATH: $PWD
-      KAFKA_BROKERS: ${KAFKA_BROKERS?err}
-    volumes:
-      - ./build/package/shared:/shared
-      - $PWD:$PWD
-      - wiki-kafka-deps:/go
+      - ./build/package/dev/kafka-manager/.env
     depends_on:
-      - wiki-db
-      - wiki-cache
-      - kafka
-    security_opt:
-      - apparmor=unconfined
-    cap_add:
-      - SYS_PTRACE
+      - zookeeper
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+  wiki-db:
+    build:
+      dockerfile: ./build/package/dev/wiki-db/Dockerfile
+      context: .
+      args:
+        PG_BACKUP: ${WIKI_PG_BACKUP?err}
+    env_file:
+      - ./build/package/dev/.env
+      - ./build/package/dev/wiki-db/.env
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 1m
+      retries: 3
+      timeout: 30s
+      start_period: 30s
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - consul
+  wiki-cache:
+    build:
+      dockerfile: ./build/package/dev/wiki-cache/Dockerfile
+      context: .
+    env_file:
+      - ./build/package/dev/.env
+      - ./build/package/dev/wiki-cache/.env
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1m
+      retries: 3
+      timeout: 30s
+      start_period: 30s
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - consul
+#  wiki-http:
+#    build:
+#      dockerfile: ./build/package/dev/wiki-http/Dockerfile
+#      context: .
+#    entrypoint:
+#      - "/debug.sh"
+#    ports:
+#      - ${WIKI_HTTP_PORT?err}:${WIKI_HTTP_PORT?err}
+#      - ${WIKI_DEBUG_PORT?err}:${WIKI_DEBUG_PORT?err}
+#    env_file:
+#      - ./build/package/dev/.env
+#      - ./build/package/dev/wiki-http/.env
+#    environment:
+#      PROJECT_PATH: $PWD
+#      KAFKA_BROKERS: ${KAFKA_BROKERS?err}
+#    volumes:
+#      - ./build/package/shared:/shared
+#      - $PWD:$PWD
+#      - wiki-http-deps:/go
+#    depends_on:
+#      - wiki-db
+#      - wiki-cache
+#    security_opt:
+#      - apparmor=unconfined
+#    cap_add:
+#      - SYS_PTRACE
+#  wiki-kafka:
+#    build:
+#      dockerfile: ./build/package/dev/wiki-kafka/Dockerfile
+#      context: .
+#    entrypoint:
+#      - "/debug.sh"
+#    ports:
+#      - ${WIKI_DEBUG_PORT?}:${WIKI_DEBUG_PORT?}
+#    env_file:
+#      - ./build/package/dev/wiki-kafka/.env
+#      - ./build/package/dev/.env
+#    environment:
+#      PROJECT_PATH: $PWD
+#      KAFKA_BROKERS: ${KAFKA_BROKERS?err}
+#    volumes:
+#      - ./build/package/shared:/shared
+#      - $PWD:$PWD
+#      - wiki-kafka-deps:/go
+#    depends_on:
+#      - wiki-db
+#      - wiki-cache
+#      - kafka
+#    security_opt:
+#      - apparmor=unconfined
+#    cap_add:
+#      - SYS_PTRACE
