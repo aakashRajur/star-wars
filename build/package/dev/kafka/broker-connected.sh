@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
-source ${ENV_FILE}
-
-VERBOSE=$(bin/zookeeper-shell.sh ${ZOOKEEPER_URI} get /brokers/ids/${CONTAINER_NO})
-STATUS=$(echo ${VERBOSE} | grep ${CONTAINER_HOST_NAME})
+#VERBOSE=$(bin/zookeeper-shell.sh ${ZOOKEEPER_CLUSTER} get /brokers/ids/${CONTAINER_NO})
+STATUS=$(bin/zookeeper-shell.sh ${ZOOKEEPER_CLUSTER} get /brokers/ids/${CONTAINER_NO} | grep ${CONTAINER_HOST_NAME})
 
 if [[ ${STATUS} == "" ]]; then
+    echo "${CONTAINER_HOST_NAME} NOT CONNECTED"
     exit 1
 else
-    echo ${STATUS}
+    echo ${STATUS} | jq .
 fi

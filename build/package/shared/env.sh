@@ -9,6 +9,7 @@ if [[ ! -f ${ENV_FILE} ]]; then
     CONTAINER_HOST_NAME="${CONTAINER_NAME:1}"
 
     printf "#!/usr/bin/env bash
+
 export SERVICE_NAME=${SERVICE_NAME};
 export CONTAINER_HOST_NAME=${CONTAINER_HOST_NAME};
 export CONTAINER_NO=${CONTAINER_NO};

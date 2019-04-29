@@ -12,8 +12,6 @@ services:
 #      - '8301:8301'
 #      - '8301:8301/udp'
       - '8500:8500'
-#      - '8600:8600'
-#      - '8600:8600/udp'
   zookeeper:
     build:
       dockerfile: ./build/package/dev/zookeeper/Dockerfile
@@ -47,25 +45,7 @@ services:
       - ./build/package/dev/.env
       - ./build/package/dev/kafka/.env
     depends_on:
-      - zookeeper
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-  kafka-manager:
-    build:
-      dockerfile: ./build/package/dev/kafka-manager/Dockerfile
-      context: .
-    ports:
-      - "9000:9000"
-    healthcheck:
-      test: ["CMD", "nc", "-z", "-w", "30", "localhost", "9000"]
-      interval: 1m
-      retries: 3
-      timeout: 30s
-      start_period: 35s
-    env_file:
-      - ./build/package/dev/.env
-      - ./build/package/dev/kafka-manager/.env
-    depends_on:
+      - consul
       - zookeeper
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro

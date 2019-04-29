@@ -1,6 +1,6 @@
 FROM redis:5-alpine
-RUN apk add --no-cache curl bash nano jq
+RUN apk add --no-cache curl bash nano jq perl-getopt-long
+COPY /build/package/shared/ /util
+COPY /build/package/dev/wiki-cache/start.sh /
 
-COPY /build/package/dev/wiki-cache/start.sh /build/package/shared/ /
-
-CMD ["/start.sh"]
+ENTRYPOINT ["/start.sh"]

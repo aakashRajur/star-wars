@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-SERVER_PROPERTIES_PATH="/tmp/server.properties"
-
 KAFKA_DOCKER_PROTOCOL="kafka_docker"
 KAFKA_DOCKER="${KAFKA_DOCKER_PROTOCOL}://${CONTAINER_HOST_NAME}:${CONTAINER_PORT}"
 
@@ -32,9 +30,10 @@ log.retention.hours=168
 log.segment.bytes=1073741824
 log.retention.check.interval.ms=300000
 
-zookeeper.connect=zookeeper:2181
+zookeeper.connect=${1}
 zookeeper.connection.timeout.ms=6000
-group.initial.rebalance.delay.ms=0" \
+group.initial.rebalance.delay.ms=0
+" \
 >> ${SERVER_PROPERTIES_PATH}
 
 cat < ${SERVER_PROPERTIES_PATH}
