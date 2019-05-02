@@ -12,7 +12,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-func PatchSpecie(storage types.Storage, logger types.Logger, tracker types.TimeTracker, paramKey string) http.WithMiddleware {
+func PatchSpecie(storage types.Storage, logger types.Logger, tracker types.TimeTracker, paramKey string) http.HandlerWithMiddleware {
 	requestHandler := func(response http.Response, request *http.Request) {
 		params := request.GetParams()
 
@@ -46,7 +46,7 @@ func PatchSpecie(storage types.Storage, logger types.Logger, tracker types.TimeT
 		middleware.ValidateBody(specie.SpecieValidation, specie.SpecieNormalization),
 	)
 
-	return http.WithMiddleware{
+	return http.HandlerWithMiddleware{
 		HandleRequest: requestHandler,
 		Middlewares:   middlewares,
 	}

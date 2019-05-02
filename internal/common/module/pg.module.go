@@ -12,7 +12,7 @@ import (
 )
 
 func GetPsql(lifecycle fx.Lifecycle, logger pgx.Logger, handler types.FatalHandler) *pg.Pg {
-	pgUri := env.GetString("PG_URI")
+	pgUri := env.GetString("DATABASE_URI")
 	pgPoolLimit := env.GetInt("PG_POOL_LIMIT")
 	psql, err := pg.NewInstance(
 		pgUri,

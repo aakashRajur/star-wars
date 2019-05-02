@@ -12,7 +12,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-func PatchPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTracker, paramKey string) http.WithMiddleware {
+func PatchPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTracker, paramKey string) http.HandlerWithMiddleware {
 	requestHandler := func(response http.Response, request *http.Request) {
 		params := request.GetParams()
 
@@ -49,7 +49,7 @@ func PatchPlanet(storage types.Storage, logger types.Logger, tracker types.TimeT
 		),
 	)
 
-	return http.WithMiddleware{
+	return http.HandlerWithMiddleware{
 		HandleRequest: requestHandler,
 		Middlewares:   middlewares,
 	}

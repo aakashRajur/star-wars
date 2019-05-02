@@ -31,11 +31,13 @@ func GetLogrus() *log.Logger {
 	case "text":
 		formatter = &logrus.TextFormatter{
 			TimestampFormat: time.RFC3339,
+			FullTimestamp:   true,
 		}
 		break
 	default:
 		formatter = &logrus.TextFormatter{
 			TimestampFormat: time.RFC3339,
+			FullTimestamp:   true,
 		}
 	}
 

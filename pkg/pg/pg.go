@@ -265,7 +265,7 @@ func (pg *Pg) Listen(channels ...string) error {
 		}
 	}
 	if len(errorChannels) > 0 {
-		return errors.Errorf(`Unable to connect to  channel(s) %s`, strings.Join(errorChannels, `, `))
+		return errors.Errorf(`UNABLE TO CONNECT TO  CHANNEL(S) %s`, strings.Join(errorChannels, `, `))
 	}
 	return nil
 }

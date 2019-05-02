@@ -11,7 +11,7 @@ import (
 )
 
 func GetRedis(lifecycle fx.Lifecycle, logger types.Logger, handler types.FatalHandler) *redis.Redis {
-	redisUri := env.GetString("REDIS_URI")
+	redisUri := env.GetString("CACHE_URI")
 	client, err := redis.NewInstance(redisUri, logger)
 
 	if err != nil {

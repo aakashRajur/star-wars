@@ -18,7 +18,7 @@ func Resource(logger types.Logger) di.ResourceProvider {
 	middlewares := http.ChainMiddlewares(middleware.Logger(logger))
 	resource := http.NewResource(`^/hello$`)
 	resource.Get(
-		http.WithMiddleware{
+		http.HandlerWithMiddleware{
 			HandleRequest: requestHandler,
 			Middlewares:   middlewares,
 		},

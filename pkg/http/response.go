@@ -74,10 +74,10 @@ func (response Response) WriteText(text string) (int, error) {
 	return fmt.Fprintf(response, text)
 }
 
-func (response Response) WriteJSONObject(object interface{}, headers *map[string]string) error {
+func (response Response) WriteJSONObject(object interface{}, headers map[string]string) error {
 	response.SetHeader(ContentType, ContentTypeJSON)
 	if headers != nil {
-		for key, value := range *headers {
+		for key, value := range headers {
 			response.SetHeader(key, value)
 		}
 	}

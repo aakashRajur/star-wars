@@ -14,12 +14,12 @@ func ChainMiddlewares(middlewares ...Middleware) Middleware {
 	}
 }
 
-type WithMiddleware struct {
+type HandlerWithMiddleware struct {
 	Middlewares   Middleware
 	HandleRequest HandleRequest
 }
 
-func (handler WithMiddleware) GetHTTPHandler() HandleRequest {
+func (handler HandlerWithMiddleware) GetHTTPHandler() HandleRequest {
 	if handler.Middlewares != nil {
 		return handler.Middlewares(handler.HandleRequest)
 	} else {

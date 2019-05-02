@@ -460,11 +460,11 @@ func (kafka *Kafka) Start(ctx context.Context) error {
 	kafka.ctx, kafka.cancel = context.WithCancel(context.Background())
 
 	go kafka.consumeMessages()
-	logger.Info(`waiting for consumer to attach`)
+	logger.Info(`WAITING FOR CONSUMER TO ATTACH`)
 
 	select {
 	case <-kafka.health:
-		logger.Info(`attached as consumer`)
+		logger.Info(`ATTACHED AS CONSUMER`)
 		return nil
 	case <-ctx.Done():
 		err := ctx.Err()
@@ -481,16 +481,16 @@ func (kafka *Kafka) Stop(ctx context.Context) error {
 
 	go func(err chan error) {
 		logger := kafka.Config.Logger
+		logger.Info(`DISCONNECTING KAFKA CLIENT`)
 
 		kafka.cancel()
 		errs := make([]error, 0)
-
-		consumer := kafka.consumer
-		e := consumer.Close()
+		client := kafka.client
+		e := client.Close()
 		if e != nil {
 			errs = append(errs, e)
 		} else {
-			logger.Info(`successfully closed kafka consumer`)
+			logger.Info(`SUCCESSFULLY CLOSED KAFKA CLIENT`)
 		}
 
 		producer := kafka.producer
@@ -498,15 +498,7 @@ func (kafka *Kafka) Stop(ctx context.Context) error {
 		if e != nil {
 			errs = append(errs, e)
 		} else {
-			logger.Info(`successfully closed kafka producer`)
-		}
-
-		client := kafka.client
-		e = client.Close()
-		if e != nil {
-			errs = append(errs, e)
-		} else {
-			logger.Info(`successfully closed kafka client`)
+			logger.Info(`SUCCESSFULLY CLOSED KAFKA PRODUCER`)
 		}
 
 		if len(errs) > 0 {
@@ -519,11 +511,11 @@ func (kafka *Kafka) Stop(ctx context.Context) error {
 
 	select {
 	case <-ctx.Done():
-		logger.Error(`failed to close kafka consumer or producer, timed out`)
+		logger.Error(`FAILED TO CLOSE KAFKA CONSUMER OR PRODUCER, TIMED OUT`)
 		return ctx.Err()
 	case e, ok := <-err:
 		if !ok {
-			logger.Info(`kafka closed successfully`)
+			logger.Info(`KAFKA CLOSED SUCCESSFULLY`)
 			return nil
 		}
 		return e

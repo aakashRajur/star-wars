@@ -11,7 +11,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-func GetSpecies(storage types.Storage, logger types.Logger, tracker types.TimeTracker, cacheKey string) http.WithMiddleware {
+func GetSpecies(storage types.Storage, logger types.Logger, tracker types.TimeTracker, cacheKey string) http.HandlerWithMiddleware {
 	requestHandler := func(response http.Response, request *http.Request) {
 		ctx := request.Context()
 		oldPagination := ctx.Value(types.PAGINATION).(types.Pagination)
@@ -34,7 +34,7 @@ func GetSpecies(storage types.Storage, logger types.Logger, tracker types.TimeTr
 		headers := make(map[string]string, 1)
 		headers[types.PAGINATION] = string(marshaled)
 
-		err = response.WriteJSONObject(result, &headers)
+		err = response.WriteJSONObject(result, headers)
 		if err != nil {
 			logger.Error(err)
 		}
@@ -42,7 +42,7 @@ func GetSpecies(storage types.Storage, logger types.Logger, tracker types.TimeTr
 
 	middlewares := http.ChainMiddlewares(middleware.Logger(logger), middleware.Pagination)
 
-	return http.WithMiddleware{
+	return http.HandlerWithMiddleware{
 		HandleRequest: requestHandler,
 		Middlewares:   middlewares,
 	}

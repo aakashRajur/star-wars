@@ -12,7 +12,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-func ApiPatchVehicle(storage types.Storage, logger types.Logger, tracker types.TimeTracker, paramKey string) http.WithMiddleware {
+func ApiPatchVehicle(storage types.Storage, logger types.Logger, tracker types.TimeTracker, paramKey string) http.HandlerWithMiddleware {
 	requestHandler := func(response http.Response, request *http.Request) {
 		params := request.GetParams()
 
@@ -46,7 +46,7 @@ func ApiPatchVehicle(storage types.Storage, logger types.Logger, tracker types.T
 		middleware.ValidateBody(vehicle.VehicleValidation, vehicle.VehicleNormalization),
 	)
 
-	return http.WithMiddleware{
+	return http.HandlerWithMiddleware{
 		HandleRequest: requestHandler,
 		Middlewares:   middlewares,
 	}

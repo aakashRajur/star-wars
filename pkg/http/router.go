@@ -2,9 +2,7 @@ package http
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
@@ -13,7 +11,6 @@ const (
 	PARAMS      = "PARAMS"
 	HealthRoute = `/health`
 	RootRoute   = `/`
-	PushedRoute = `/pushed`
 )
 
 type Router struct {
@@ -64,50 +61,11 @@ func (router *Router) routeRequests(writer http.ResponseWriter, request *http.Re
 }
 
 func (router *Router) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	url := request.URL.Path
-
-	pusher, http2Ok := writer.(http.Pusher)
-	switch {
-	case url == RootRoute:
-		{
-			if http2Ok {
-				if err := pusher.Push(PushedRoute, nil); err != nil {
-					router.Logger.ErrorFields(
-						err,
-						map[string]interface{}{
-							`msg`: `HTTP2 UPGRADE UNSUCCESSFUL`,
-						},
-					)
-				}
-			}
-			_, err := fmt.Fprintf(writer, `%s`, time.Now().UTC())
-			if err != nil {
-				router.Logger.Error(err)
-			}
-			return
-		}
-	case url == PushedRoute:
-		{
-			info := `UNSUCCESSFUL`
-			if http2Ok {
-				info = `SUCCESSFUL`
-			}
-			_, err := fmt.Fprintf(
-				writer,
-				`HTTP2 UPGRADE %s %s`,
-				info,
-				time.Now().UTC(),
-			)
-			if err != nil {
-				router.Logger.Error(err)
-			}
-			return
-		}
-	case router.routeRequests(writer, request):
+	if router.routeRequests(writer, request) {
 		return
-	default:
-		http.NotFound(writer, request)
 	}
+
+	http.NotFound(writer, request)
 }
 
 func NewRouter(logger types.Logger) *Router {

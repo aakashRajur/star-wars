@@ -13,7 +13,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-func GetPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTracker, cacheKey string, paramKey string) http.WithMiddleware {
+func GetPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTracker, cacheKey string, paramKey string) http.HandlerWithMiddleware {
 	requestHandler := func(response http.Response, request *http.Request) {
 		params := request.GetParams()
 
@@ -42,7 +42,7 @@ func GetPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTra
 
 	middlewares := http.ChainMiddlewares(middleware.Logger(logger))
 
-	return http.WithMiddleware{
+	return http.HandlerWithMiddleware{
 		HandleRequest: requestHandler,
 		Middlewares:   middlewares,
 	}
