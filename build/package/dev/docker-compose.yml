@@ -8,9 +8,6 @@ services:
   consul:
     image: bitnami/consul:latest
     ports:
-#      - '8300:8300'
-#      - '8301:8301'
-#      - '8301:8301/udp'
       - '8500:8500'
   zookeeper:
     build:
@@ -58,6 +55,7 @@ services:
     env_file:
       - ./build/package/dev/.env
       - ./build/package/dev/wiki-db/.env
+      - ./build/package/dev/wiki-db/credentials.env
     ports:
       - "5433:5432"
     healthcheck:
@@ -87,55 +85,53 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
       - consul
-#  wiki-http:
-#    build:
-#      dockerfile: ./build/package/dev/wiki-http/Dockerfile
-#      context: .
-#    entrypoint:
-#      - "/debug.sh"
-#    ports:
-#      - ${WIKI_HTTP_PORT?err}:${WIKI_HTTP_PORT?err}
-#      - ${WIKI_DEBUG_PORT?err}:${WIKI_DEBUG_PORT?err}
-#    env_file:
-#      - ./build/package/dev/.env
-#      - ./build/package/dev/wiki-http/.env
-#    environment:
-#      PROJECT_PATH: $PWD
-#      KAFKA_BROKERS: ${KAFKA_BROKERS?err}
-#    volumes:
-#      - ./build/package/shared:/shared
-#      - $PWD:$PWD
-#      - wiki-http-deps:/go
-#    depends_on:
-#      - wiki-db
-#      - wiki-cache
-#    security_opt:
-#      - apparmor=unconfined
-#    cap_add:
-#      - SYS_PTRACE
-#  wiki-kafka:
-#    build:
-#      dockerfile: ./build/package/dev/wiki-kafka/Dockerfile
-#      context: .
-#    entrypoint:
-#      - "/debug.sh"
-#    ports:
-#      - ${WIKI_DEBUG_PORT?}:${WIKI_DEBUG_PORT?}
-#    env_file:
-#      - ./build/package/dev/wiki-kafka/.env
-#      - ./build/package/dev/.env
-#    environment:
-#      PROJECT_PATH: $PWD
-#      KAFKA_BROKERS: ${KAFKA_BROKERS?err}
-#    volumes:
-#      - ./build/package/shared:/shared
-#      - $PWD:$PWD
-#      - wiki-kafka-deps:/go
-#    depends_on:
-#      - wiki-db
-#      - wiki-cache
-#      - kafka
-#    security_opt:
-#      - apparmor=unconfined
-#    cap_add:
-#      - SYS_PTRACE
+  wiki-http:
+    build:
+      dockerfile: ./build/package/dev/wiki-http/Dockerfile
+      context: .
+    ports:
+      - ${WIKI_HTTP_PORT?err}:${WIKI_HTTP_PORT?err}
+      - ${WIKI_DEBUG_PORT?err}:${WIKI_DEBUG_PORT?err}
+    env_file:
+      - ./build/package/dev/.env
+      - ./build/package/dev/wiki-http/.env
+      - ./build/package/dev/wiki-db/credentials.env
+    environment:
+      PROJECT_PATH: $PWD
+    volumes:
+      - $PWD:$PWD
+      - wiki-http-deps:/go
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - consul
+      - wiki-db
+      - wiki-cache
+    security_opt:
+      - apparmor=unconfined
+    cap_add:
+      - SYS_PTRACE
+  wiki-kafka:
+    build:
+      dockerfile: ./build/package/dev/wiki-kafka/Dockerfile
+      context: .
+    ports:
+      - ${WIKI_DEBUG_PORT?}:${WIKI_DEBUG_PORT?}
+    env_file:
+      - ./build/package/dev/.env
+      - ./build/package/dev/wiki-kafka/.env
+      - ./build/package/dev/wiki-db/credentials.env
+    environment:
+      PROJECT_PATH: $PWD
+    volumes:
+      - $PWD:$PWD
+      - wiki-kafka-deps:/go
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - consul
+      - wiki-db
+      - wiki-cache
+      - kafka
+    security_opt:
+      - apparmor=unconfined
+    cap_add:
+      - SYS_PTRACE

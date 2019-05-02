@@ -15,12 +15,6 @@ while getopts "s:d:r:"  o; do
         s)
             SERVICE=${OPTARG}
             ;;
-        d)
-            DELIMITER=${OPTARG}
-            if [[ ${DELIMITER} == "" ]]; then
-                DELIMITER="\s"
-            fi
-            ;;
         r)
             RETRY=${OPTARG}
             if [[ -z "${RETRY}" ]]; then
@@ -39,8 +33,11 @@ if [[ -z "${SERVICE}" ]]; then
 fi
 
 for ((i=0; i<${RETRY}; i++)); do
-    SERVICE_ENDPOINTS=$(curl -Ss http://${SERVICE_DISCOVERY_URI}/v1/catalog/service/${SERVICE} | jq -r --arg DELIMITER "${DELIMITER}" 'map("\(.ServiceAddress):\(.ServicePort)") | join("$DELIMITER")')
-    if [[ -z "${SERVICE_ENDPOINTS}" ]] && [[ ${RETRY} > 1 ]]; then
+    SERVICE_ENDPOINTS=$(curl -Ss http://${SERVICE_DISCOVERY_URI}/v1/catalog/service/${SERVICE} | jq -r 'map("\(.ServiceAddress):\(.ServicePort)") | join(",")')
+    if [[ -z "${SERVICE_ENDPOINTS}" ]]; then
+        if [[ ${RETRY} > 1 ]]; then
+            exit 1
+        fi
         sleep 5
     else
         echo "${SERVICE_ENDPOINTS}"

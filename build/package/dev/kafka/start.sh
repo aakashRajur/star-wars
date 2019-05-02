@@ -23,7 +23,7 @@ exit 1
 # wait for consul
 (/util/wait-for.sh ${SERVICE_DISCOVERY_HOST}:${SERVICE_DISCOVERY_PORT}) || exit 1
 
-ZOOKEEPER_CLUSTER=$(/util/get-service-endpoints.sh -s ${ZOOKEEPER_SERVICE} -d "," -r 5)
+ZOOKEEPER_CLUSTER=$(/util/get-service-endpoints.sh -s ${ZOOKEEPER_SERVICE} -r 5)
 if [[ -z "${ZOOKEEPER_CLUSTER}" ]]; then
     echo "SERVICE DISCOVERY DID NOT PROVIDE ZOOKEEPER SERVICE ENDPOINT"
     exit 1
@@ -57,7 +57,7 @@ wait ${CHILD}
 EXIT_CODE=${?}
 echo "CHILD: ${CHILD} EXITED: ${EXIT_CODE}"
 
-echo "UNREGISTER NODE TO SERVICE DISCOVERY"
+echo "UNREGISTER NODE FROM SERVICE DISCOVERY"
 /util/unregister.sh
 
 echo "EXITING"
