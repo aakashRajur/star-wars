@@ -103,6 +103,10 @@ func (resourceDefinition ResourceDefinition) GetArgNormalizers() map[string]type
 	return normalizors
 }
 
+func (ResourceDefinition) Key() string {
+	return TypeResourceDefinition
+}
+
 func ResourceDefinitionFromMap(data map[string]interface{}) (ResourceDefinition, error) {
 	definition := ResourceDefinition{}
 
