@@ -9,11 +9,14 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 const (
 	VerbGet   = `GET`
 	VerbPatch = `PATCH`
+	VerbPut   = `PUT`
 )
 
 func withParams(u *url.URL, params map[string]interface{}) string {
@@ -66,7 +69,69 @@ func NewRequest(config RequestConfig) (*http.Response, error) {
 	return client.Do(req)
 }
 
-func JsonObject(response *http.Response) (map[string]interface{}, error) {
+func textFromResponse(response *http.Response) (string, error) {
+	//noinspection GoUnhandledErrorResult
+	defer response.Body.Close()
+
+	data, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return ``, err
+	}
+
+	if len(data) < 1 {
+		return `N/A`, nil
+	}
+
+	return string(data), nil
+}
+
+func TextFromResponse(response *http.Response) (string, error) {
+	status := response.StatusCode
+	if status < 200 || status > 299 {
+		body, err := textFromResponse(response)
+		if err != nil {
+			return ``, errors.Errorf(
+				`REQUEST STATUS %d, FAILED TO PARSE ERROR BODY: %s`,
+				status,
+				err.Error(),
+			)
+		} else {
+			return ``, errors.Errorf(
+				`REQUEST STATUS %d, ERROR BODY: %s`,
+				status,
+				body,
+			)
+		}
+	}
+	//noinspection GoUnhandledErrorResult
+	defer response.Body.Close()
+
+	data, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return ``, err
+	}
+
+	return string(data), nil
+}
+
+func JsonObjectFromResponse(response *http.Response) (map[string]interface{}, error) {
+	status := response.StatusCode
+	if status < 200 || status > 299 {
+		body, err := textFromResponse(response)
+		if err != nil {
+			return nil, errors.Errorf(
+				`REQUEST STATUS %d, FAILED TO PARSE ERROR BODY: %s`,
+				status,
+				err.Error(),
+			)
+		} else {
+			return nil, errors.Errorf(
+				`REQUEST STATUS %d, ERROR BODY: %s`,
+				status,
+				body,
+			)
+		}
+	}
 	//noinspection GoUnhandledErrorResult
 	defer response.Body.Close()
 
@@ -84,7 +149,24 @@ func JsonObject(response *http.Response) (map[string]interface{}, error) {
 	return parsed, nil
 }
 
-func JsonArray(response *http.Response) ([]map[string]interface{}, error) {
+func JsonArrayFromResponse(response *http.Response) ([]map[string]interface{}, error) {
+	status := response.StatusCode
+	if status < 200 || status > 299 {
+		body, err := textFromResponse(response)
+		if err != nil {
+			return nil, errors.Errorf(
+				`REQUEST STATUS %d, FAILED TO PARSE ERROR BODY: %s`,
+				status,
+				err.Error(),
+			)
+		} else {
+			return nil, errors.Errorf(
+				`REQUEST STATUS %d, ERROR BODY: %s`,
+				status,
+				body,
+			)
+		}
+	}
 	//noinspection GoUnhandledErrorResult
 	defer response.Body.Close()
 
