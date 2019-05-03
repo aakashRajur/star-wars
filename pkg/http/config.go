@@ -1,6 +1,7 @@
 package http
 
 import (
+	"net/url"
 	"time"
 
 	"github.com/aakashRajur/star-wars/pkg/types"
@@ -18,4 +19,13 @@ type ServerConfig struct {
 	SslCert string
 	SslKey  string
 	Logger  types.Logger
+}
+
+type RequestConfig struct {
+	Verb    string
+	Url     url.URL
+	Headers map[string]string
+	Params  map[string]interface{}
+	Body    interface{}
+	Timeout time.Duration
 }
