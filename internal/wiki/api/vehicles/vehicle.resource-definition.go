@@ -2,6 +2,7 @@ package vehicles
 
 import (
 	"github.com/aakashRajur/star-wars/pkg/di"
+	"github.com/aakashRajur/star-wars/pkg/http"
 	"github.com/aakashRajur/star-wars/pkg/resource-definition"
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
@@ -12,7 +13,7 @@ const (
 
 var ResourceDefinitionGet = resource_definition.ResourceDefinition{
 	HttpURI:  HttpURI,
-	HttpVerb: resource_definition.VerbGet,
+	HttpVerb: http.VerbGet,
 	Type:     `VEHICLES_GET`,
 	Args: []resource_definition.Arg{
 		{

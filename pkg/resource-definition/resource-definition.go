@@ -14,9 +14,6 @@ const (
 	TypeString = `STRING`
 	TypeInt    = `INT`
 
-	VerbGet   = `GET`
-	VerbPatch = `PATCH`
-
 	resourceDefinitionHttpUri      = `HTTP_URI`
 	resourceDefinitionHttpVerb     = `HTTP_VERB`
 	resourceDefinitionType         = `TYPE`
@@ -28,17 +25,17 @@ const (
 )
 
 type Arg struct {
-	Key      string
-	Type     string
-	Required bool
+	Key      string `json:"key" xml:"key"`
+	Type     string `json:"type" xml:"type"`
+	Required bool   `json:"required" xml:"required"`
 }
 
 type ResourceDefinition struct {
-	HttpURI      string
-	HttpVerb     string
-	Type         string
-	Args         []Arg
-	DataRequired bool
+	HttpURI      string `json:"http_uri" xml:"http_uri"`
+	HttpVerb     string `json:"http_verb" xml:"http_verb"`
+	Type         string `json:"type" xml:"type"`
+	Args         []Arg  `json:"args" xml:"args"`
+	DataRequired bool   `json:"data_required" xml:"data_required"`
 }
 
 func (resourceDefinition ResourceDefinition) GetMap() map[string]interface{} {

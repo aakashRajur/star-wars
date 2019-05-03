@@ -2,6 +2,7 @@ package film
 
 import (
 	"github.com/aakashRajur/star-wars/pkg/di"
+	"github.com/aakashRajur/star-wars/pkg/http"
 	"github.com/aakashRajur/star-wars/pkg/resource-definition"
 )
 
@@ -12,7 +13,7 @@ const (
 
 var ResourceDefinitionGet = resource_definition.ResourceDefinition{
 	HttpURI:  HttpURI,
-	HttpVerb: resource_definition.VerbGet,
+	HttpVerb: http.VerbGet,
 	Type:     `FILM_GET`,
 	Args: []resource_definition.Arg{
 		{
@@ -32,7 +33,7 @@ func ProvideResourceDefinitionGet() di.ResourceDefinitionProvider {
 
 var ResourceDefinitionPatch = resource_definition.ResourceDefinition{
 	HttpURI:  HttpURI,
-	HttpVerb: resource_definition.VerbPatch,
+	HttpVerb: http.VerbPatch,
 	Type:     `FILM_PATCH`,
 	Args: []resource_definition.Arg{
 		{
