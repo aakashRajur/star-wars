@@ -36,6 +36,8 @@ type ResourceDefinition struct {
 	Type         string `json:"type" xml:"type"`
 	Args         []Arg  `json:"args" xml:"args"`
 	DataRequired bool   `json:"data_required" xml:"data_required"`
+	Source       string `json:"source" xml:"source"`
+	Mount        string `json:"mount" xml:"mount"`
 }
 
 func (resourceDefinition ResourceDefinition) GetMap() map[string]interface{} {
