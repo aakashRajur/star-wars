@@ -11,7 +11,6 @@ import (
 func GetDefinedTopics() kafka.DefinedTopics {
 	var definedTopics kafka.DefinedTopics = make(map[string]string)
 
-	definedTopics[topics.ResourceDiscoveryTopic] = env.GetString(topics.ResourceDiscoveryTopic)
 	definedTopics[topics.WikiRequestTopic] = env.GetString(topics.WikiRequestTopic)
 	definedTopics[topics.WikiResponseTopic] = env.GetString(topics.WikiResponseTopic)
 	definedTopics[topics.AuthRequestTopic] = env.GetString(topics.AuthRequestTopic)
