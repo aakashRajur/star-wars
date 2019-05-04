@@ -18,6 +18,15 @@ function cleanup() {
 # wait for consul
 (/util/wait-for.sh ${SERVICE_DISCOVERY_HOST}:${SERVICE_DISCOVERY_PORT}) || exit 1
 
+# set instance id of this instance
+INSTANCE_ID="${CONTAINER_HOST_NAME}"
+if [[ -z "${INSTANCE_ID}" ]]; then
+    echo "UNABLE TO SET CLIENT ID FOR NODE $(hostname)"
+    exit 1
+fi
+export INSTANCE_ID=${INSTANCE_ID};
+echo "export INSTANCE_ID=${INSTANCE_ID};" >> ${ENV_FILE}
+
 # discover database service endpoint
 DATABASE_URI=$(/util/get-service-endpoints.sh -s ${DATABASE_SERVICE} -r 5)
 if [[ -z "${DATABASE_URI}" ]]; then
