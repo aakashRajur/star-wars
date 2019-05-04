@@ -9,6 +9,7 @@ import (
 var WikiHttpModule = fx.Options(
 	module.FatalHandlerModule,
 	module.EnvModule,
+	module.InstanceIdModule,
 	module.LogModule,
 	module.InstrumentationModule,
 	module.PgModule,
