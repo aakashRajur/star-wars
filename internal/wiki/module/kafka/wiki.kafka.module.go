@@ -24,4 +24,5 @@ var WikiKafkaModule = fx.Options(
 	TopicsModule,
 	SubscriptionModule,
 	module.AppModule,
+	module.ResourceRegistrationModule,
 )

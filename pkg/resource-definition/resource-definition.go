@@ -106,6 +106,19 @@ func (resourceDefinition ResourceDefinition) GetArgNormalizers() map[string]type
 	return normalizors
 }
 
+func (resourceDefinition ResourceDefinition) Copy() ResourceDefinition {
+	return ResourceDefinition{
+		HttpURI:      resourceDefinition.HttpURI,
+		HttpVerb:     resourceDefinition.HttpVerb,
+		Type:         resourceDefinition.Type,
+		Args:         resourceDefinition.Args,
+		DataRequired: resourceDefinition.DataRequired,
+		Source:       resourceDefinition.Source,
+		AccessURI:    resourceDefinition.AccessURI,
+		Protocol:     resourceDefinition.Protocol,
+	}
+}
+
 func (ResourceDefinition) Key() string {
 	return TypeResourceDefinition
 }

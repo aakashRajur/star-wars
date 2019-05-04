@@ -21,4 +21,5 @@ var WikiHttpModule = fx.Options(
 	module.CacheStrategyModule,
 	ResourceModule,
 	module.AppModule,
+	module.ResourceRegistrationModule,
 )
