@@ -119,6 +119,7 @@ services:
     env_file:
       - ./build/package/dev/.env
       - ./build/package/dev/wiki-kafka/.env
+      - ./build/package/dev/wiki-kafka/topics.env
       - ./build/package/dev/wiki-db/credentials.env
     environment:
       PROJECT_PATH: $PWD
