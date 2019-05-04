@@ -37,7 +37,7 @@ type ResourceDefinition struct {
 	Args         []Arg  `json:"args" xml:"args"`
 	DataRequired bool   `json:"data_required" xml:"data_required"`
 	Source       string `json:"source" xml:"source"`
-	Mount        string `json:"mount" xml:"mount"`
+	AccessURI    string `json:"access_uri" xml:"access_uri"`
 	Protocol     string `json:"protocol" xml:"protocol"`
 }
 

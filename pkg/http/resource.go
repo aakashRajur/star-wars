@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 	"regexp"
 )
@@ -66,7 +67,7 @@ func (resource Resource) ServeHTTP(writer http.ResponseWriter, request *http.Req
 
 func NewResource(pattern string) Resource {
 	return Resource{
-		Pattern:  regexp.MustCompile(pattern),
+		Pattern:  regexp.MustCompile(fmt.Sprintf(`^%s$`, pattern)),
 		Handlers: make(map[string]HandleRequest),
 	}
 }

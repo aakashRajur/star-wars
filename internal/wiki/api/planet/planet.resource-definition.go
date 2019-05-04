@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	HttpURI       = `^/planet/(?P<id>[0-9]+)$`
+	HttpURI       = `/planet/(?P<id>[0-9]+)`
 	ParamPlanetId = `id`
 )
 

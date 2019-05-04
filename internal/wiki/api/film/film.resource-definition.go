@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	HttpURI     = `^/film/(?P<id>[0-9]+)$`
+	HttpURI     = `/film/(?P<id>[0-9]+)`
 	ParamFilmId = `id`
 )
 

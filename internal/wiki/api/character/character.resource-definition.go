@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	HttpURI          = `^/character/(?P<id>[0-9]+)$`
+	HttpURI          = `/character/(?P<id>[0-9]+)`
 	ParamCharacterId = `id`
 )
 

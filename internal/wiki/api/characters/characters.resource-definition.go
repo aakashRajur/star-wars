@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	HttpURI = `^/characters$`
+	HttpURI = `/characters`
 )
 
 var ResourceDefinitionGet = resource_definition.ResourceDefinition{

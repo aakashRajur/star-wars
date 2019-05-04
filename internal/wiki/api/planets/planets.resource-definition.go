@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	HttpURI = `^/planets$`
+	HttpURI = `/planets`
 )
 
 var ResourceDefinitionGet = resource_definition.ResourceDefinition{

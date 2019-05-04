@@ -12,7 +12,7 @@ import (
 )
 
 func StatsResource(logger types.Logger) di.ResourceProvider {
-	resource := http.NewResource(`^/stats$`)
+	resource := http.NewResource(`/stats`)
 
 	resource.Get(
 		http.HandlerWithMiddleware{
