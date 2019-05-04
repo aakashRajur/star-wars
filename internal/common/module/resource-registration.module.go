@@ -3,11 +3,13 @@ package module
 import (
 	"context"
 	"fmt"
+
+	"github.com/pkg/errors"
+	"go.uber.org/fx"
+
 	"github.com/aakashRajur/star-wars/pkg/env"
 	"github.com/aakashRajur/star-wars/pkg/resource-definition"
 	"github.com/aakashRajur/star-wars/pkg/types"
-	"github.com/pkg/errors"
-	"go.uber.org/fx"
 )
 
 func GetResourceRegistrationModule(
@@ -16,7 +18,7 @@ func GetResourceRegistrationModule(
 	lifecycle fx.Lifecycle,
 	instanceId types.InstanceId,
 	protocol types.Protocol,
-	registrar types.ResourceRegistration,
+	registrar resource_definition.ResourceRegistration,
 	definitions []resource_definition.ResourceDefinition,
 ) {
 	accessUriPrefix := env.GetString(`ACCESS_URI_PREFIX`)

@@ -1,10 +1,11 @@
 package module
 
 import (
+	"go.uber.org/fx"
+
 	"github.com/aakashRajur/star-wars/pkg/consul"
 	"github.com/aakashRajur/star-wars/pkg/env"
-	"github.com/aakashRajur/star-wars/pkg/types"
-	"go.uber.org/fx"
+	"github.com/aakashRajur/star-wars/pkg/resource-definition"
 )
 
 func GetConsul() *consul.Consul {
@@ -14,7 +15,7 @@ func GetConsul() *consul.Consul {
 	return &instance
 }
 
-func GetResourceRegistration(consul *consul.Consul) types.ResourceRegistration {
+func GetResourceRegistration(consul *consul.Consul) resource_definition.ResourceRegistration {
 	return consul
 }
 
