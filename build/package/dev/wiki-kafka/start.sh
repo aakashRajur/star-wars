@@ -19,13 +19,13 @@ function cleanup() {
 (/util/wait-for.sh ${SERVICE_DISCOVERY_HOST}:${SERVICE_DISCOVERY_PORT}) || exit 1
 
 # set client id of this instance
-KAFKA_CLIENT_ID="${CONTAINER_HOST_NAME}"
-if [[ -z "${KAFKA_CLIENT_ID}" ]]; then
+INSTANCE_ID="${CONTAINER_HOST_NAME}"
+if [[ -z "${INSTANCE_ID}" ]]; then
     echo "UNABLE TO SET CLIENT ID FOR NODE $(hostname)"
     exit 1
 fi
-export KAFKA_CLIENT_ID=${KAFKA_CLIENT_ID};
-echo "export KAFKA_CLIENT_ID=${KAFKA_CLIENT_ID};" >> ${ENV_FILE}
+export INSTANCE_ID=${INSTANCE_ID};
+echo "export INSTANCE_ID=${INSTANCE_ID};" >> ${ENV_FILE}
 
 # discover database service endpoint
 DATABASE_URI=$(/util/get-service-endpoints.sh -s ${DATABASE_SERVICE} -r 5)
