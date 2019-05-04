@@ -1,4 +1,4 @@
-package kafka
+package module
 
 import (
 	"go.uber.org/fx"
