@@ -17,6 +17,10 @@ const (
 	UnregistrationUri = `/v1/kv/:key`
 )
 
+func getResourceKey(resourceType string, source string) string {
+	return fmt.Sprintf(`resoureces/%s/%s`, resourceType, source)
+}
+
 type Consul struct {
 	Host string
 }
@@ -31,7 +35,7 @@ func (consul *Consul) Register(definition resource_definition.ResourceDefinition
 		Verb: http.VerbPut,
 		Url:  registerUrl,
 		Params: map[string]interface{}{
-			`key`: fmt.Sprintf(`resources/%s`, definition.Type),
+			`key`: getResourceKey(definition.Type, definition.Source),
 		},
 		Body:    definition,
 		Timeout: 10 * time.Second,
@@ -70,7 +74,7 @@ func (consul *Consul) Unregister(definition resource_definition.ResourceDefiniti
 		Verb: http.VerbPut,
 		Url:  unregisterUrl,
 		Params: map[string]interface{}{
-			`key`: fmt.Sprintf(`resources/%s`, definition.Type),
+			`key`: getResourceKey(definition.Type, definition.Source),
 		},
 		Timeout: 10 * time.Second,
 	}
