@@ -20,7 +20,6 @@ var WikiKafkaModule = fx.Options(
 	ResourceModule,
 	HealthcheckModule,
 	ResourceDefinitionModule,
-	HookModule,
 	TopicsModule,
 	SubscriptionModule,
 	module.AppModule,

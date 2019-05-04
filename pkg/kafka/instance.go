@@ -7,7 +7,7 @@ import (
 	"github.com/Shopify/sarama"
 )
 
-func NewInstance(config Config, hook Hook) (*Kafka, error) {
+func NewInstance(config Config) (*Kafka, error) {
 	logger := config.Logger
 	if config.Verbose {
 		sarama.Logger = log.New(logger.Out(), `[kafka]`, log.LstdFlags|log.LUTC)
@@ -62,7 +62,6 @@ func NewInstance(config Config, hook Hook) (*Kafka, error) {
 
 	kafka := Kafka{
 		Config:        config,
-		hook:          hook,
 		logger:        logger,
 		mux:           sync.Mutex{},
 		health:        make(chan bool),

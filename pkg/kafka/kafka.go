@@ -16,7 +16,6 @@ const ProtocolName string = `KAFKA`
 
 type Kafka struct {
 	Config        Config
-	hook          Hook
 	logger        types.Logger
 	mux           sync.Mutex
 	ctx           context.Context
@@ -402,11 +401,6 @@ func (kafka *Kafka) Setup(sarama.ConsumerGroupSession) error {
 	defer kafka.mux.Unlock()
 	kafka.health <- true
 
-	onStart := kafka.hook.OnStart
-	if onStart != nil {
-		onStart(kafka)
-	}
-
 	return nil
 }
 
@@ -414,11 +408,6 @@ func (kafka *Kafka) Cleanup(sarama.ConsumerGroupSession) error {
 	kafka.mux.Lock()
 	defer kafka.mux.Unlock()
 	kafka.health <- false
-
-	onStop := kafka.hook.OnStop
-	if onStop != nil {
-		onStop(kafka)
-	}
 
 	return nil
 }

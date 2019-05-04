@@ -30,8 +30,8 @@ func GetKafkaConfig(logger types.Logger, instanceId types.InstanceId) kafka.Conf
 	return config
 }
 
-func GetKafka(handler types.FatalHandler, config kafka.Config, hook kafka.Hook, definedTopics kafka.DefinedTopics, subscriptions []*kafka.Subscription) *kafka.Kafka {
-	instance, err := kafka.NewInstance(config, hook)
+func GetKafka(handler types.FatalHandler, config kafka.Config, definedTopics kafka.DefinedTopics, subscriptions []*kafka.Subscription) *kafka.Kafka {
+	instance, err := kafka.NewInstance(config)
 	if err != nil {
 		handler.HandleFatal(err)
 		return nil
