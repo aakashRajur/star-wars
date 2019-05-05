@@ -27,7 +27,6 @@ trap 'cleanup' INT SIGINT SIGTERM
 # start redis in background
 echo "STARTING REDIS"
 (redis-server) &
-CHILD=${!}
 
 # start healthcheck server in background
 echo "STARTING SERVICE DISCOVERY HEALTHCHECK SERVER"
@@ -39,10 +38,10 @@ echo "STARTING SERVICE DISCOVERY HEALTHCHECK SERVER"
 echo "REGISTER NODE TO SERVICE DISCOVERY"
 /util/wait-for.sh -t 30 ${CONTAINER_HOST_NAME}:${CONSUL_HEALTHCHECK_PORT} && /util/register.sh
 
-echo "WAITING FOR CHILD: ${CHILD} TO EXIT"
-wait ${CHILD}
+echo "WAITING FOR CHILD TO EXIT"
+wait
 EXIT_CODE=${?}
-echo "CHILD: ${CHILD} EXITED: ${EXIT_CODE}"
+echo "CHILD EXITED: ${EXIT_CODE}"
 
 echo "UNREGISTER NODE FROM SERVICE DISCOVERY"
 /util/unregister.sh

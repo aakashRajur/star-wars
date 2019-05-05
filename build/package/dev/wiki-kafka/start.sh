@@ -72,16 +72,16 @@ if [[ ${DEBUG} == true ]]; then
 else
     (go run ${MAIN}) &
 fi
-CHILD=${!}
 
 # register node with consul
 echo "REGISTER NODE TO SERVICE DISCOVERY"
 /util/wait-for.sh -t 180 ${CONTAINER_HOST_NAME}:${CONSUL_HEALTHCHECK_PORT} && /util/register.sh
 
-echo "WAITING FOR CHILD: ${CHILD} TO EXIT"
-wait ${CHILD}
+echo "WAITING FOR CHILD TO EXIT"
+wait
 EXIT_CODE=${?}
-echo "CHILD: ${CHILD} EXITED: ${EXIT_CODE}"
+sleep 10
+echo "CHILD EXITED: ${EXIT_CODE}"
 
 echo "UNREGISTER NODE FROM SERVICE DISCOVERY"
 /util/unregister.sh
