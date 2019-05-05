@@ -74,14 +74,26 @@ func (response Response) WriteText(text string) (int, error) {
 	return fmt.Fprintf(response, text)
 }
 
-func (response Response) WriteJSONObject(object interface{}, headers map[string]string) error {
+func (response Response) WriteJSON(data interface{}, headers map[string]string) error {
 	response.SetHeader(ContentType, ContentTypeJSON)
 	if headers != nil {
 		for key, value := range headers {
 			response.SetHeader(key, value)
 		}
 	}
-	return json.NewEncoder(response).Encode(object)
+	return json.NewEncoder(response).Encode(data)
+}
+
+func (response Response) WriteJSONIndent(data interface{}, headers map[string]string) error {
+	response.SetHeader(ContentType, ContentTypeJSON)
+	if headers != nil {
+		for key, value := range headers {
+			response.SetHeader(key, value)
+		}
+	}
+	encoder := json.NewEncoder(response)
+	encoder.SetIndent("", "  ")
+	return encoder.Encode(data)
 }
 
 func (response Response) Error(status int, err error) {

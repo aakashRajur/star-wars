@@ -95,7 +95,7 @@ func StatsResource(logger types.Logger) di.ResourceProvider {
 
 				stats[`processes`] = compiled
 
-				err = response.WriteJSONObject(stats, nil)
+				err = response.WriteJSONIndent(stats, nil)
 				if err != nil {
 					logger.Error(err)
 				}

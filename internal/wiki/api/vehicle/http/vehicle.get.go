@@ -34,7 +34,7 @@ func ApiGetVehicle(storage types.Storage, logger types.Logger, tracker types.Tim
 			return
 		}
 
-		err = response.WriteJSONObject(data, nil)
+		err = response.WriteJSON(data, nil)
 		if err != nil {
 			logger.Error(err)
 		}

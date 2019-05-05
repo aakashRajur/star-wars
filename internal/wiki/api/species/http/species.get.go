@@ -34,7 +34,7 @@ func GetSpecies(storage types.Storage, logger types.Logger, tracker types.TimeTr
 		headers := make(map[string]string, 1)
 		headers[types.PAGINATION] = string(marshaled)
 
-		err = response.WriteJSONObject(result, headers)
+		err = response.WriteJSON(result, headers)
 		if err != nil {
 			logger.Error(err)
 		}
