@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"log"
-	"os"
 	"time"
 
 	"go.uber.org/fx"
@@ -19,7 +18,6 @@ func main() {
 	wait := interrupt.NotifyOnInterrupt(
 		app.Stop,
 		30*time.Second,
-		os.Interrupt,
 	)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
