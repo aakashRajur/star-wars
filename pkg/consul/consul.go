@@ -18,7 +18,7 @@ const (
 )
 
 func getResourceKey(resourceType string, source string) string {
-	return fmt.Sprintf(`resoureces/%s/%s`, resourceType, source)
+	return fmt.Sprintf(`resources/%s/%s`, resourceType, source)
 }
 
 type Consul struct {
