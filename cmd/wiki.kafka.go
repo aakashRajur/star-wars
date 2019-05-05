@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	defer log.Println(`Exiting...`)
+	defer log.Println(`APPLICATION EXITED`)
 	app := fx.New(kafka.WikiKafkaModule)
 
 	wait := interrupt.NotifyOnInterrupt(
