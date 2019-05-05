@@ -9,6 +9,7 @@ import (
 )
 
 const ProtocolName = `HTTP`
+const SecureProtocolName = `HTTPS`
 
 type Server struct {
 	http.Server
@@ -18,6 +19,11 @@ type Server struct {
 }
 
 func (server *Server) Name() string {
+	sslCert := server.config.SslCert
+	sslKey := server.config.SslKey
+	if sslCert != `` && sslKey != `` {
+		return SecureProtocolName
+	}
 	return ProtocolName
 }
 
@@ -27,12 +33,18 @@ func (server *Server) Start(context.Context) error {
 	sslCert := server.config.SslCert
 	sslKey := server.config.SslKey
 
-	go func() {
+	go func(sslCert, sslKey string) {
 		server.logger.Info("SERVER WILL HANDLE REQUESTS AT", server.Addr)
-		if err := server.ListenAndServeTLS(sslCert, sslKey); err != nil && err != http.ErrServerClosed {
-			server.logger.Fatal(err)
+		if sslCert != `` && sslKey != `` {
+			if err := server.ListenAndServeTLS(sslCert, sslKey); err != nil && err != http.ErrServerClosed {
+				server.logger.Fatal(err)
+			}
+		} else {
+			if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+				server.logger.Fatal(err)
+			}
 		}
-	}()
+	}(sslCert, sslKey)
 	return nil
 }
 

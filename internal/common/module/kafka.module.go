@@ -11,12 +11,12 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-func GetKafkaConfig(logger types.Logger, instanceId types.InstanceId) kafka.Config {
+func GetKafkaConfig(logger types.Logger, endpoint types.Endpoint) kafka.Config {
 	brokers := strings.Split(env.GetString(`KAFKA_BROKERS`), `,`)
 	maxPartitions := env.GetInt(`KAFKA_MAX_PARTITIONS`)
 	maxReplicas := env.GetInt(`KAFKA_MAX_REPLICAS`)
 	groupId := env.GetString(`KAFKA_GROUP_ID`)
-	clientId := string(instanceId)
+	clientId := string(endpoint)
 
 	config := kafka.Config{
 		Logger:      logger,

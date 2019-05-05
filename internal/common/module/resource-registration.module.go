@@ -16,7 +16,7 @@ func GetResourceRegistrationModule(
 	logger types.Logger,
 	handler types.FatalHandler,
 	lifecycle fx.Lifecycle,
-	instanceId types.InstanceId,
+	endpoint types.Endpoint,
 	protocol types.Protocol,
 	registrar resource_definition.ResourceRegistration,
 	definitions []resource_definition.ResourceDefinition,
@@ -31,8 +31,9 @@ func GetResourceRegistrationModule(
 	for _, definition := range definitions {
 		enriched := definition.Copy()
 		enriched.AccessURI = fmt.Sprintf(`%s%s`, accessUriPrefix, enriched.HttpURI)
-		enriched.Source = string(instanceId)
+		enriched.Source = string(endpoint)
 		enriched.Protocol = protocol.Name()
+		enriched.Endpoint = string(endpoint)
 		compiled = append(compiled, enriched)
 	}
 

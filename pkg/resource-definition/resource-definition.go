@@ -39,6 +39,7 @@ type ResourceDefinition struct {
 	Source       string `json:"source" xml:"source"`
 	AccessURI    string `json:"access_uri" xml:"access_uri"`
 	Protocol     string `json:"protocol" xml:"protocol"`
+	Endpoint     string `json:"endpoint" xml:"endpoint"`
 }
 
 func (resourceDefinition ResourceDefinition) GetMap() map[string]interface{} {

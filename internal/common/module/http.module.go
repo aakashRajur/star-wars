@@ -3,7 +3,6 @@ package module
 import (
 	"time"
 
-	"github.com/juju/errors"
 	"go.uber.org/fx"
 
 	"github.com/aakashRajur/star-wars/pkg/env"
@@ -11,15 +10,9 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-func GetHttpServer(logger types.Logger, resources []http.Resource, handler types.FatalHandler) *http.Server {
+func GetHttpServer(logger types.Logger, resources []http.Resource) *http.Server {
 	sslCert := env.GetString(`HTTP_SSL_CERT`)
-	if sslCert == `` {
-		handler.HandleFatal(errors.New(`HTTP_SSL_CERT not set in env`))
-	}
 	sslKey := env.GetString(`HTTP_SSL_KEY`)
-	if sslKey == `` {
-		handler.HandleFatal(errors.New(`HTTP_SSL_KEY not set in env`))
-	}
 	httpPort := ":" + env.GetString(`HTTP_PORT`)
 	timeoutConfig := http.Timeout{
 		Read:  time.Second * time.Duration(env.GetInt(`HTTP_READ_TIMEOUT`)),
