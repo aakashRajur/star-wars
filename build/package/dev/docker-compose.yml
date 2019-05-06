@@ -1,14 +1,14 @@
 version: "3.7"
 
 volumes:
-  wiki-http-deps:
-  wiki-kafka-deps:
+  go-deps:
+  node-deps:
 
 services:
   consul:
     image: bitnami/consul:latest
     ports:
-      - '8500:8500'
+      - '${CONSUL_PORT?err}:8500'
   zookeeper:
     build:
       dockerfile: ./build/package/dev/zookeeper/Dockerfile
@@ -90,8 +90,8 @@ services:
       dockerfile: ./build/package/dev/wiki-http/Dockerfile
       context: .
     ports:
-      - ${WIKI_HTTP_PORT?err}:${WIKI_HTTP_PORT?err}
-      - ${WIKI_DEBUG_PORT?err}:${WIKI_DEBUG_PORT?err}
+      - "${WIKI_HTTP_PORT?err}:${WIKI_HTTP_PORT?err}"
+      - "${DEBUG_PORT?err}:${DEBUG_PORT?err}"
     env_file:
       - ./build/package/dev/.env
       - ./build/package/dev/wiki-http/.env
@@ -99,8 +99,8 @@ services:
     environment:
       PROJECT_PATH: $PWD
     volumes:
-      - $PWD:$PWD
-      - wiki-http-deps:/go
+      - $PWD:$PWD:ro
+      - go-deps:/go
       - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
       - consul
@@ -115,7 +115,7 @@ services:
       dockerfile: ./build/package/dev/wiki-kafka/Dockerfile
       context: .
     ports:
-      - ${WIKI_DEBUG_PORT?}:${WIKI_DEBUG_PORT?}
+      - ${DEBUG_PORT?}:${DEBUG_PORT?}
     env_file:
       - ./build/package/dev/.env
       - ./build/package/dev/wiki-kafka/.env
@@ -124,14 +124,36 @@ services:
     environment:
       PROJECT_PATH: $PWD
     volumes:
-      - $PWD:$PWD
-      - wiki-kafka-deps:/go
+      - $PWD:$PWD:ro
+      - go-deps:/go
       - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
       - consul
       - wiki-db
       - wiki-cache
       - kafka
+    security_opt:
+      - apparmor=unconfined
+    cap_add:
+      - SYS_PTRACE
+  api-gateway:
+    build:
+      dockerfile: ./build/package/dev/api-gateway/Dockerfile
+      context: .
+    ports:
+      - "${API_GATEWAY_PORT?err}:${API_GATEWAY_PORT?err}"
+      - "${DEBUG_PORT?err}:${DEBUG_PORT?err}"
+    env_file:
+      - ./build/package/dev/.env
+      - ./build/package/dev/api-gateway/.env
+    environment:
+      PROJECT_PATH: $PWD
+    volumes:
+      - $PWD:$PWD:ro
+      - go-deps:/go
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - consul
     security_opt:
       - apparmor=unconfined
     cap_add:
