@@ -10,7 +10,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-func GetHttpServer(logger types.Logger, resources []http.Resource) *http.Server {
+func GetHttpServer(logger types.Logger, router *http.Router) *http.Server {
 	sslCert := env.GetString(`HTTP_SSL_CERT`)
 	sslKey := env.GetString(`HTTP_SSL_KEY`)
 	httpPort := ":" + env.GetString(`HTTP_PORT`)
@@ -18,11 +18,6 @@ func GetHttpServer(logger types.Logger, resources []http.Resource) *http.Server 
 		Read:  time.Second * time.Duration(env.GetInt(`HTTP_READ_TIMEOUT`)),
 		Write: time.Second * time.Duration(env.GetInt(`HTTP_WRITE_TIMEOUT`)),
 		Idle:  time.Second * time.Duration(env.GetInt(`HTTP_IDLE_TIMEOUT`)),
-	}
-
-	router := http.NewRouter(logger)
-	for _, each := range resources {
-		router.DefineResource(each)
 	}
 
 	serverConfig := http.ServerConfig{
@@ -42,7 +37,10 @@ func GetHttpProtocol(server *http.Server) types.Protocol {
 	return server
 }
 
-var HttpModule = fx.Provide(
-	GetHttpServer,
-	GetHttpProtocol,
+var HttpModule = fx.Options(
+	HttpRouterModule,
+	fx.Provide(
+		GetHttpServer,
+		GetHttpProtocol,
+	),
 )
