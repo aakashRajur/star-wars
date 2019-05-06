@@ -63,5 +63,6 @@ func GetKafkaProtocol(kafka *kafka.Kafka) types.Protocol {
 var KafkaModule = fx.Provide(
 	GetKafkaConfig,
 	GetKafka,
-	GetKafkaProtocol,
 )
+
+var KafkaProtocolModule = fx.Provide(GetKafkaProtocol)

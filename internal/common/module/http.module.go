@@ -39,8 +39,7 @@ func GetHttpProtocol(server *http.Server) types.Protocol {
 
 var HttpModule = fx.Options(
 	HttpRouterModule,
-	fx.Provide(
-		GetHttpServer,
-		GetHttpProtocol,
-	),
+	fx.Provide(GetHttpServer),
 )
+
+var HttpProtocolModule = fx.Provide(GetHttpProtocol)
