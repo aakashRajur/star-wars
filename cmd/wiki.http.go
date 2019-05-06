@@ -7,13 +7,13 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/aakashRajur/star-wars/internal/wiki/module/http"
+	"github.com/aakashRajur/star-wars/internal/wiki-http/module"
 	"github.com/aakashRajur/star-wars/pkg/interrupt"
 )
 
 func main() {
 	defer log.Println(`APPLICATION EXITED`)
-	app := fx.New(http.WikiHttpModule)
+	app := fx.New(module.WikiHttpModule)
 
 	wait := interrupt.NotifyOnInterrupt(
 		app.Stop,

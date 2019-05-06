@@ -1,4 +1,4 @@
-package kafka
+package module
 
 import (
 	"go.uber.org/fx"
@@ -6,7 +6,7 @@ import (
 	"github.com/aakashRajur/star-wars/internal/common/module"
 )
 
-var WikiKafkaModule = fx.Options(
+var WikiHttpModule = fx.Options(
 	module.FatalHandlerModule,
 	module.EnvModule,
 	module.EndpointModule,
@@ -16,13 +16,10 @@ var WikiKafkaModule = fx.Options(
 	module.RedisModule,
 	module.RedisPgModule,
 	module.ConsulModule,
-	module.KafkaModule,
+	module.HttpModule,
 	module.ResourceDefinitionModule,
 	module.CacheStrategyModule,
 	ResourceModule,
-	HealthcheckModule,
-	TopicsModule,
-	SubscriptionModule,
 	module.AppModule,
 	module.ResourceRegistrationModule,
 )

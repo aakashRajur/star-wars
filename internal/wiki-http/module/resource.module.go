@@ -1,4 +1,4 @@
-package http
+package module
 
 import (
 	"go.uber.org/fx"

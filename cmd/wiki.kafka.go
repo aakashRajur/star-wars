@@ -7,13 +7,13 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/aakashRajur/star-wars/internal/wiki/module/kafka"
+	"github.com/aakashRajur/star-wars/internal/wiki-kafka/module"
 	"github.com/aakashRajur/star-wars/pkg/interrupt"
 )
 
 func main() {
 	defer log.Println(`APPLICATION EXITED`)
-	app := fx.New(kafka.WikiKafkaModule)
+	app := fx.New(module.WikiKafkaModule)
 
 	wait := interrupt.NotifyOnInterrupt(
 		app.Stop,
