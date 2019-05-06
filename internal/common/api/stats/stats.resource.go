@@ -1,4 +1,4 @@
-package module
+package stats
 
 import (
 	"time"
@@ -11,7 +11,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/util"
 )
 
-func StatsResource(logger types.Logger) di.ResourceProvider {
+func Resource(logger types.Logger) di.ResourceProvider {
 	resource := http.NewResource(`/stats`)
 
 	resource.Get(

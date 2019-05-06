@@ -3,12 +3,12 @@ package module
 import (
 	"go.uber.org/fx"
 
-	"github.com/aakashRajur/star-wars/internal/common/module"
+	"github.com/aakashRajur/star-wars/internal/common/api/hello"
+	"github.com/aakashRajur/star-wars/internal/common/api/stats"
 	"github.com/aakashRajur/star-wars/internal/wiki/api/character/http"
 	"github.com/aakashRajur/star-wars/internal/wiki/api/characters/http"
 	"github.com/aakashRajur/star-wars/internal/wiki/api/film/http"
 	"github.com/aakashRajur/star-wars/internal/wiki/api/films/http"
-	"github.com/aakashRajur/star-wars/internal/wiki/api/hello/http"
 	"github.com/aakashRajur/star-wars/internal/wiki/api/planet/http"
 	"github.com/aakashRajur/star-wars/internal/wiki/api/planets/http"
 	"github.com/aakashRajur/star-wars/internal/wiki/api/specie/http"
@@ -24,7 +24,7 @@ func GetResources(resourceGroup di.ResourcesCompiler) []http.Resource {
 }
 
 var ResourceModule = fx.Provide(
-	module.StatsResource,
+	stats.Resource,
 	hello.Resource,
 	planets.Resource,
 	planet.Resource,
