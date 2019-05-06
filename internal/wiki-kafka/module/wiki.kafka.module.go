@@ -4,6 +4,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/aakashRajur/star-wars/internal/common/module"
+	topics "github.com/aakashRajur/star-wars/internal/topics/module"
 )
 
 var WikiKafkaModule = fx.Options(
@@ -22,7 +23,7 @@ var WikiKafkaModule = fx.Options(
 	ResourceModule,
 	module.HttpModule,
 	HealthcheckModule,
-	TopicsModule,
+	topics.TopicsModule,
 	SubscriptionModule,
 	module.KafkaProtocolModule,
 	module.AppModule,
