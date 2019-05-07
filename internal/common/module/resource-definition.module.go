@@ -14,10 +14,10 @@ import (
 	"github.com/aakashRajur/star-wars/internal/wiki/api/vehicle"
 	"github.com/aakashRajur/star-wars/internal/wiki/api/vehicles"
 	"github.com/aakashRajur/star-wars/pkg/di"
-	"github.com/aakashRajur/star-wars/pkg/resource-definition"
+	"github.com/aakashRajur/star-wars/pkg/resource"
 )
 
-func GetResourceDefinitions(definitionCompiler di.ResourceDefinitionCompiler) []resource_definition.ResourceDefinition {
+func GetResourceDefinitions(definitionCompiler di.ResourceDefinitionCompiler) []resource.Definition {
 	return definitionCompiler.ResourceDefinitions
 }
 

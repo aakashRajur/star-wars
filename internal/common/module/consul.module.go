@@ -5,7 +5,7 @@ import (
 
 	"github.com/aakashRajur/star-wars/pkg/consul"
 	"github.com/aakashRajur/star-wars/pkg/env"
-	"github.com/aakashRajur/star-wars/pkg/resource-definition"
+	"github.com/aakashRajur/star-wars/pkg/resource"
 )
 
 func GetConsul() *consul.Consul {
@@ -15,7 +15,7 @@ func GetConsul() *consul.Consul {
 	return &instance
 }
 
-func GetResourceRegistration(consul *consul.Consul) resource_definition.ResourceRegistration {
+func GetResourceRegistration(consul *consul.Consul) resource.Registree {
 	return consul
 }
 

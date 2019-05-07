@@ -1,4 +1,4 @@
-package resource_definition
+package resource
 
 import (
 	"github.com/juju/errors"
@@ -30,7 +30,7 @@ type Arg struct {
 	Required bool   `json:"required" xml:"required"`
 }
 
-type ResourceDefinition struct {
+type Definition struct {
 	HttpURI      string `json:"http_uri" xml:"http_uri"`
 	HttpVerb     string `json:"http_verb" xml:"http_verb"`
 	Type         string `json:"type" xml:"type"`
@@ -42,7 +42,7 @@ type ResourceDefinition struct {
 	Endpoint     string `json:"endpoint" xml:"endpoint"`
 }
 
-func (resourceDefinition ResourceDefinition) GetMap() map[string]interface{} {
+func (resourceDefinition Definition) GetMap() map[string]interface{} {
 	marshaled := make(map[string]interface{})
 
 	marshaled[resourceDefinitionHttpUri] = resourceDefinition.HttpURI
@@ -65,7 +65,7 @@ func (resourceDefinition ResourceDefinition) GetMap() map[string]interface{} {
 	return marshaled
 }
 
-func (resourceDefinition ResourceDefinition) GetArgValidators() map[string][]types.Validator {
+func (resourceDefinition Definition) GetArgValidators() map[string][]types.Validator {
 	validators := make(map[string][]types.Validator)
 
 	for _, each := range resourceDefinition.Args {
@@ -89,7 +89,7 @@ func (resourceDefinition ResourceDefinition) GetArgValidators() map[string][]typ
 	return validators
 }
 
-func (resourceDefinition ResourceDefinition) GetArgNormalizers() map[string]types.Normalizor {
+func (resourceDefinition Definition) GetArgNormalizers() map[string]types.Normalizor {
 	normalizors := make(map[string]types.Normalizor)
 
 	for _, each := range resourceDefinition.Args {
@@ -107,8 +107,8 @@ func (resourceDefinition ResourceDefinition) GetArgNormalizers() map[string]type
 	return normalizors
 }
 
-func (resourceDefinition ResourceDefinition) Copy() ResourceDefinition {
-	return ResourceDefinition{
+func (resourceDefinition Definition) Copy() Definition {
+	return Definition{
 		HttpURI:      resourceDefinition.HttpURI,
 		HttpVerb:     resourceDefinition.HttpVerb,
 		Type:         resourceDefinition.Type,
@@ -120,12 +120,12 @@ func (resourceDefinition ResourceDefinition) Copy() ResourceDefinition {
 	}
 }
 
-func (ResourceDefinition) Key() string {
+func (Definition) Key() string {
 	return TypeResourceDefinition
 }
 
-func ResourceDefinitionFromMap(data map[string]interface{}) (ResourceDefinition, error) {
-	definition := ResourceDefinition{}
+func ResourceDefinitionFromMap(data map[string]interface{}) (Definition, error) {
+	definition := Definition{}
 
 	httpUri, ok := data[resourceDefinitionHttpUri]
 	if !ok {

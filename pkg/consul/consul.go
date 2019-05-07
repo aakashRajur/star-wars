@@ -9,7 +9,7 @@ import (
 	"github.com/juju/errors"
 
 	"github.com/aakashRajur/star-wars/pkg/http"
-	"github.com/aakashRajur/star-wars/pkg/resource-definition"
+	"github.com/aakashRajur/star-wars/pkg/resource"
 )
 
 const (
@@ -25,7 +25,7 @@ type Consul struct {
 	Host string
 }
 
-func (consul *Consul) Register(definition resource_definition.ResourceDefinition) error {
+func (consul *Consul) Register(definition resource.Definition) error {
 	registerUrl := url.URL{
 		Scheme: `http`,
 		Host:   consul.Host,
@@ -64,7 +64,7 @@ func (consul *Consul) Register(definition resource_definition.ResourceDefinition
 	return nil
 }
 
-func (consul *Consul) Unregister(definition resource_definition.ResourceDefinition) error {
+func (consul *Consul) Unregister(definition resource.Definition) error {
 	unregisterUrl := url.URL{
 		Scheme: `http`,
 		Host:   consul.Host,

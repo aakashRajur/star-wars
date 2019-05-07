@@ -8,7 +8,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/aakashRajur/star-wars/pkg/env"
-	"github.com/aakashRajur/star-wars/pkg/resource-definition"
+	"github.com/aakashRajur/star-wars/pkg/resource"
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
@@ -18,8 +18,8 @@ func GetResourceRegistrationModule(
 	lifecycle fx.Lifecycle,
 	endpoint types.Endpoint,
 	protocol types.Protocol,
-	registrar resource_definition.ResourceRegistration,
-	definitions []resource_definition.ResourceDefinition,
+	registrar resource.Registree,
+	definitions []resource.Definition,
 ) {
 	accessUriPrefix := env.GetString(`ACCESS_URI_PREFIX`)
 	if accessUriPrefix == `` {
@@ -27,7 +27,7 @@ func GetResourceRegistrationModule(
 		return
 	}
 
-	compiled := make([]resource_definition.ResourceDefinition, 0)
+	compiled := make([]resource.Definition, 0)
 	for _, definition := range definitions {
 		enriched := definition.Copy()
 		enriched.AccessURI = fmt.Sprintf(`%s%s`, accessUriPrefix, enriched.HttpURI)

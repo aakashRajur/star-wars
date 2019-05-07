@@ -3,7 +3,7 @@ package films
 import (
 	"github.com/aakashRajur/star-wars/pkg/di"
 	"github.com/aakashRajur/star-wars/pkg/http"
-	"github.com/aakashRajur/star-wars/pkg/resource-definition"
+	"github.com/aakashRajur/star-wars/pkg/resource"
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
@@ -11,19 +11,19 @@ const (
 	HttpURI = `/films`
 )
 
-var ResourceDefinitionGet = resource_definition.ResourceDefinition{
+var ResourceDefinitionGet = resource.Definition{
 	HttpURI:  HttpURI,
 	HttpVerb: http.VerbGet,
 	Type:     `FILMS_GET`,
-	Args: []resource_definition.Arg{
+	Args: []resource.Arg{
 		{
 			Key:      types.QueryPaginationId,
-			Type:     resource_definition.TypeInt,
+			Type:     resource.TypeInt,
 			Required: false,
 		},
 		{
 			Key:      types.QueryLimit,
-			Type:     resource_definition.TypeInt,
+			Type:     resource.TypeInt,
 			Required: false,
 		},
 	},

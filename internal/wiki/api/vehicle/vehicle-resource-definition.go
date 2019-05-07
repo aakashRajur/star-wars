@@ -3,7 +3,7 @@ package vehicle
 import (
 	"github.com/aakashRajur/star-wars/pkg/di"
 	"github.com/aakashRajur/star-wars/pkg/http"
-	"github.com/aakashRajur/star-wars/pkg/resource-definition"
+	"github.com/aakashRajur/star-wars/pkg/resource"
 )
 
 const (
@@ -11,14 +11,14 @@ const (
 	ParamVehicleId = `id`
 )
 
-var ResourceDefinitionGet = resource_definition.ResourceDefinition{
+var ResourceDefinitionGet = resource.Definition{
 	HttpURI:  HttpURI,
 	HttpVerb: http.VerbGet,
 	Type:     `VEHICLE_GET`,
-	Args: []resource_definition.Arg{
+	Args: []resource.Arg{
 		{
 			Key:      ParamVehicleId,
-			Type:     resource_definition.TypeInt,
+			Type:     resource.TypeInt,
 			Required: true,
 		},
 	},
@@ -31,14 +31,14 @@ func ProvideResourceDefinitionGet() di.ResourceDefinitionProvider {
 	}
 }
 
-var ResourceDefinitionPatch = resource_definition.ResourceDefinition{
+var ResourceDefinitionPatch = resource.Definition{
 	HttpURI:  HttpURI,
 	HttpVerb: http.VerbPatch,
 	Type:     `VEHICLE_PATCH`,
-	Args: []resource_definition.Arg{
+	Args: []resource.Arg{
 		{
 			Key:      ParamVehicleId,
-			Type:     resource_definition.TypeInt,
+			Type:     resource.TypeInt,
 			Required: true,
 		},
 	},
