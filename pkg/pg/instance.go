@@ -5,19 +5,20 @@ import (
 	"github.com/juju/errors"
 )
 
-func NewInstance(uri string, poolLimit int, logger pgx.Logger) (*Pg, error) {
-	if uri == "" {
+func NewInstance(config Config, logger pgx.Logger) (*Pg, error) {
+	pgUri := string(config.URI)
+	if pgUri == "" {
 		return nil, errors.NotValidf("PG_URI is invalid")
 	}
-	config, err := pgx.ParseConnectionString(uri)
+	pgConfig, err := pgx.ParseConnectionString(pgUri)
 	if err != nil {
 		return nil, errors.NotSupportedf("DB_URL parse err")
 	}
-	config.Logger = logger
+	pgConfig.Logger = logger
 
 	poolConfig := pgx.ConnPoolConfig{
-		ConnConfig:     config,
-		MaxConnections: poolLimit,
+		ConnConfig:     pgConfig,
+		MaxConnections: config.PoolLimit,
 	}
 
 	queryInterface, err := pgx.NewConnPool(poolConfig)
@@ -26,7 +27,7 @@ func NewInstance(uri string, poolLimit int, logger pgx.Logger) (*Pg, error) {
 	}
 
 	return &Pg{
-		config:         config,
+		config:         pgConfig,
 		QueryInterface: queryInterface,
 	}, nil
 }
