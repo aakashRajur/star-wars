@@ -58,24 +58,26 @@ trap 'cleanup' INT SIGINT SIGTERM
 cd ${PROJECT_PATH}
 
 echo "STARTING WIKI-HTTP"
+go mod vendor
+echo "INSTALLED DEPENDENCIES"
 if [[ ${DEBUG} == true ]]; then
     (dlv --headless --listen=:${DEBUG_PORT} --api-version=2 debug ${MAIN}) &
 else
     (go run ${MAIN}) &
 fi
 
-# register node with consul
-echo "REGISTER NODE TO SERVICE DISCOVERY"
-/util/wait-for.sh -t 180 ${CONTAINER_HOST_NAME}:${CONSUL_HEALTHCHECK_PORT} && /util/register.sh
-
+## register node with consul
+#echo "REGISTER NODE TO SERVICE DISCOVERY"
+#/util/wait-for.sh -t 180 ${CONTAINER_HOST_NAME}:${CONSUL_HEALTHCHECK_PORT} && /util/register.sh
+#
 echo "WAITING FOR CHILD TO EXIT"
 wait
 EXIT_CODE=${?}
 sleep 10
 echo "CHILD EXITED: ${EXIT_CODE}"
-
-echo "UNREGISTER NODE FROM SERVICE DISCOVERY"
-/util/unregister.sh
-
-echo "EXITING"
-exit ${EXIT_CODE}
+#
+#echo "UNREGISTER NODE FROM SERVICE DISCOVERY"
+#/util/unregister.sh
+#
+#echo "EXITING"
+#exit ${EXIT_CODE}
