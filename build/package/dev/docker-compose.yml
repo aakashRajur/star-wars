@@ -99,7 +99,7 @@ services:
     environment:
       PROJECT_PATH: $PWD
     volumes:
-      - $PWD:$PWD:ro
+      - $PWD:$PWD
       - go-deps:/go
       - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
@@ -149,7 +149,7 @@ services:
     environment:
       PROJECT_PATH: $PWD
     volumes:
-      - $PWD:$PWD:ro
+      - $PWD:$PWD
       - go-deps:/go
       - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
