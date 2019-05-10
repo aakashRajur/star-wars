@@ -1,9 +1,13 @@
 package consul
 
-func NewInstance(consulHost string) (*Consul, error) {
-	instance := Consul{
-		Host: consulHost,
-	}
+import (
+	"github.com/aakashRajur/star-wars/pkg/types"
+)
 
-	return &instance, nil
+func NewInstance(config Config, logger types.Logger) *Consul {
+	consul := Consul{
+		Config: config,
+		Logger: logger,
+	}
+	return &consul
 }

@@ -1,103 +1,146 @@
 package consul
 
 import (
-	"encoding/json"
 	"fmt"
-	"net/url"
 	"time"
 
-	"github.com/juju/errors"
+	"github.com/pkg/errors"
 
 	"github.com/aakashRajur/star-wars/pkg/http"
-	"github.com/aakashRajur/star-wars/pkg/resource"
+	"github.com/aakashRajur/star-wars/pkg/service"
+	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
 const (
-	RegistrationUri   = `/v1/kv/:key`
-	UnregistrationUri = `/v1/kv/:key`
+	keyId                        = `id`
+	keyName                      = `name`
+	keyAddress                   = `address`
+	keyPort                      = `port`
+	keyHealthcheck               = `check`
+	keyHealthcheckSkipTLS        = `tls_skip_verify`
+	keyHealthcheckMethod         = `method`
+	keyHealthcheckInterval       = `interval`
+	keyHealthcheckTimeout        = `timeout`
+	consulServiceRegisterPath    = `/v1/agent/service/register`
+	consulServiceUnregisterParam = `service_id`
+	consulServiceUnregisterPath  = `/v1/agent/service/deregister/:service_id`
+	consulServiceQueryParam      = `service`
+	consulServiceQueryPath       = `/v1/catalog/service/:service`
+	consulServiceAddressKey      = `ServiceAddress`
 )
 
-func getResourceKey(resourceType string, source string) string {
-	return fmt.Sprintf(`resources/%s/%s`, resourceType, source)
-}
-
 type Consul struct {
-	Host string
+	Logger types.Logger
+	Config Config
 }
 
-func (consul *Consul) Register(definition resource.Definition) error {
-	registerUrl := url.URL{
-		Scheme: `http`,
-		Host:   consul.Host,
-		Path:   RegistrationUri,
+func (consul *Consul) Register(definition service.Service) error {
+	body := make(map[string]interface{})
+
+	body[keyId] = definition.Id
+	body[keyName] = definition.Name
+	body[keyAddress] = fmt.Sprintf(
+		`%s://%s:%d`,
+		definition.Scheme,
+		definition.Hostname,
+		definition.Port,
+	)
+	body[keyPort] = definition.Port
+	healthcheck := definition.Healthcheck
+	body[keyHealthcheck] = map[string]interface{}{
+		healthcheck.Scheme:     healthcheck.URL,
+		keyHealthcheckSkipTLS:  healthcheck.SkipTLS,
+		keyHealthcheckMethod:   healthcheck.HttpVerb,
+		keyHealthcheckInterval: healthcheck.Interval,
+		keyHealthcheckTimeout:  healthcheck.Timeout,
 	}
-	registerConfig := http.RequestConfig{
-		Verb: http.VerbPut,
-		Url:  registerUrl,
-		Params: map[string]interface{}{
-			`key`: getResourceKey(definition.Type, definition.Source),
-		},
-		Body:    definition,
+
+	url := consul.Config.Url()
+	url.Path = consulServiceRegisterPath
+
+	requestConfig := http.RequestConfig{
+		Verb:    http.VerbPut,
+		Url:     url,
+		Headers: nil,
+		Params:  nil,
+		Body:    body,
 		Timeout: 10 * time.Second,
 	}
 
-	resp, err := http.NewRequest(registerConfig)
+	response, err := http.NewRequest(requestConfig)
 	if err != nil {
+		fmt.Printf("REGISTER: %+v\n", err.Error())
 		return err
 	}
 
-	data, err := http.TextFromResponse(resp)
-	if err != nil {
-		return err
-	}
-
-	var success bool
-	err = json.Unmarshal([]byte(data), &success)
-	if err != nil {
-		return err
-	}
-
-	if !success {
-		return errors.Errorf(`UNABLE TO REGISTER RESOURCE %s`, definition.Type)
+	if response.StatusCode < 200 && response.StatusCode > 299 {
+		return errors.Errorf(`FAILED TO REGISTER SERVICE: %s`, response.Status)
 	}
 
 	return nil
 }
 
-func (consul *Consul) Unregister(definition resource.Definition) error {
-	unregisterUrl := url.URL{
-		Scheme: `http`,
-		Host:   consul.Host,
-		Path:   UnregistrationUri,
-	}
-	unregisterConfig := http.RequestConfig{
-		Verb: http.VerbPut,
-		Url:  unregisterUrl,
+func (consul *Consul) Unregister(definition service.Service) error {
+	url := consul.Config.Url()
+	url.Path = consulServiceUnregisterPath
+
+	requestConfig := http.RequestConfig{
+		Verb:    `PUT`,
+		Url:     url,
+		Headers: nil,
 		Params: map[string]interface{}{
-			`key`: getResourceKey(definition.Type, definition.Source),
+			consulServiceUnregisterParam: definition.Id,
 		},
+		Body:    nil,
 		Timeout: 10 * time.Second,
 	}
 
-	resp, err := http.NewRequest(unregisterConfig)
+	response, err := http.NewRequest(requestConfig)
 	if err != nil {
 		return err
 	}
+	fmt.Printf("UNREGISTER:  %+v\n", response)
 
-	data, err := http.TextFromResponse(resp)
-	if err != nil {
-		return err
-	}
-
-	var success bool
-	err = json.Unmarshal([]byte(data), &success)
-	if err != nil {
-		return err
-	}
-
-	if !success {
-		return errors.Errorf(`UNABLE TO UNREGISTER RESOURCE %s`, definition.Type)
+	if response.StatusCode < 200 && response.StatusCode > 299 {
+		return errors.Errorf(`FAILED TO UNREGISTER SERVICE: %s`, response.Status)
 	}
 
 	return nil
+}
+
+func (consul *Consul) Resolve(service string) ([]string, error) {
+	url := consul.Config.Url()
+	url.Path = consulServiceQueryPath
+
+	requestConfig := http.RequestConfig{
+		Verb:    http.VerbGet,
+		Url:     url,
+		Headers: nil,
+		Params: map[string]interface{}{
+			consulServiceQueryParam: service,
+		},
+		Body:    nil,
+		Timeout: 10 * time.Second,
+	}
+
+	compiled := make([]string, 0)
+	response, err := http.NewRequest(requestConfig)
+	if err != nil {
+		return compiled, err
+	}
+
+	available, err := http.JsonArrayFromResponse(response)
+	if err != nil {
+		return compiled, err
+	}
+
+	for _, each := range available {
+		address, ok := (each[consulServiceAddressKey]).(string)
+		if !ok {
+			continue
+		}
+		compiled = append(compiled, address)
+	}
+
+	return compiled, nil
 }
