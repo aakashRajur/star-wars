@@ -17,10 +17,10 @@ func main() {
 
 	wait := interrupt.NotifyOnInterrupt(
 		app.Stop,
-		30*time.Second,
+		60*time.Second,
 	)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	if err := app.Start(ctx); err != nil {
 		log.Fatal(err)
