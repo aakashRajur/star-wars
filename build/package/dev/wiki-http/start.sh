@@ -27,28 +27,6 @@ fi
 export INSTANCE_ID=${INSTANCE_ID};
 echo "export INSTANCE_ID=${INSTANCE_ID};" >> ${ENV_FILE}
 
-# discover database service endpoint
-DATABASE_URI=$(/util/get-service-endpoints.sh -s ${DATABASE_SERVICE} -r 5)
-if [[ -z "${DATABASE_URI}" ]]; then
-    echo "SERVICE DISCOVERY DID NOT PROVIDE DATABASE SERVICE ENDPOINT"
-    exit 1
-else
-    DATABASE_URI="postgres://${PG_USER}@${DATABASE_URI}/${PG_DB}"
-fi
-export DATABASE_URI=${DATABASE_URI};
-echo "export DATABASE_URI=${DATABASE_URI};" >> ${ENV_FILE}
-
-# discover cache service endpoint
-CACHE_URI=$(/util/get-service-endpoints.sh -s ${CACHE_SERVICE} -r 5)
-if [[ -z "${CACHE_URI}" ]]; then
-    echo "SERVICE DISCOVERY DID NOT PROVIDE CACHE SERVICE ENDPOINT"
-    exit 1
-else
-    CACHE_URI="redis://${CACHE_URI}"
-fi
-export CACHE_URI=${CACHE_URI};
-echo "export CACHE_URI=${CACHE_URI};" >> ${ENV_FILE}
-
 source ${ENV_FILE}
 
 # hook up our cleanup function

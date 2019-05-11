@@ -16,6 +16,7 @@ const (
 	HOSTNAME             = `CONTAINER_HOST_NAME`
 	PORT                 = `HTTP_PORT`
 	HEALTHCHECK_INTERVAL = `CONSUL_HEALTHCHECK_INTERVAL`
+	INSTANCE_ID          = `INSTANCE_ID`
 )
 
 func GetService() service.Service {
@@ -23,6 +24,7 @@ func GetService() service.Service {
 	hostName := env.GetString(HOSTNAME)
 	port := env.GetInt(PORT)
 	healthcheckInterval := env.GetString(HEALTHCHECK_INTERVAL)
+	instanceId := env.GetString(INSTANCE_ID)
 
 	healthcheck := service.Healthcheck{
 		Scheme:   `http`,
@@ -33,7 +35,7 @@ func GetService() service.Service {
 	}
 
 	return service.Service{
-		Id:          hostName,
+		Id:          instanceId,
 		Name:        serviceName,
 		Scheme:      `http`,
 		Hostname:    hostName,
