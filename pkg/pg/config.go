@@ -1,6 +1,6 @@
 package pg
 
 type Config struct {
-	URI       Url
+	URL       Url
 	PoolLimit int
 }

@@ -1,13 +1,15 @@
 package module
 
 import (
+	"math"
+
+	"github.com/juju/errors"
+	"go.uber.org/fx"
+
 	"github.com/aakashRajur/star-wars/pkg/env"
 	"github.com/aakashRajur/star-wars/pkg/kafka"
 	"github.com/aakashRajur/star-wars/pkg/service"
 	"github.com/aakashRajur/star-wars/pkg/types"
-	"github.com/juju/errors"
-	"go.uber.org/fx"
-	"math"
 )
 
 //noinspection GoSnakeCaseUsage
@@ -17,17 +19,20 @@ const (
 	KAFKA_MAX_REPLICAS   = `KAFKA_MAX_REPLICAS`
 )
 
-func GetKafkaConfig(resolver service.Resolver, service service.Service, logger types.Logger, handler types.FatalHandler) kafka.Config {
+func GetKafkaBrokers(resolver service.Resolver, handler types.FatalHandler) kafka.Brokers {
 	brokers, err := resolver.Resolve(KAFKA_SERVICE)
 	if err != nil {
 		handler.HandleFatal(err)
-		return kafka.Config{}
+		return []string{}
 	}
 	if len(brokers) < 1 {
 		handler.HandleFatal(errors.New(`NO KAFKA BROKERS FOUND`))
-		return kafka.Config{}
+		return []string{}
 	}
+	return brokers
+}
 
+func GetKafkaConfig(brokers kafka.Brokers, service service.Service, logger types.Logger) kafka.Config {
 	maxPartitions := env.GetInt(KAFKA_MAX_PARTITIONS)
 	maxReplicas := env.GetInt(KAFKA_MAX_REPLICAS)
 	groupId := service.Name
@@ -71,13 +76,14 @@ func GetKafka(config kafka.Config, definedTopics kafka.DefinedTopics, subscripti
 	return instance
 }
 
-func GetKafkaProtocol(kafka *kafka.Kafka) types.Protocol {
-	return kafka
-}
-
 var KafkaModule = fx.Provide(
+	GetKafkaBrokers,
 	GetKafkaConfig,
 	GetKafka,
 )
+
+func GetKafkaProtocol(kafka *kafka.Kafka) types.Protocol {
+	return kafka
+}
 
 var KafkaProtocolModule = fx.Provide(GetKafkaProtocol)

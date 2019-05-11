@@ -13,7 +13,7 @@ var (
 
 type Config struct {
 	Logger      types.Logger
-	Brokers     []string
+	Brokers     Brokers
 	GroupId     string
 	ClientId    string
 	Verbose     bool

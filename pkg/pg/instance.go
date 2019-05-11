@@ -6,7 +6,7 @@ import (
 )
 
 func NewInstance(config Config, logger pgx.Logger) (*Pg, error) {
-	pgUri := string(config.URI)
+	pgUri := string(config.URL)
 	if pgUri == "" {
 		return nil, errors.NotValidf("PG_URI is invalid")
 	}

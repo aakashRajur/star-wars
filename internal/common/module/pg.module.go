@@ -18,22 +18,24 @@ const (
 	PG_SERVICE = `DATABASE_SERVICE`
 )
 
-func GetPgConfig(resolver service.Resolver, handler types.FatalHandler) pg.Config {
+func GetPgUrl(resolver service.Resolver, handler types.FatalHandler) pg.Url {
 	pgService := env.GetString(PG_SERVICE)
 	endpoints, err := resolver.Resolve(pgService)
 	if err != nil {
 		handler.HandleFatal(err)
-		return pg.Config{}
+		return ``
 	}
 	if len(endpoints) < 1 {
 		handler.HandleFatal(errors.New(`NO PG SERVICE FOUND`))
-		return pg.Config{}
+		return ``
 	}
+	return pg.Url(endpoints[0])
+}
 
-	pgUri := endpoints[0]
+func GetPgConfig(url pg.Url) pg.Config {
 	pgPoolLimit := env.GetInt("PG_POOL_LIMIT")
 	return pg.Config{
-		URI:       pg.Url(pgUri),
+		URL:       url,
 		PoolLimit: pgPoolLimit,
 	}
 }
@@ -62,6 +64,7 @@ func GetPgLogger(logger types.Logger) pgx.Logger {
 
 var PgModule = fx.Provide(
 	GetPgLogger,
+	GetPgUrl,
 	GetPgConfig,
 	GetPg,
 )
