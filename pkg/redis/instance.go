@@ -6,8 +6,8 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-func NewInstance(uri string, logger types.Logger) (*Redis, error) {
-	options, err := redis.ParseURL(uri)
+func NewInstance(url Url, logger types.Logger) (*Redis, error) {
+	options, err := redis.ParseURL(string(url))
 	if err != nil {
 		return nil, err
 	}

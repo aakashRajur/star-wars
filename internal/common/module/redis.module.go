@@ -2,6 +2,8 @@ package module
 
 import (
 	"context"
+	"github.com/aakashRajur/star-wars/pkg/service"
+	"github.com/juju/errors"
 
 	"go.uber.org/fx"
 
@@ -10,8 +12,24 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-func GetRedis(lifecycle fx.Lifecycle, logger types.Logger, handler types.FatalHandler) *redis.Redis {
-	redisUri := env.GetString("CACHE_URI")
+//noinspection GoSnakeCaseUsage
+const (
+	REDIS_SERVICE = `CACHE_SERVICE`
+)
+
+func GetRedis(resolver service.Resolver, handler types.FatalHandler, logger types.Logger, lifecycle fx.Lifecycle) *redis.Redis {
+	redisService := env.GetString(REDIS_SERVICE)
+	endpoints, err := resolver.Resolve(redisService)
+	if err != nil {
+		handler.HandleFatal(err)
+		return nil
+	}
+	if len(endpoints) < 1 {
+		handler.HandleFatal(errors.New(`NO PG SERVICE FOUND`))
+		return nil
+	}
+
+	redisUri := redis.Url(endpoints[0])
 	client, err := redis.NewInstance(redisUri, logger)
 
 	if err != nil {
