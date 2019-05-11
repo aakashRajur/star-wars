@@ -100,7 +100,6 @@ func (consul *Consul) Unregister(definition service.Service) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("UNREGISTER:  %+v\n", response)
 
 	if response.StatusCode < 200 && response.StatusCode > 299 {
 		return errors.Errorf(`FAILED TO UNREGISTER SERVICE: %s`, response.Status)
