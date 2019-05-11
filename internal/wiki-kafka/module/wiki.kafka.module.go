@@ -10,12 +10,16 @@ import (
 var WikiKafkaModule = fx.Options(
 	module.FatalHandlerModule,
 	module.EnvModule,
-	module.EndpointModule,
 	module.LogModule,
 	module.InstrumentationModule,
+	ServiceModule,
 	module.PgModule,
 	module.RedisModule,
 	module.RedisPgModule,
+	module.ConsulModule,
+	ResourceModule,
+	module.HttpModule,
+	HealthcheckModule,
 	module.KafkaModule,
 	module.ResourceDefinitionModule,
 	module.CacheStrategyModule,
@@ -23,4 +27,5 @@ var WikiKafkaModule = fx.Options(
 	SubscriptionModule,
 	module.KafkaProtocolModule,
 	module.AppModule,
+	module.RegistreeModule,
 )

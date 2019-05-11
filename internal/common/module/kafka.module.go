@@ -1,22 +1,37 @@
 package module
 
 import (
-	"math"
-	"strings"
-
-	"go.uber.org/fx"
-
 	"github.com/aakashRajur/star-wars/pkg/env"
 	"github.com/aakashRajur/star-wars/pkg/kafka"
+	"github.com/aakashRajur/star-wars/pkg/service"
 	"github.com/aakashRajur/star-wars/pkg/types"
+	"github.com/juju/errors"
+	"go.uber.org/fx"
+	"math"
 )
 
-func GetKafkaConfig(logger types.Logger, endpoint types.Endpoint) kafka.Config {
-	brokers := strings.Split(env.GetString(`KAFKA_BROKERS`), `,`)
-	maxPartitions := env.GetInt(`KAFKA_MAX_PARTITIONS`)
-	maxReplicas := env.GetInt(`KAFKA_MAX_REPLICAS`)
-	groupId := env.GetString(`KAFKA_GROUP_ID`)
-	clientId := string(endpoint)
+//noinspection GoSnakeCaseUsage
+const (
+	KAFKA_SERVICE        = `kafka`
+	KAFKA_MAX_PARTITIONS = `KAFKA_MAX_PARTITIONS`
+	KAFKA_MAX_REPLICAS   = `KAFKA_MAX_REPLICAS`
+)
+
+func GetKafkaConfig(resolver service.Resolver, service service.Service, logger types.Logger, handler types.FatalHandler) kafka.Config {
+	brokers, err := resolver.Resolve(KAFKA_SERVICE)
+	if err != nil {
+		handler.HandleFatal(err)
+		return kafka.Config{}
+	}
+	if len(brokers) < 1 {
+		handler.HandleFatal(errors.New(`NO KAFKA BROKERS FOUND`))
+		return kafka.Config{}
+	}
+
+	maxPartitions := env.GetInt(KAFKA_MAX_PARTITIONS)
+	maxReplicas := env.GetInt(KAFKA_MAX_REPLICAS)
+	groupId := service.Name
+	clientId := service.Hostname
 
 	config := kafka.Config{
 		Logger:      logger,
@@ -30,7 +45,7 @@ func GetKafkaConfig(logger types.Logger, endpoint types.Endpoint) kafka.Config {
 	return config
 }
 
-func GetKafka(handler types.FatalHandler, config kafka.Config, definedTopics kafka.DefinedTopics, subscriptions []*kafka.Subscription) *kafka.Kafka {
+func GetKafka(config kafka.Config, definedTopics kafka.DefinedTopics, subscriptions []*kafka.Subscription, handler types.FatalHandler) *kafka.Kafka {
 	instance, err := kafka.NewInstance(config)
 	if err != nil {
 		handler.HandleFatal(err)

@@ -39,12 +39,14 @@ func (consul *Consul) Register(definition service.Service) error {
 
 	body[keyId] = definition.Id
 	body[keyName] = definition.Name
-	body[keyAddress] = fmt.Sprintf(
-		`%s://%s:%d`,
-		definition.Scheme,
-		definition.Hostname,
-		definition.Port,
-	)
+	if definition.Port > 0 {
+		body[keyAddress] = fmt.Sprintf(
+			`%s://%s:%d`,
+			definition.Scheme,
+			definition.Hostname,
+			definition.Port,
+		)
+	}
 	body[keyPort] = definition.Port
 	healthcheck := definition.Healthcheck
 	body[keyHealthcheck] = map[string]interface{}{
@@ -69,7 +71,6 @@ func (consul *Consul) Register(definition service.Service) error {
 
 	response, err := http.NewRequest(requestConfig)
 	if err != nil {
-		fmt.Printf("REGISTER: %+v\n", err.Error())
 		return err
 	}
 

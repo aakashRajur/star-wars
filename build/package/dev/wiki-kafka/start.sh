@@ -28,35 +28,35 @@ export INSTANCE_ID=${INSTANCE_ID};
 echo "export INSTANCE_ID=${INSTANCE_ID};" >> ${ENV_FILE}
 
 # discover database service endpoint
-DATABASE_URI=$(/util/get-service-endpoints.sh -s ${DATABASE_SERVICE} -r 5)
-if [[ -z "${DATABASE_URI}" ]]; then
-    echo "SERVICE DISCOVERY DID NOT PROVIDE DATABASE SERVICE ENDPOINT"
-    exit 1
-else
-    DATABASE_URI="postgres://${PG_USER}@${DATABASE_URI}/${PG_DB}"
-fi
-export DATABASE_URI=${DATABASE_URI};
-echo "export DATABASE_URI=${DATABASE_URI};" >> ${ENV_FILE}
-
-# discover cache service endpoint
-CACHE_URI=$(/util/get-service-endpoints.sh -s ${CACHE_SERVICE} -r 5)
-if [[ -z "${CACHE_URI}" ]]; then
-    echo "SERVICE DISCOVERY DID NOT PROVIDE CACHE SERVICE ENDPOINT"
-    exit 1
-else
-    CACHE_URI="redis://${CACHE_URI}"
-fi
-export CACHE_URI=${CACHE_URI};
-echo "export CACHE_URI=${CACHE_URI};" >> ${ENV_FILE}
+#DATABASE_URI=$(/util/get-service-endpoints.sh -s ${DATABASE_SERVICE} -r 5)
+#if [[ -z "${DATABASE_URI}" ]]; then
+#    echo "SERVICE DISCOVERY DID NOT PROVIDE DATABASE SERVICE ENDPOINT"
+#    exit 1
+#else
+#    DATABASE_URI="postgres://${PG_USER}@${DATABASE_URI}/${PG_DB}"
+#fi
+#export DATABASE_URI=${DATABASE_URI};
+#echo "export DATABASE_URI=${DATABASE_URI};" >> ${ENV_FILE}
+#
+## discover cache service endpoint
+#CACHE_URI=$(/util/get-service-endpoints.sh -s ${CACHE_SERVICE} -r 5)
+#if [[ -z "${CACHE_URI}" ]]; then
+#    echo "SERVICE DISCOVERY DID NOT PROVIDE CACHE SERVICE ENDPOINT"
+#    exit 1
+#else
+#    CACHE_URI="redis://${CACHE_URI}"
+#fi
+#export CACHE_URI=${CACHE_URI};
+#echo "export CACHE_URI=${CACHE_URI};" >> ${ENV_FILE}
 
 # discover kafka brokers
-KAFKA_BROKERS=$(/util/get-service-endpoints.sh -s ${KAFKA_SERVICE} -r 5)
-if [[ -z "${KAFKA_BROKERS}" ]]; then
-    echo "SERVICE DISCOVERY DID NOT PROVIDE KAFKA SERVICE ENDPOINT"
-    exit 1
-fi
-export KAFKA_BROKERS=${KAFKA_BROKERS};
-echo "export KAFKA_BROKERS=${KAFKA_BROKERS};" >> ${ENV_FILE}
+#KAFKA_BROKERS=$(/util/get-service-endpoints.sh -s ${KAFKA_SERVICE} -r 5)
+#if [[ -z "${KAFKA_BROKERS}" ]]; then
+#    echo "SERVICE DISCOVERY DID NOT PROVIDE KAFKA SERVICE ENDPOINT"
+#    exit 1
+#fi
+#export KAFKA_BROKERS=${KAFKA_BROKERS};
+#echo "export KAFKA_BROKERS=${KAFKA_BROKERS};" >> ${ENV_FILE}
 
 source ${ENV_FILE}
 
@@ -74,8 +74,8 @@ else
 fi
 
 # register node with consul
-echo "REGISTER NODE TO SERVICE DISCOVERY"
-/util/wait-for.sh -t 180 ${CONTAINER_HOST_NAME}:${CONSUL_HEALTHCHECK_PORT} && /util/register.sh
+#echo "REGISTER NODE TO SERVICE DISCOVERY"
+#/util/wait-for.sh -t 180 ${CONTAINER_HOST_NAME}:${CONSUL_HEALTHCHECK_PORT} && /util/register.sh
 
 echo "WAITING FOR CHILD TO EXIT"
 wait
@@ -83,8 +83,8 @@ EXIT_CODE=${?}
 sleep 10
 echo "CHILD EXITED: ${EXIT_CODE}"
 
-echo "UNREGISTER NODE FROM SERVICE DISCOVERY"
-/util/unregister.sh
+#echo "UNREGISTER NODE FROM SERVICE DISCOVERY"
+#/util/unregister.sh
 
 echo "EXITING"
 exit ${EXIT_CODE}
