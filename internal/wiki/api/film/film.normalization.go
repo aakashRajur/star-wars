@@ -5,7 +5,11 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/validate/normalizations"
 )
 
-var FilmNormalization = map[string]types.Normalizor{
+var ArgNormalization = map[string]types.Normalizor{
+	`id`: normalizations.NormalizeInteger(),
+}
+
+var BodyNormalization = map[string]types.Normalizor{
 	`episode`:    normalizations.NormalizeInteger(),
 	`planets`:    normalizations.NormalizeArray(normalizations.NormalizeInteger()),
 	`vehicles`:   normalizations.NormalizeArray(normalizations.NormalizeInteger()),

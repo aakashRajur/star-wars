@@ -2,9 +2,6 @@ package film
 
 import (
 	nativeHttp "net/http"
-	"strconv"
-
-	"github.com/juju/errors"
 
 	"github.com/aakashRajur/star-wars/internal/wiki/api/film"
 	middleware "github.com/aakashRajur/star-wars/middleware/http"
@@ -16,21 +13,12 @@ func PatchFilm(storage types.Storage, logger types.Logger, tracker types.TimeTra
 	requestHandler := func(response http.Response, request *http.Request) {
 		params := request.GetParams()
 
-		id, ok := params[paramKey]
-		if !ok {
-			response.Error(nativeHttp.StatusNotAcceptable, errors.New(`Planet id not provided`))
-			return
-		}
-		parsedId, err := strconv.Atoi(id)
-		if err != nil {
-			response.Error(nativeHttp.StatusUnprocessableEntity, errors.New(`Invalid planet id`))
-			return
-		}
+		id := params[paramKey].(int)
 
 		ctx := request.Context()
 		body := ctx.Value(middleware.JSON_BODY).(map[string]interface{})
 
-		err = film.QueryUpdateFilm(storage, tracker, parsedId, body)
+		err := film.QueryUpdateFilm(storage, tracker, id, body)
 
 		if err != nil {
 			response.Error(nativeHttp.StatusInternalServerError, err)
@@ -42,8 +30,13 @@ func PatchFilm(storage types.Storage, logger types.Logger, tracker types.TimeTra
 
 	middlewares := http.ChainMiddlewares(
 		middleware.Logger(logger),
+		middleware.ValidateArgs(
+			film.ArgValidation,
+			film.ArgNormalization,
+		),
 		middleware.JsonBodyParser,
-		middleware.ValidateBody(film.FilmValidation, film.FilmNormalization),
+		middleware.ValidateBody(
+			film.BodyValidation, film.BodyNormalization),
 	)
 
 	return http.HandlerWithMiddleware{

@@ -9,7 +9,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourceDefinitionPatch = film.ResourceDefinitionPatch
+var resourcePatch = film.ResourcePatch
 
 func PatchFilm(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
@@ -20,17 +20,7 @@ func PatchFilm(storage types.Storage, logger types.Logger, tracker types.TimeTra
 		}
 
 		args := event.Args
-		id, ok := args[film.ParamFilmId].(int)
-		if !ok {
-			response.Error = map[string]string{
-				`id`: `invalid film id`,
-			}
-			err := instance.Emit(response)
-			if err != nil {
-				logger.Error(err)
-			}
-			return
-		}
+		id := args[film.ParamFilmId].(int)
 
 		data := event.Data.(map[string]interface{})
 
@@ -58,22 +48,22 @@ func PatchFilm(storage types.Storage, logger types.Logger, tracker types.TimeTra
 		middleware.ValidateArgs(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			resourceDefinitionPatch.GetArgValidators(),
-			resourceDefinitionPatch.GetArgNormalizers(),
+			film.ArgValidation,
+			film.ArgNormalization,
 			true,
 		),
 		middleware.ValidateData(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			film.FilmValidation,
-			film.FilmNormalization,
-			resourceDefinitionPatch.DataRequired,
+			film.BodyValidation,
+			film.BodyNormalization,
+			true,
 		),
 	)
 
 	subscription := kafka.Subscription{
 		Topic:   definedTopics[topics.WikiRequestTopic],
-		Type:    resourceDefinitionPatch.Type,
+		Type:    resourcePatch.Type,
 		Handler: middlewares(handler),
 	}
 

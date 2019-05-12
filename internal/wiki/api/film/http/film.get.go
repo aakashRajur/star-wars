@@ -2,9 +2,6 @@ package film
 
 import (
 	nativeHttp "net/http"
-	"strconv"
-
-	"github.com/pkg/errors"
 
 	"github.com/aakashRajur/star-wars/internal/wiki/api/film"
 	middleware "github.com/aakashRajur/star-wars/middleware/http"
@@ -16,18 +13,9 @@ func GetFilm(storage types.Storage, logger types.Logger, tracker types.TimeTrack
 	requestHandler := func(response http.Response, request *http.Request) {
 		params := request.GetParams()
 
-		id, ok := params[paramKey]
-		if !ok {
-			response.Error(nativeHttp.StatusNotAcceptable, errors.New(`film id not provided`))
-			return
-		}
-		parsedId, err := strconv.Atoi(id)
-		if err != nil {
-			response.Error(nativeHttp.StatusUnprocessableEntity, errors.New(`invalid film id`))
-			return
-		}
+		id := params[paramKey].(int)
 
-		data, err := film.QuerySelectFilm(storage, tracker, cacheKey, parsedId)
+		data, err := film.QuerySelectFilm(storage, tracker, cacheKey, id)
 		if err != nil {
 			response.Error(nativeHttp.StatusNotFound, err)
 			return
@@ -39,7 +27,13 @@ func GetFilm(storage types.Storage, logger types.Logger, tracker types.TimeTrack
 		}
 	}
 
-	middlewares := http.ChainMiddlewares(middleware.Logger(logger))
+	middlewares := http.ChainMiddlewares(
+		middleware.Logger(logger),
+		middleware.ValidateArgs(
+			film.ArgValidation,
+			film.ArgNormalization,
+		),
+	)
 
 	return http.HandlerWithMiddleware{
 		HandleRequest: requestHandler,

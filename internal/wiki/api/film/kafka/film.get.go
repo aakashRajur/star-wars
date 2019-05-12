@@ -10,7 +10,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourceDefinitionGet = film.ResourceDefinitionGet
+var resourceGet = film.ResourceGet
 
 func GetFilm(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
@@ -21,17 +21,7 @@ func GetFilm(storage types.Storage, logger types.Logger, tracker types.TimeTrack
 		}
 
 		args := event.Args
-		id, ok := args[film.ParamFilmId].(int)
-		if !ok {
-			response.Error = map[string]string{
-				`id`: `invalid film id`,
-			}
-			err := instance.Emit(response)
-			if err != nil {
-				logger.Error(err)
-			}
-			return
-		}
+		id := args[film.ParamFilmId].(int)
 
 		data, err := film.QuerySelectFilm(storage, tracker, films.CacheKey, id)
 		if err != nil {
@@ -57,15 +47,15 @@ func GetFilm(storage types.Storage, logger types.Logger, tracker types.TimeTrack
 		middleware.ValidateArgs(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			resourceDefinitionGet.GetArgValidators(),
-			resourceDefinitionGet.GetArgNormalizers(),
+			film.ArgValidation,
+			film.ArgNormalization,
 			true,
 		),
 	)
 
 	subscription := kafka.Subscription{
 		Topic:   definedTopics[topics.WikiRequestTopic],
-		Type:    resourceDefinitionGet.Type,
+		Type:    resourceGet.Type,
 		Handler: middlewares(handler),
 	}
 
