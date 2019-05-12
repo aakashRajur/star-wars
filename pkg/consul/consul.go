@@ -27,6 +27,8 @@ const (
 	consulServiceQueryParam      = `service`
 	consulServiceQueryPath       = `/v1/catalog/service/:service`
 	consulServiceAddressKey      = `ServiceAddress`
+	resolveRetry                 = 5
+	resolveWait                  = 5 * time.Second
 )
 
 type Consul struct {
@@ -109,38 +111,51 @@ func (consul *Consul) Unregister(definition service.Service) error {
 }
 
 func (consul *Consul) Resolve(service string) ([]string, error) {
-	url := consul.Config.Url()
-	url.Path = consulServiceQueryPath
+	var lastErr error = nil
+	for i := 0; i < resolveRetry; i++ {
+		url := consul.Config.Url()
+		url.Path = consulServiceQueryPath
 
-	requestConfig := http.RequestConfig{
-		Verb:    http.VerbGet,
-		Url:     url,
-		Headers: nil,
-		Params: map[string]interface{}{
-			consulServiceQueryParam: service,
-		},
-		Body:    nil,
-		Timeout: 10 * time.Second,
-	}
+		requestConfig := http.RequestConfig{
+			Verb:    http.VerbGet,
+			Url:     url,
+			Headers: nil,
+			Params: map[string]interface{}{
+				consulServiceQueryParam: service,
+			},
+			Body:    nil,
+			Timeout: 10 * time.Second,
+		}
 
-	compiled := make([]string, 0)
-	response, err := http.NewRequest(requestConfig)
-	if err != nil {
-		return compiled, err
-	}
+		compiled := make([]string, 0)
+		response, err := http.NewRequest(requestConfig)
+		if err != nil {
+			return compiled, err
+		}
 
-	available, err := http.JsonArrayFromResponse(response)
-	if err != nil {
-		return compiled, err
-	}
-
-	for _, each := range available {
-		address, ok := (each[consulServiceAddressKey]).(string)
-		if !ok {
+		available, err := http.JsonArrayFromResponse(response)
+		if err != nil {
+			lastErr = err
+			time.Sleep(resolveWait)
 			continue
 		}
-		compiled = append(compiled, address)
+
+		for _, each := range available {
+			address, ok := (each[consulServiceAddressKey]).(string)
+			if !ok {
+				continue
+			}
+			compiled = append(compiled, address)
+		}
+
+		if len(compiled) < 1 {
+			lastErr = errors.Errorf(`NO SERVICES FOUND FOR %s`, service)
+			time.Sleep(resolveWait)
+			continue
+		}
+
+		return compiled, nil
 	}
 
-	return compiled, nil
+	return []string{}, lastErr
 }
