@@ -149,7 +149,7 @@ func unregisterResources(consul *Consul, definition service.Service) {
 		url.Path = consulResourceUnregisterPath
 
 		requestConfig := http.RequestConfig{
-			Verb:    http.VerbPut,
+			Verb:    http.VerbDelete,
 			Url:     url,
 			Headers: nil,
 			Params: map[string]interface{}{
