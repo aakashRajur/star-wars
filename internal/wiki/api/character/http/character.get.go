@@ -2,9 +2,6 @@ package character
 
 import (
 	nativeHttp "net/http"
-	"strconv"
-
-	"github.com/juju/errors"
 
 	"github.com/aakashRajur/star-wars/internal/wiki/api/character"
 	middleware "github.com/aakashRajur/star-wars/middleware/http"
@@ -16,18 +13,9 @@ func GetCharacter(storage types.Storage, logger types.Logger, tracker types.Time
 	requestHandler := func(response http.Response, request *http.Request) {
 		params := request.GetParams()
 
-		id, ok := params[paramKey]
-		if !ok {
-			response.Error(nativeHttp.StatusNotAcceptable, errors.New(`character id not provided`))
-			return
-		}
-		parsedId, err := strconv.Atoi(id)
-		if err != nil {
-			response.Error(nativeHttp.StatusUnprocessableEntity, errors.New(`invalid character id`))
-			return
-		}
+		id := params[paramKey].(int)
 
-		data, err := character.QuerySelectCharacter(storage, tracker, cacheKey, parsedId)
+		data, err := character.QuerySelectCharacter(storage, tracker, cacheKey, id)
 		if err != nil {
 			response.Error(nativeHttp.StatusNotFound, err)
 			return
@@ -39,7 +27,13 @@ func GetCharacter(storage types.Storage, logger types.Logger, tracker types.Time
 		}
 	}
 
-	middlewares := http.ChainMiddlewares(middleware.Logger(logger))
+	middlewares := http.ChainMiddlewares(
+		middleware.Logger(logger),
+		middleware.ValidateArgs(
+			character.ArgValidation,
+			character.ArgNormalization,
+		),
+	)
 
 	return http.HandlerWithMiddleware{
 		HandleRequest: requestHandler,

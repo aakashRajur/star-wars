@@ -10,7 +10,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourceDefinitionGet = character.ResourceDefinitionGet
+var resourceGet = character.ResourceGet
 
 func GetCharacter(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
@@ -21,17 +21,7 @@ func GetCharacter(storage types.Storage, logger types.Logger, tracker types.Time
 		}
 
 		args := event.Args
-		id, ok := args[character.ParamCharacterId].(int)
-		if !ok {
-			response.Error = map[string]string{
-				`id`: `invalid character id`,
-			}
-			err := instance.Emit(response)
-			if err != nil {
-				logger.Error(err)
-			}
-			return
-		}
+		id := args[character.ParamCharacterId].(int)
 
 		data, err := character.QuerySelectCharacter(storage, tracker, characters.CacheKey, id)
 		if err != nil {
@@ -57,15 +47,15 @@ func GetCharacter(storage types.Storage, logger types.Logger, tracker types.Time
 		middleware.ValidateArgs(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			resourceDefinitionGet.GetArgValidators(),
-			resourceDefinitionGet.GetArgNormalizers(),
+			character.ArgValidation,
+			character.ArgNormalization,
 			true,
 		),
 	)
 
 	subscription := kafka.Subscription{
 		Topic:   definedTopics[topics.WikiRequestTopic],
-		Type:    resourceDefinitionGet.Type,
+		Type:    resourceGet.Type,
 		Handler: middlewares(handler),
 	}
 

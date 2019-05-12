@@ -9,7 +9,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourceDefinitionPatch = character.ResourceDefinitionPatch
+var resourcePatch = character.ResourcePatch
 
 func PatchCharacter(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
@@ -20,17 +20,7 @@ func PatchCharacter(storage types.Storage, logger types.Logger, tracker types.Ti
 		}
 
 		args := event.Args
-		id, ok := args[character.ParamCharacterId].(int)
-		if !ok {
-			response.Error = map[string]string{
-				`id`: `invalid character id`,
-			}
-			err := instance.Emit(response)
-			if err != nil {
-				logger.Error(err)
-			}
-			return
-		}
+		id := args[character.ParamCharacterId].(int)
 
 		data := event.Data.(map[string]interface{})
 
@@ -57,22 +47,22 @@ func PatchCharacter(storage types.Storage, logger types.Logger, tracker types.Ti
 		middleware.ValidateArgs(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			resourceDefinitionPatch.GetArgValidators(),
-			resourceDefinitionPatch.GetArgNormalizers(),
+			character.ArgValidation,
+			character.ArgNormalization,
 			true,
 		),
 		middleware.ValidateData(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			character.CharacterValidation,
-			character.CharacterNormalization,
-			resourceDefinitionPatch.DataRequired,
+			character.BodyValidation,
+			character.BodyNormalization,
+			true,
 		),
 	)
 
 	subscription := kafka.Subscription{
 		Topic:   definedTopics[topics.WikiRequestTopic],
-		Type:    resourceDefinitionPatch.Type,
+		Type:    resourcePatch.Type,
 		Handler: middlewares(handler),
 	}
 
