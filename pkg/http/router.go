@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/aakashRajur/star-wars/pkg/types"
@@ -34,7 +35,7 @@ func (router *Router) routeRequests(writer http.ResponseWriter, request *http.Re
 		return true
 	}
 
-	params := make(map[string]string, 1)
+	params := make(map[string]interface{}, 1)
 
 	for _, each := range router.Routes {
 		pattern := each.Pattern
@@ -44,7 +45,14 @@ func (router *Router) routeRequests(writer http.ResponseWriter, request *http.Re
 			if len(matches) > 0 {
 				keys := pattern.SubexpNames()[1:]
 				for i := range keys {
-					params[keys[i]] = matches[i]
+					value := matches[i]
+					var unmarshaled interface{}
+					err := json.Unmarshal([]byte(value), &unmarshaled)
+					if err != nil {
+						params[keys[i]] = value
+					} else {
+						params[keys[i]] = unmarshaled
+					}
 				}
 			}
 

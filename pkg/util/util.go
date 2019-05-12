@@ -67,7 +67,7 @@ func GetType(value interface{}) string {
 }
 
 func LogRequest(logger types.Logger, request *http.Request) {
-	params := request.Context().Value(http.PARAMS).(map[string]string)
+	params := request.Context().Value(http.PARAMS).(map[string]interface{})
 	query := request.URL.Query()
 
 	logger.InfoFields(
