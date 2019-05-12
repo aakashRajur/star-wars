@@ -1,18 +1,18 @@
-package kafka
+package specie
 
 import (
 	"github.com/aakashRajur/star-wars/internal/topics"
-	"github.com/aakashRajur/star-wars/internal/wiki/api/films"
-	"github.com/aakashRajur/star-wars/internal/wiki/api/planet"
+	"github.com/aakashRajur/star-wars/internal/wiki/api/specie"
+	"github.com/aakashRajur/star-wars/internal/wiki/api/species"
 	middleware "github.com/aakashRajur/star-wars/middleware/kafka"
 	"github.com/aakashRajur/star-wars/pkg/di"
 	"github.com/aakashRajur/star-wars/pkg/kafka"
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourceGet = planet.ResourceGet
+var resourceGet = specie.ResourceGet
 
-func GetPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
+func GetSpecie(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
 		response := kafka.Event{
 			Topic: definedTopics[topics.WikiResponseTopic],
@@ -21,9 +21,9 @@ func GetPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTra
 		}
 
 		args := event.Args
-		id := args[planet.ParamPlanetId].(int)
+		id := args[specie.ParamSpecieId].(int)
 
-		data, err := planet.QuerySelectPlanet(storage, tracker, films.CacheKey, id)
+		data, err := specie.QuerySelectSpecie(storage, tracker, species.CacheKey, id)
 		if err != nil {
 			response.Error = map[string]string{
 				`db`: err.Error(),
@@ -47,8 +47,8 @@ func GetPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTra
 		middleware.ValidateArgs(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			planet.ArgValidation,
-			planet.ArgNormalization,
+			specie.ArgValidation,
+			specie.ArgNormalization,
 			true,
 		),
 	)

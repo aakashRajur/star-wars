@@ -1,17 +1,17 @@
-package kafka
+package planet
 
 import (
 	"github.com/aakashRajur/star-wars/internal/topics"
-	"github.com/aakashRajur/star-wars/internal/wiki/api/specie"
+	"github.com/aakashRajur/star-wars/internal/wiki/api/planet"
 	middleware "github.com/aakashRajur/star-wars/middleware/kafka"
 	"github.com/aakashRajur/star-wars/pkg/di"
 	"github.com/aakashRajur/star-wars/pkg/kafka"
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourcePatch = specie.ResourcePatch
+var resourcePatch = planet.ResourcePatch
 
-func PatchSpecie(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
+func PatchPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
 		response := kafka.Event{
 			Topic: definedTopics[topics.WikiResponseTopic],
@@ -20,11 +20,11 @@ func PatchSpecie(storage types.Storage, logger types.Logger, tracker types.TimeT
 		}
 
 		args := event.Args
-		id := args[specie.ParamSpecieId].(int)
+		id := args[planet.ParamPlanetId].(int)
 
 		data := event.Data.(map[string]interface{})
 
-		err := specie.QueryUpdateSpecie(storage, tracker, id, data)
+		err := planet.QueryUpdatePlanet(storage, tracker, id, data)
 		if err != nil {
 			response.Error = map[string]string{
 				`db`: err.Error(),
@@ -47,15 +47,15 @@ func PatchSpecie(storage types.Storage, logger types.Logger, tracker types.TimeT
 		middleware.ValidateArgs(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			specie.ArgValidation,
-			specie.ArgNormalization,
+			planet.ArgValidation,
+			planet.ArgNormalization,
 			true,
 		),
 		middleware.ValidateData(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			specie.BodyValidation,
-			specie.BodyNormalization,
+			planet.BodyValidation,
+			planet.BodyNormalization,
 			true,
 		),
 	)

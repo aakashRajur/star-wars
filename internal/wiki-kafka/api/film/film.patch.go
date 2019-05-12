@@ -1,17 +1,17 @@
-package kafka
+package film
 
 import (
 	"github.com/aakashRajur/star-wars/internal/topics"
-	"github.com/aakashRajur/star-wars/internal/wiki/api/vehicle"
+	"github.com/aakashRajur/star-wars/internal/wiki/api/film"
 	middleware "github.com/aakashRajur/star-wars/middleware/kafka"
 	"github.com/aakashRajur/star-wars/pkg/di"
 	"github.com/aakashRajur/star-wars/pkg/kafka"
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourcePatch = vehicle.ResourcePatch
+var resourcePatch = film.ResourcePatch
 
-func PatchVehicle(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
+func PatchFilm(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
 		response := kafka.Event{
 			Topic: definedTopics[topics.WikiResponseTopic],
@@ -20,11 +20,12 @@ func PatchVehicle(storage types.Storage, logger types.Logger, tracker types.Time
 		}
 
 		args := event.Args
-		id := args[vehicle.ParamVehicleId].(int)
+		id := args[film.ParamFilmId].(int)
 
 		data := event.Data.(map[string]interface{})
 
-		err := vehicle.QueryUpdateVehicle(storage, tracker, id, data)
+		err := film.QueryUpdateFilm(storage, tracker, id, data)
+
 		if err != nil {
 			response.Error = map[string]string{
 				`db`: err.Error(),
@@ -47,15 +48,15 @@ func PatchVehicle(storage types.Storage, logger types.Logger, tracker types.Time
 		middleware.ValidateArgs(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			vehicle.ArgValidation,
-			vehicle.ArgNormalization,
+			film.ArgValidation,
+			film.ArgNormalization,
 			true,
 		),
 		middleware.ValidateData(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			vehicle.BodyValidation,
-			vehicle.BodyNormalization,
+			film.BodyValidation,
+			film.BodyNormalization,
 			true,
 		),
 	)

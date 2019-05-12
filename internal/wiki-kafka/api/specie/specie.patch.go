@@ -1,19 +1,17 @@
-package kafka
+package specie
 
 import (
-	"encoding/json"
-
 	"github.com/aakashRajur/star-wars/internal/topics"
-	"github.com/aakashRajur/star-wars/internal/wiki/api/characters"
+	"github.com/aakashRajur/star-wars/internal/wiki/api/specie"
 	middleware "github.com/aakashRajur/star-wars/middleware/kafka"
 	"github.com/aakashRajur/star-wars/pkg/di"
 	"github.com/aakashRajur/star-wars/pkg/kafka"
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourceGet = characters.ResourceGet
+var resourcePatch = specie.ResourcePatch
 
-func GetCharacters(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
+func PatchSpecie(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
 		response := kafka.Event{
 			Topic: definedTopics[topics.WikiResponseTopic],
@@ -21,8 +19,12 @@ func GetCharacters(storage types.Storage, logger types.Logger, tracker types.Tim
 			Id:    event.Id,
 		}
 
-		oldPagination := event.Ctx.Value(types.PAGINATION).(types.Pagination)
-		result, newPagination, err := characters.QuerySelectCharacters(storage, tracker, characters.CacheKey, oldPagination)
+		args := event.Args
+		id := args[specie.ParamSpecieId].(int)
+
+		data := event.Data.(map[string]interface{})
+
+		err := specie.QueryUpdateSpecie(storage, tracker, id, data)
 		if err != nil {
 			response.Error = map[string]string{
 				`db`: err.Error(),
@@ -34,22 +36,6 @@ func GetCharacters(storage types.Storage, logger types.Logger, tracker types.Tim
 			return
 		}
 
-		marshaled, err := json.Marshal(*newPagination)
-		if err != nil {
-			response.Error = map[string]string{
-				`pagination`: err.Error(),
-			}
-			err := instance.Emit(response)
-			if err != nil {
-				logger.Error(err)
-			}
-			return
-		}
-
-		response.Args = map[string]interface{}{
-			types.PAGINATION: string(marshaled),
-		}
-		response.Data = result
 		err = instance.Emit(response)
 		if err != nil {
 			logger.Error(err)
@@ -58,12 +44,25 @@ func GetCharacters(storage types.Storage, logger types.Logger, tracker types.Tim
 
 	middlewares := kafka.ChainMiddlewares(
 		middleware.Logger(logger),
-		middleware.Pagination(),
+		middleware.ValidateArgs(
+			logger,
+			definedTopics[topics.WikiResponseTopic],
+			specie.ArgValidation,
+			specie.ArgNormalization,
+			true,
+		),
+		middleware.ValidateData(
+			logger,
+			definedTopics[topics.WikiResponseTopic],
+			specie.BodyValidation,
+			specie.BodyNormalization,
+			true,
+		),
 	)
 
 	subscription := kafka.Subscription{
 		Topic:   definedTopics[topics.WikiRequestTopic],
-		Type:    resourceGet.Type,
+		Type:    resourcePatch.Type,
 		Handler: middlewares(handler),
 	}
 

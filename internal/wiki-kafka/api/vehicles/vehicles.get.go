@@ -1,19 +1,18 @@
-package kafka
+package vehicles
 
 import (
 	"encoding/json"
-
 	"github.com/aakashRajur/star-wars/internal/topics"
-	"github.com/aakashRajur/star-wars/internal/wiki/api/planets"
+	"github.com/aakashRajur/star-wars/internal/wiki/api/vehicles"
 	middleware "github.com/aakashRajur/star-wars/middleware/kafka"
 	"github.com/aakashRajur/star-wars/pkg/di"
 	"github.com/aakashRajur/star-wars/pkg/kafka"
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourceGet = planets.ResourceGet
+var resourceGet = vehicles.ResourceGet
 
-func GetPlanets(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
+func GetVehicles(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
 		response := kafka.Event{
 			Topic: definedTopics[topics.WikiResponseTopic],
@@ -22,7 +21,7 @@ func GetPlanets(storage types.Storage, logger types.Logger, tracker types.TimeTr
 		}
 
 		oldPagination := event.Ctx.Value(types.PAGINATION).(types.Pagination)
-		result, newPagination, err := planets.QuerySelectPlanets(storage, tracker, planets.CacheKey, oldPagination)
+		result, newPagination, err := vehicles.QuerySelectVehicles(storage, tracker, vehicles.CacheKey, oldPagination)
 		if err != nil {
 			response.Error = map[string]string{
 				`db`: err.Error(),

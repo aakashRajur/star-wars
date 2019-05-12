@@ -1,18 +1,18 @@
-package kafka
+package character
 
 import (
-	"encoding/json"
 	"github.com/aakashRajur/star-wars/internal/topics"
-	"github.com/aakashRajur/star-wars/internal/wiki/api/vehicles"
+	"github.com/aakashRajur/star-wars/internal/wiki/api/character"
+	"github.com/aakashRajur/star-wars/internal/wiki/api/characters"
 	middleware "github.com/aakashRajur/star-wars/middleware/kafka"
 	"github.com/aakashRajur/star-wars/pkg/di"
 	"github.com/aakashRajur/star-wars/pkg/kafka"
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourceGet = vehicles.ResourceGet
+var resourceGet = character.ResourceGet
 
-func GetVehicles(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
+func GetCharacter(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
 		response := kafka.Event{
 			Topic: definedTopics[topics.WikiResponseTopic],
@@ -20,8 +20,10 @@ func GetVehicles(storage types.Storage, logger types.Logger, tracker types.TimeT
 			Id:    event.Id,
 		}
 
-		oldPagination := event.Ctx.Value(types.PAGINATION).(types.Pagination)
-		result, newPagination, err := vehicles.QuerySelectVehicles(storage, tracker, vehicles.CacheKey, oldPagination)
+		args := event.Args
+		id := args[character.ParamCharacterId].(int)
+
+		data, err := character.QuerySelectCharacter(storage, tracker, characters.CacheKey, id)
 		if err != nil {
 			response.Error = map[string]string{
 				`db`: err.Error(),
@@ -33,22 +35,7 @@ func GetVehicles(storage types.Storage, logger types.Logger, tracker types.TimeT
 			return
 		}
 
-		marshaled, err := json.Marshal(*newPagination)
-		if err != nil {
-			response.Error = map[string]string{
-				`pagination`: err.Error(),
-			}
-			err := instance.Emit(response)
-			if err != nil {
-				logger.Error(err)
-			}
-			return
-		}
-
-		response.Args = map[string]interface{}{
-			types.PAGINATION: string(marshaled),
-		}
-		response.Data = result
+		response.Data = data
 		err = instance.Emit(response)
 		if err != nil {
 			logger.Error(err)
@@ -57,7 +44,13 @@ func GetVehicles(storage types.Storage, logger types.Logger, tracker types.TimeT
 
 	middlewares := kafka.ChainMiddlewares(
 		middleware.Logger(logger),
-		middleware.Pagination(),
+		middleware.ValidateArgs(
+			logger,
+			definedTopics[topics.WikiResponseTopic],
+			character.ArgValidation,
+			character.ArgNormalization,
+			true,
+		),
 	)
 
 	subscription := kafka.Subscription{

@@ -1,17 +1,19 @@
-package kafka
+package planets
 
 import (
+	"encoding/json"
+
 	"github.com/aakashRajur/star-wars/internal/topics"
-	"github.com/aakashRajur/star-wars/internal/wiki/api/film"
+	"github.com/aakashRajur/star-wars/internal/wiki/api/planets"
 	middleware "github.com/aakashRajur/star-wars/middleware/kafka"
 	"github.com/aakashRajur/star-wars/pkg/di"
 	"github.com/aakashRajur/star-wars/pkg/kafka"
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourcePatch = film.ResourcePatch
+var resourceGet = planets.ResourceGet
 
-func PatchFilm(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
+func GetPlanets(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
 		response := kafka.Event{
 			Topic: definedTopics[topics.WikiResponseTopic],
@@ -19,13 +21,8 @@ func PatchFilm(storage types.Storage, logger types.Logger, tracker types.TimeTra
 			Id:    event.Id,
 		}
 
-		args := event.Args
-		id := args[film.ParamFilmId].(int)
-
-		data := event.Data.(map[string]interface{})
-
-		err := film.QueryUpdateFilm(storage, tracker, id, data)
-
+		oldPagination := event.Ctx.Value(types.PAGINATION).(types.Pagination)
+		result, newPagination, err := planets.QuerySelectPlanets(storage, tracker, planets.CacheKey, oldPagination)
 		if err != nil {
 			response.Error = map[string]string{
 				`db`: err.Error(),
@@ -37,6 +34,22 @@ func PatchFilm(storage types.Storage, logger types.Logger, tracker types.TimeTra
 			return
 		}
 
+		marshaled, err := json.Marshal(*newPagination)
+		if err != nil {
+			response.Error = map[string]string{
+				`pagination`: err.Error(),
+			}
+			err := instance.Emit(response)
+			if err != nil {
+				logger.Error(err)
+			}
+			return
+		}
+
+		response.Args = map[string]interface{}{
+			types.PAGINATION: string(marshaled),
+		}
+		response.Data = result
 		err = instance.Emit(response)
 		if err != nil {
 			logger.Error(err)
@@ -45,25 +58,12 @@ func PatchFilm(storage types.Storage, logger types.Logger, tracker types.TimeTra
 
 	middlewares := kafka.ChainMiddlewares(
 		middleware.Logger(logger),
-		middleware.ValidateArgs(
-			logger,
-			definedTopics[topics.WikiResponseTopic],
-			film.ArgValidation,
-			film.ArgNormalization,
-			true,
-		),
-		middleware.ValidateData(
-			logger,
-			definedTopics[topics.WikiResponseTopic],
-			film.BodyValidation,
-			film.BodyNormalization,
-			true,
-		),
+		middleware.Pagination(),
 	)
 
 	subscription := kafka.Subscription{
 		Topic:   definedTopics[topics.WikiRequestTopic],
-		Type:    resourcePatch.Type,
+		Type:    resourceGet.Type,
 		Handler: middlewares(handler),
 	}
 

@@ -1,19 +1,18 @@
-package kafka
+package vehicle
 
 import (
-	"encoding/json"
-
 	"github.com/aakashRajur/star-wars/internal/topics"
-	"github.com/aakashRajur/star-wars/internal/wiki/api/films"
+	"github.com/aakashRajur/star-wars/internal/wiki/api/vehicle"
+	"github.com/aakashRajur/star-wars/internal/wiki/api/vehicles"
 	middleware "github.com/aakashRajur/star-wars/middleware/kafka"
 	"github.com/aakashRajur/star-wars/pkg/di"
 	"github.com/aakashRajur/star-wars/pkg/kafka"
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourceGet = films.ResourceGet
+var resourceGet = vehicle.ResourceGet
 
-func GetFilms(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
+func GetVehicle(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
 		response := kafka.Event{
 			Topic: definedTopics[topics.WikiResponseTopic],
@@ -21,8 +20,10 @@ func GetFilms(storage types.Storage, logger types.Logger, tracker types.TimeTrac
 			Id:    event.Id,
 		}
 
-		oldPagination := event.Ctx.Value(types.PAGINATION).(types.Pagination)
-		result, newPagination, err := films.QuerySelectFilms(storage, tracker, films.CacheKey, oldPagination)
+		args := event.Args
+		id := args[vehicle.ParamVehicleId].(int)
+
+		data, err := vehicle.QuerySelectVehicle(storage, tracker, vehicles.CacheKey, id)
 		if err != nil {
 			response.Error = map[string]string{
 				`db`: err.Error(),
@@ -34,22 +35,7 @@ func GetFilms(storage types.Storage, logger types.Logger, tracker types.TimeTrac
 			return
 		}
 
-		marshaled, err := json.Marshal(*newPagination)
-		if err != nil {
-			response.Error = map[string]string{
-				`pagination`: err.Error(),
-			}
-			err := instance.Emit(response)
-			if err != nil {
-				logger.Error(err)
-			}
-			return
-		}
-
-		response.Args = map[string]interface{}{
-			types.PAGINATION: string(marshaled),
-		}
-		response.Data = result
+		response.Data = data
 		err = instance.Emit(response)
 		if err != nil {
 			logger.Error(err)
@@ -58,7 +44,13 @@ func GetFilms(storage types.Storage, logger types.Logger, tracker types.TimeTrac
 
 	middlewares := kafka.ChainMiddlewares(
 		middleware.Logger(logger),
-		middleware.Pagination(),
+		middleware.ValidateArgs(
+			logger,
+			definedTopics[topics.WikiResponseTopic],
+			vehicle.ArgValidation,
+			vehicle.ArgNormalization,
+			true,
+		),
 	)
 
 	subscription := kafka.Subscription{

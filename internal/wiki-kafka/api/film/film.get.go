@@ -1,17 +1,18 @@
-package kafka
+package film
 
 import (
 	"github.com/aakashRajur/star-wars/internal/topics"
-	"github.com/aakashRajur/star-wars/internal/wiki/api/planet"
+	"github.com/aakashRajur/star-wars/internal/wiki/api/film"
+	"github.com/aakashRajur/star-wars/internal/wiki/api/films"
 	middleware "github.com/aakashRajur/star-wars/middleware/kafka"
 	"github.com/aakashRajur/star-wars/pkg/di"
 	"github.com/aakashRajur/star-wars/pkg/kafka"
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourcePatch = planet.ResourcePatch
+var resourceGet = film.ResourceGet
 
-func PatchPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
+func GetFilm(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
 		response := kafka.Event{
 			Topic: definedTopics[topics.WikiResponseTopic],
@@ -20,11 +21,9 @@ func PatchPlanet(storage types.Storage, logger types.Logger, tracker types.TimeT
 		}
 
 		args := event.Args
-		id := args[planet.ParamPlanetId].(int)
+		id := args[film.ParamFilmId].(int)
 
-		data := event.Data.(map[string]interface{})
-
-		err := planet.QueryUpdatePlanet(storage, tracker, id, data)
+		data, err := film.QuerySelectFilm(storage, tracker, films.CacheKey, id)
 		if err != nil {
 			response.Error = map[string]string{
 				`db`: err.Error(),
@@ -36,6 +35,7 @@ func PatchPlanet(storage types.Storage, logger types.Logger, tracker types.TimeT
 			return
 		}
 
+		response.Data = data
 		err = instance.Emit(response)
 		if err != nil {
 			logger.Error(err)
@@ -47,22 +47,15 @@ func PatchPlanet(storage types.Storage, logger types.Logger, tracker types.TimeT
 		middleware.ValidateArgs(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			planet.ArgValidation,
-			planet.ArgNormalization,
-			true,
-		),
-		middleware.ValidateData(
-			logger,
-			definedTopics[topics.WikiResponseTopic],
-			planet.BodyValidation,
-			planet.BodyNormalization,
+			film.ArgValidation,
+			film.ArgNormalization,
 			true,
 		),
 	)
 
 	subscription := kafka.Subscription{
 		Topic:   definedTopics[topics.WikiRequestTopic],
-		Type:    resourcePatch.Type,
+		Type:    resourceGet.Type,
 		Handler: middlewares(handler),
 	}
 

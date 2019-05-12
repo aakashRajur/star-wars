@@ -1,17 +1,17 @@
-package kafka
+package vehicle
 
 import (
 	"github.com/aakashRajur/star-wars/internal/topics"
-	"github.com/aakashRajur/star-wars/internal/wiki/api/character"
+	"github.com/aakashRajur/star-wars/internal/wiki/api/vehicle"
 	middleware "github.com/aakashRajur/star-wars/middleware/kafka"
 	"github.com/aakashRajur/star-wars/pkg/di"
 	"github.com/aakashRajur/star-wars/pkg/kafka"
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourcePatch = character.ResourcePatch
+var resourcePatch = vehicle.ResourcePatch
 
-func PatchCharacter(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
+func PatchVehicle(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
 		response := kafka.Event{
 			Topic: definedTopics[topics.WikiResponseTopic],
@@ -20,11 +20,11 @@ func PatchCharacter(storage types.Storage, logger types.Logger, tracker types.Ti
 		}
 
 		args := event.Args
-		id := args[character.ParamCharacterId].(int)
+		id := args[vehicle.ParamVehicleId].(int)
 
 		data := event.Data.(map[string]interface{})
 
-		err := character.QueryUpdateCharacter(storage, tracker, id, data)
+		err := vehicle.QueryUpdateVehicle(storage, tracker, id, data)
 		if err != nil {
 			response.Error = map[string]string{
 				`db`: err.Error(),
@@ -47,15 +47,15 @@ func PatchCharacter(storage types.Storage, logger types.Logger, tracker types.Ti
 		middleware.ValidateArgs(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			character.ArgValidation,
-			character.ArgNormalization,
+			vehicle.ArgValidation,
+			vehicle.ArgNormalization,
 			true,
 		),
 		middleware.ValidateData(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			character.BodyValidation,
-			character.BodyNormalization,
+			vehicle.BodyValidation,
+			vehicle.BodyNormalization,
 			true,
 		),
 	)
