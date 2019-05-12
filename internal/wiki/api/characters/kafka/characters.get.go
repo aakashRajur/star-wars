@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"encoding/json"
+
 	"github.com/aakashRajur/star-wars/internal/topics"
 	"github.com/aakashRajur/star-wars/internal/wiki/api/characters"
 	middleware "github.com/aakashRajur/star-wars/middleware/kafka"
@@ -10,7 +11,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourceDefinitionGet = characters.ResourceDefinitionGet
+var resourceGet = characters.ResourceGet
 
 func GetCharacters(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
@@ -57,19 +58,12 @@ func GetCharacters(storage types.Storage, logger types.Logger, tracker types.Tim
 
 	middlewares := kafka.ChainMiddlewares(
 		middleware.Logger(logger),
-		middleware.ValidateArgs(
-			logger,
-			definedTopics[topics.WikiResponseTopic],
-			resourceDefinitionGet.GetArgValidators(),
-			resourceDefinitionGet.GetArgNormalizers(),
-			false,
-		),
 		middleware.Pagination(),
 	)
 
 	subscription := kafka.Subscription{
 		Topic:   definedTopics[topics.WikiRequestTopic],
-		Type:    resourceDefinitionGet.Type,
+		Type:    resourceGet.Type,
 		Handler: middlewares(handler),
 	}
 

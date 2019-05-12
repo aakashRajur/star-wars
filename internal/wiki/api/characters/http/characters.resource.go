@@ -8,7 +8,7 @@ import (
 )
 
 func Resource(storage types.Storage, logger types.Logger, tracker types.TimeTracker) di.ResourceProvider {
-	resource := http.NewResource(characters.HttpURI)
+	resource := http.NewResource(characters.HttpURL)
 	resource.Get(GetCharacters(storage, logger, tracker, characters.CacheKey))
 
 	return di.ResourceProvider{
