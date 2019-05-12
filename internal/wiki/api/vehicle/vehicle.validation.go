@@ -5,7 +5,11 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/validate/validations"
 )
 
-var VehicleValidation = map[string][]types.Validator{
+var ArgValidation = map[string][]types.Validator{
+	`id`: {validations.Required(), validations.ValidateIndex()},
+}
+
+var BodyValidation = map[string][]types.Validator{
 	`name`:                  {validations.ValidateString()},
 	`model`:                 {validations.ValidateString()},
 	`manufacturer`:          {validations.ValidateString()},

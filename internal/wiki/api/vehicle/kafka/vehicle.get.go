@@ -10,7 +10,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourceDefinitionGet = vehicle.ResourceDefinitionGet
+var resourceGet = vehicle.ResourceGet
 
 func GetVehicle(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
@@ -21,17 +21,7 @@ func GetVehicle(storage types.Storage, logger types.Logger, tracker types.TimeTr
 		}
 
 		args := event.Args
-		id, ok := args[vehicle.ParamVehicleId].(int)
-		if !ok {
-			response.Error = map[string]string{
-				`id`: `invalid character id`,
-			}
-			err := instance.Emit(response)
-			if err != nil {
-				logger.Error(err)
-			}
-			return
-		}
+		id := args[vehicle.ParamVehicleId].(int)
 
 		data, err := vehicle.QuerySelectVehicle(storage, tracker, vehicles.CacheKey, id)
 		if err != nil {
@@ -57,15 +47,15 @@ func GetVehicle(storage types.Storage, logger types.Logger, tracker types.TimeTr
 		middleware.ValidateArgs(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			resourceDefinitionGet.GetArgValidators(),
-			resourceDefinitionGet.GetArgNormalizers(),
+			vehicle.ArgValidation,
+			vehicle.ArgNormalization,
 			true,
 		),
 	)
 
 	subscription := kafka.Subscription{
 		Topic:   definedTopics[topics.WikiRequestTopic],
-		Type:    resourceDefinitionGet.Type,
+		Type:    resourceGet.Type,
 		Handler: middlewares(handler),
 	}
 

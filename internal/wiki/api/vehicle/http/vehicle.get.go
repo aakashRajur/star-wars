@@ -2,9 +2,6 @@ package vehicle
 
 import (
 	nativeHttp "net/http"
-	"strconv"
-
-	"github.com/juju/errors"
 
 	"github.com/aakashRajur/star-wars/internal/wiki/api/vehicle"
 	middleware "github.com/aakashRajur/star-wars/middleware/http"
@@ -17,18 +14,9 @@ func ApiGetVehicle(storage types.Storage, logger types.Logger, tracker types.Tim
 	requestHandler := func(response http.Response, request *http.Request) {
 		params := request.GetParams()
 
-		id, ok := params[paramKey]
-		if !ok {
-			response.Error(nativeHttp.StatusNotAcceptable, errors.New(`vehicle id not provided`))
-			return
-		}
-		parsedId, err := strconv.Atoi(id)
-		if err != nil {
-			response.Error(nativeHttp.StatusUnprocessableEntity, errors.New(`invalid vehicle id`))
-			return
-		}
+		id := params[paramKey].(int)
 
-		data, err := vehicle.QuerySelectVehicle(storage, tracker, cacheKey, parsedId)
+		data, err := vehicle.QuerySelectVehicle(storage, tracker, cacheKey, id)
 		if err != nil {
 			response.Error(nativeHttp.StatusNotFound, err)
 			return
@@ -40,7 +28,13 @@ func ApiGetVehicle(storage types.Storage, logger types.Logger, tracker types.Tim
 		}
 	}
 
-	middlewares := http.ChainMiddlewares(middleware.Logger(logger))
+	middlewares := http.ChainMiddlewares(
+		middleware.Logger(logger),
+		middleware.ValidateArgs(
+			vehicle.ArgValidation,
+			vehicle.ArgNormalization,
+		),
+	)
 
 	return http.HandlerWithMiddleware{
 		HandleRequest: requestHandler,

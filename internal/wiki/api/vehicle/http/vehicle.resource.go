@@ -9,7 +9,7 @@ import (
 )
 
 func Resource(storage types.Storage, logger types.Logger, tracker types.TimeTracker) di.ResourceProvider {
-	resource := http.NewResource(vehicle.HttpURI)
+	resource := http.NewResource(vehicle.HttpURL)
 	resource.Get(ApiGetVehicle(storage, logger, tracker, vehicles.CacheKey, vehicle.ParamVehicleId))
 	resource.Patch(ApiPatchVehicle(storage, logger, tracker, vehicle.ParamVehicleId))
 
