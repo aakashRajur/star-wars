@@ -10,7 +10,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourceDefinitionGet = vehicles.ResourceDefinitionGet
+var resourceGet = vehicles.ResourceGet
 
 func GetVehicles(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
@@ -57,19 +57,12 @@ func GetVehicles(storage types.Storage, logger types.Logger, tracker types.TimeT
 
 	middlewares := kafka.ChainMiddlewares(
 		middleware.Logger(logger),
-		middleware.ValidateArgs(
-			logger,
-			definedTopics[topics.WikiResponseTopic],
-			resourceDefinitionGet.GetArgValidators(),
-			resourceDefinitionGet.GetArgNormalizers(),
-			false,
-		),
 		middleware.Pagination(),
 	)
 
 	subscription := kafka.Subscription{
 		Topic:   definedTopics[topics.WikiRequestTopic],
-		Type:    resourceDefinitionGet.Type,
+		Type:    resourceGet.Type,
 		Handler: middlewares(handler),
 	}
 
