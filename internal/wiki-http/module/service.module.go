@@ -19,7 +19,7 @@ const (
 	INSTANCE_ID          = `INSTANCE_ID`
 )
 
-func GetService() service.Service {
+func GetService(resources []service.Resource) service.Service {
 	serviceName := env.GetString(SERVICE_NAME)
 	hostName := env.GetString(HOSTNAME)
 	port := env.GetInt(PORT)
@@ -41,6 +41,7 @@ func GetService() service.Service {
 		Hostname:    hostName,
 		Port:        port,
 		Healthcheck: healthcheck,
+		Resources:   resources,
 	}
 }
 

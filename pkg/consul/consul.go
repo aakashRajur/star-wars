@@ -27,16 +27,14 @@ const (
 	consulServiceQueryParam      = `service`
 	consulServiceQueryPath       = `/v1/catalog/service/:service`
 	consulServiceAddressKey      = `ServiceAddress`
+	consulResourceKey            = `key`
+	consulResourceRegisterPath   = `/v1/kv/:key`
+	consulResourceUnregisterPath = `/v1/kv/:key`
 	resolveRetry                 = 5
 	resolveWait                  = 5 * time.Second
 )
 
-type Consul struct {
-	Logger types.Logger
-	Config Config
-}
-
-func (consul *Consul) Register(definition service.Service) error {
+func registerService(consul *Consul, definition service.Service) error {
 	body := make(map[string]interface{})
 
 	body[keyId] = definition.Id
@@ -75,7 +73,6 @@ func (consul *Consul) Register(definition service.Service) error {
 	if err != nil {
 		return err
 	}
-
 	if response.StatusCode < 200 && response.StatusCode > 299 {
 		return errors.Errorf(`FAILED TO REGISTER SERVICE: %s`, response.Status)
 	}
@@ -83,7 +80,7 @@ func (consul *Consul) Register(definition service.Service) error {
 	return nil
 }
 
-func (consul *Consul) Unregister(definition service.Service) error {
+func unregisterService(consul *Consul, definition service.Service) error {
 	url := consul.Config.Url()
 	url.Path = consulServiceUnregisterPath
 
@@ -107,6 +104,97 @@ func (consul *Consul) Unregister(definition service.Service) error {
 		return errors.Errorf(`FAILED TO UNREGISTER SERVICE: %s`, response.Status)
 	}
 
+	return nil
+}
+
+func registerResources(consul *Consul, definition service.Service) {
+	logger := consul.Logger
+	resources := definition.Resources
+	for _, resource := range resources {
+		url := consul.Config.Url()
+		url.Path = consulResourceRegisterPath
+
+		body := resource.Map()
+
+		requestConfig := http.RequestConfig{
+			Verb:    http.VerbPut,
+			Url:     url,
+			Headers: nil,
+			Params: map[string]interface{}{
+				consulResourceKey: fmt.Sprintf(
+					`%s/%s`,
+					resource.Type,
+					definition.Id,
+				),
+			},
+			Body:    body,
+			Timeout: 10 * time.Second,
+		}
+
+		response, err := http.NewRequest(requestConfig)
+		if err != nil {
+			logger.Error(err)
+		}
+		if response.StatusCode < 200 && response.StatusCode > 299 {
+			logger.Error(errors.Errorf(`UNABLE TO REGISTER RESOURCE %s`, resource.Type))
+		}
+	}
+}
+
+func unregisterResources(consul *Consul, definition service.Service) {
+	logger := consul.Logger
+	resources := definition.Resources
+	for _, resource := range resources {
+		url := consul.Config.Url()
+		url.Path = consulResourceUnregisterPath
+
+		requestConfig := http.RequestConfig{
+			Verb:    http.VerbPut,
+			Url:     url,
+			Headers: nil,
+			Params: map[string]interface{}{
+				consulResourceKey: fmt.Sprintf(
+					`%s/%s`,
+					resource.Type,
+					definition.Id,
+				),
+			},
+			Body:    nil,
+			Timeout: 10 * time.Second,
+		}
+
+		response, err := http.NewRequest(requestConfig)
+		if err != nil {
+			logger.Error(err)
+		}
+		if response.StatusCode < 200 && response.StatusCode > 299 {
+			logger.Error(errors.Errorf(`UNABLE TO UNREGISTER RESOURCE %s`, resource.Type))
+		}
+	}
+}
+
+type Consul struct {
+	Logger types.Logger
+	Config Config
+}
+
+func (consul *Consul) Register(definition service.Service) error {
+	err := registerService(consul, definition)
+	if err != nil {
+		return err
+	}
+
+	registerResources(consul, definition)
+	return nil
+}
+
+func (consul *Consul) Unregister(definition service.Service) error {
+	err := unregisterService(consul, definition)
+	if err != nil {
+		return err
+	}
+
+	unregisterResources(consul, definition)
 	return nil
 }
 

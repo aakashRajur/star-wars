@@ -14,9 +14,10 @@ import (
 )
 
 const (
-	VerbGet   = `GET`
-	VerbPatch = `PATCH`
-	VerbPut   = `PUT`
+	VerbGet    = `GET`
+	VerbPatch  = `PATCH`
+	VerbPut    = `PUT`
+	VerbDelete = `DELETE`
 )
 
 func withParams(u *url.URL, params map[string]interface{}) string {

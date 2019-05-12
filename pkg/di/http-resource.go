@@ -8,10 +8,10 @@ import (
 
 type HttpResourcesCompiler struct {
 	fx.In
-	Resources []http.Resource `group:"resources"`
+	Resources []http.Resource `group:"http_resources"`
 }
 
 type HttpResourceProvider struct {
 	fx.Out
-	Resource http.Resource `group:"resources"`
+	Resource http.Resource `group:"http_resources"`
 }
