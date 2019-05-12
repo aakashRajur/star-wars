@@ -15,7 +15,7 @@ func Pagination() kafka.Middleware {
 			}
 
 			args := event.Args
-			if args != nil {
+			if args == nil {
 				newCtx := context.WithValue(event.Ctx, types.PAGINATION, pagination)
 				event.Ctx = newCtx
 				next(event, instance)
