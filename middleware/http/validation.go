@@ -10,6 +10,32 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
+func ValidateArgs(validators map[string][]types.Validator, normalizors map[string]types.Normalizor) http.Middleware {
+	return func(next http.HandleRequest) http.HandleRequest {
+		return func(response http.Response, request *http.Request) {
+			params := request.GetParams()
+
+			err := validate.Validate(validators, params)
+			if err != nil {
+				response.ErrorString(nativeHttp.StatusUnprocessableEntity, http.ContentTypeJSON, err.Error())
+			}
+
+			if normalizors == nil {
+				next(response, request)
+				return
+			}
+
+			normalized, err := validate.Normalize(normalizors, params)
+			if err != nil {
+				response.ErrorString(nativeHttp.StatusUnprocessableEntity, http.ContentTypeJSON, err.Error())
+				return
+			}
+
+			next(response, request.WithParams(normalized))
+		}
+	}
+}
+
 func ValidateBody(validators map[string][]types.Validator, normalizors map[string]types.Normalizor) http.Middleware {
 	return func(next http.HandleRequest) http.HandleRequest {
 		return func(response http.Response, request *http.Request) {
