@@ -3,6 +3,7 @@ version: "3.7"
 volumes:
   go-deps:
   node-deps:
+  db-dir:
 
 services:
   consul:
@@ -66,6 +67,7 @@ services:
       start_period: 30s
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - db-dir:/var/lib/postgresql/data
     depends_on:
       - consul
   wiki-cache:

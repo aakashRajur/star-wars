@@ -32,7 +32,7 @@ echo "STARTING SERVICE DISCOVERY HEALTHCHECK SERVER"
 
 # register node with consul
 echo "REGISTER NODE TO SERVICE DISCOVERY"
-/util/wait-for.sh -t 30 ${CONTAINER_HOST_NAME}:${CONSUL_HEALTHCHECK_PORT} && /util/register.sh
+/util/wait-for.sh -t 180 ${CONTAINER_HOST_NAME}:${CONSUL_HEALTHCHECK_PORT} && /util/register.sh
 
 echo "WAITING FOR CHILD TO EXIT"
 wait
