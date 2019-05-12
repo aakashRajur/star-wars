@@ -38,7 +38,10 @@ func GetFilms(storage types.Storage, logger types.Logger, tracker types.TimeTrac
 			logger.Error(err)
 		}
 	}
-	middlewares := http.ChainMiddlewares(middleware.Logger(logger), middleware.Pagination)
+	middlewares := http.ChainMiddlewares(
+		middleware.Logger(logger),
+		middleware.Pagination,
+	)
 
 	return http.HandlerWithMiddleware{
 		HandleRequest: requestHandler,
