@@ -2,9 +2,6 @@ package planet
 
 import (
 	nativeHttp "net/http"
-	"strconv"
-
-	"github.com/juju/errors"
 
 	"github.com/aakashRajur/star-wars/internal/wiki/api/planet"
 	middleware "github.com/aakashRajur/star-wars/middleware/http"
@@ -16,21 +13,12 @@ func PatchPlanet(storage types.Storage, logger types.Logger, tracker types.TimeT
 	requestHandler := func(response http.Response, request *http.Request) {
 		params := request.GetParams()
 
-		id, ok := params[paramKey]
-		if !ok {
-			response.Error(nativeHttp.StatusNotAcceptable, errors.New(`Planet id not provided`))
-			return
-		}
-		parsedId, err := strconv.Atoi(id)
-		if err != nil {
-			response.Error(nativeHttp.StatusUnprocessableEntity, errors.New(`Invalid planet id`))
-			return
-		}
+		id := params[paramKey].(int)
 
 		ctx := request.Context()
 		body := ctx.Value(middleware.JSON_BODY).(map[string]interface{})
 
-		err = planet.QueryUpdatePlanet(storage, tracker, parsedId, body)
+		err := planet.QueryUpdatePlanet(storage, tracker, id, body)
 
 		if err != nil {
 			response.Error(nativeHttp.StatusInternalServerError, err)
@@ -42,10 +30,14 @@ func PatchPlanet(storage types.Storage, logger types.Logger, tracker types.TimeT
 
 	middlewares := http.ChainMiddlewares(
 		middleware.Logger(logger),
+		middleware.ValidateArgs(
+			planet.ArgValidation,
+			planet.ArgNormalization,
+		),
 		middleware.JsonBodyParser,
 		middleware.ValidateBody(
-			planet.PlanetValidation,
-			planet.PlanetNormalization,
+			planet.BodyValidation,
+			planet.BodyNormalization,
 		),
 	)
 

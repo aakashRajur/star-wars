@@ -10,7 +10,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourceDefinitionGet = planet.ResourceDefinitionGet
+var resourceGet = planet.ResourceGet
 
 func GetPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
@@ -21,17 +21,7 @@ func GetPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTra
 		}
 
 		args := event.Args
-		id, ok := args[planet.ParamPlanetId].(int)
-		if !ok {
-			response.Error = map[string]string{
-				`id`: `invalid planet id`,
-			}
-			err := instance.Emit(response)
-			if err != nil {
-				logger.Error(err)
-			}
-			return
-		}
+		id := args[planet.ParamPlanetId].(int)
 
 		data, err := planet.QuerySelectPlanet(storage, tracker, films.CacheKey, id)
 		if err != nil {
@@ -57,15 +47,15 @@ func GetPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTra
 		middleware.ValidateArgs(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			resourceDefinitionGet.GetArgValidators(),
-			resourceDefinitionGet.GetArgNormalizers(),
+			planet.ArgValidation,
+			planet.ArgNormalization,
 			true,
 		),
 	)
 
 	subscription := kafka.Subscription{
 		Topic:   definedTopics[topics.WikiRequestTopic],
-		Type:    resourceDefinitionGet.Type,
+		Type:    resourceGet.Type,
 		Handler: middlewares(handler),
 	}
 

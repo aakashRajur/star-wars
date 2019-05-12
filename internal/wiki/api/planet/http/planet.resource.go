@@ -9,7 +9,7 @@ import (
 )
 
 func Resource(storage types.Storage, logger types.Logger, tracker types.TimeTracker) di.ResourceProvider {
-	resource := http.NewResource(planet.HttpURI)
+	resource := http.NewResource(planet.HttpURL)
 	resource.Get(GetPlanet(storage, logger, tracker, planets.CacheKey, planet.ParamPlanetId))
 	resource.Patch(PatchPlanet(storage, logger, tracker, planet.ParamPlanetId))
 

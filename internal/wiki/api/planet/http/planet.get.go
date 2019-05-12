@@ -2,9 +2,6 @@ package planet
 
 import (
 	nativeHttp "net/http"
-	"strconv"
-
-	"github.com/pkg/errors"
 
 	"github.com/aakashRajur/star-wars/internal/wiki/api/planet"
 	middleware "github.com/aakashRajur/star-wars/middleware/http"
@@ -17,18 +14,9 @@ func GetPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTra
 	requestHandler := func(response http.Response, request *http.Request) {
 		params := request.GetParams()
 
-		id, ok := params[paramKey]
-		if !ok {
-			response.Error(nativeHttp.StatusNotAcceptable, errors.New(`planet id not provided`))
-			return
-		}
-		parsedId, err := strconv.Atoi(id)
-		if err != nil {
-			response.Error(nativeHttp.StatusUnprocessableEntity, errors.New(`invalid planet id`))
-			return
-		}
+		id := params[paramKey].(int)
 
-		data, err := planet.QuerySelectPlanet(storage, tracker, cacheKey, parsedId)
+		data, err := planet.QuerySelectPlanet(storage, tracker, cacheKey, id)
 		if err != nil {
 			response.Error(nativeHttp.StatusNotFound, err)
 			return
@@ -40,7 +28,13 @@ func GetPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTra
 		}
 	}
 
-	middlewares := http.ChainMiddlewares(middleware.Logger(logger))
+	middlewares := http.ChainMiddlewares(
+		middleware.Logger(logger),
+		middleware.ValidateArgs(
+			planet.ArgValidation,
+			planet.ArgNormalization,
+		),
+	)
 
 	return http.HandlerWithMiddleware{
 		HandleRequest: requestHandler,

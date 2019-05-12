@@ -9,7 +9,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourceDefinitionPatch = planet.ResourceDefinitionPatch
+var resourcePatch = planet.ResourcePatch
 
 func PatchPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
@@ -20,17 +20,7 @@ func PatchPlanet(storage types.Storage, logger types.Logger, tracker types.TimeT
 		}
 
 		args := event.Args
-		id, ok := args[planet.ParamPlanetId].(int)
-		if !ok {
-			response.Error = map[string]string{
-				`id`: `invalid planet id`,
-			}
-			err := instance.Emit(response)
-			if err != nil {
-				logger.Error(err)
-			}
-			return
-		}
+		id := args[planet.ParamPlanetId].(int)
 
 		data := event.Data.(map[string]interface{})
 
@@ -57,22 +47,22 @@ func PatchPlanet(storage types.Storage, logger types.Logger, tracker types.TimeT
 		middleware.ValidateArgs(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			resourceDefinitionPatch.GetArgValidators(),
-			resourceDefinitionPatch.GetArgNormalizers(),
+			planet.ArgValidation,
+			planet.ArgNormalization,
 			true,
 		),
 		middleware.ValidateData(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			planet.PlanetValidation,
-			planet.PlanetNormalization,
-			resourceDefinitionPatch.DataRequired,
+			planet.BodyValidation,
+			planet.BodyNormalization,
+			true,
 		),
 	)
 
 	subscription := kafka.Subscription{
 		Topic:   definedTopics[topics.WikiRequestTopic],
-		Type:    resourceDefinitionPatch.Type,
+		Type:    resourcePatch.Type,
 		Handler: middlewares(handler),
 	}
 
