@@ -9,7 +9,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/util"
 )
 
-func Resource(logger types.Logger) di.ResourceProvider {
+func Resource(logger types.Logger) di.HttpResourceProvider {
 	resource := http.NewResource(`/stats`)
 
 	resource.Get(
@@ -35,5 +35,5 @@ func Resource(logger types.Logger) di.ResourceProvider {
 		},
 	)
 
-	return di.ResourceProvider{Resource: resource}
+	return di.HttpResourceProvider{Resource: resource}
 }

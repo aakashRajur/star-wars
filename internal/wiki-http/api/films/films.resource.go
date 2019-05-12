@@ -7,11 +7,11 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-func Resource(storage types.Storage, logger types.Logger, tracker types.TimeTracker) di.ResourceProvider {
+func Resource(storage types.Storage, logger types.Logger, tracker types.TimeTracker) di.HttpResourceProvider {
 	resource := http.NewResource(films.HttpURL)
 	resource.Get(GetFilms(storage, logger, tracker, films.CacheKey))
 
-	return di.ResourceProvider{
+	return di.HttpResourceProvider{
 		Resource: resource,
 	}
 }

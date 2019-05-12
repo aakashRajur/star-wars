@@ -6,12 +6,12 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/http"
 )
 
-type ResourcesCompiler struct {
+type HttpResourcesCompiler struct {
 	fx.In
 	Resources []http.Resource `group:"resources"`
 }
 
-type ResourceProvider struct {
+type HttpResourceProvider struct {
 	fx.Out
 	Resource http.Resource `group:"resources"`
 }

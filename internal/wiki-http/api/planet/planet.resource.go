@@ -8,10 +8,10 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-func Resource(storage types.Storage, logger types.Logger, tracker types.TimeTracker) di.ResourceProvider {
+func Resource(storage types.Storage, logger types.Logger, tracker types.TimeTracker) di.HttpResourceProvider {
 	resource := http.NewResource(planet.HttpURL)
 	resource.Get(GetPlanet(storage, logger, tracker, planets.CacheKey, planet.ParamPlanetId))
 	resource.Patch(PatchPlanet(storage, logger, tracker, planet.ParamPlanetId))
 
-	return di.ResourceProvider{Resource: resource}
+	return di.HttpResourceProvider{Resource: resource}
 }

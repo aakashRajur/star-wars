@@ -19,7 +19,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/http"
 )
 
-func GetResources(resourceGroup di.ResourcesCompiler) []http.Resource {
+func GetResources(resourceGroup di.HttpResourcesCompiler) []http.Resource {
 	return resourceGroup.Resources
 }
 

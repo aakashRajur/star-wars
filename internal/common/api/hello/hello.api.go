@@ -7,7 +7,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-func Resource(logger types.Logger) di.ResourceProvider {
+func Resource(logger types.Logger) di.HttpResourceProvider {
 	requestHandler := func(response http.Response, request *http.Request) {
 		_, err := response.WriteText(SayHello())
 		if err != nil {
@@ -22,7 +22,7 @@ func Resource(logger types.Logger) di.ResourceProvider {
 			Middlewares:   middlewares,
 		},
 	)
-	return di.ResourceProvider{
+	return di.HttpResourceProvider{
 		Resource: resource,
 	}
 }
