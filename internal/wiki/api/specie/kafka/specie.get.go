@@ -10,7 +10,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-var resourceDefinitionGet = specie.ResourceDefinitionGet
+var resourceGet = specie.ResourceGet
 
 func GetSpecie(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
@@ -21,17 +21,7 @@ func GetSpecie(storage types.Storage, logger types.Logger, tracker types.TimeTra
 		}
 
 		args := event.Args
-		id, ok := args[specie.ParamSpecieId].(int)
-		if !ok {
-			response.Error = map[string]string{
-				`id`: `invalid specie id`,
-			}
-			err := instance.Emit(response)
-			if err != nil {
-				logger.Error(err)
-			}
-			return
-		}
+		id := args[specie.ParamSpecieId].(int)
 
 		data, err := specie.QuerySelectSpecie(storage, tracker, species.CacheKey, id)
 		if err != nil {
@@ -57,15 +47,15 @@ func GetSpecie(storage types.Storage, logger types.Logger, tracker types.TimeTra
 		middleware.ValidateArgs(
 			logger,
 			definedTopics[topics.WikiResponseTopic],
-			resourceDefinitionGet.GetArgValidators(),
-			resourceDefinitionGet.GetArgNormalizers(),
+			specie.ArgValidation,
+			specie.ArgNormalization,
 			true,
 		),
 	)
 
 	subscription := kafka.Subscription{
 		Topic:   definedTopics[topics.WikiRequestTopic],
-		Type:    resourceDefinitionGet.Type,
+		Type:    resourceGet.Type,
 		Handler: middlewares(handler),
 	}
 

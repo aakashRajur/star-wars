@@ -2,9 +2,6 @@ package specie
 
 import (
 	nativeHttp "net/http"
-	"strconv"
-
-	"github.com/juju/errors"
 
 	"github.com/aakashRajur/star-wars/internal/wiki/api/specie"
 	middleware "github.com/aakashRajur/star-wars/middleware/http"
@@ -16,18 +13,9 @@ func ApiGetSpecie(storage types.Storage, logger types.Logger, tracker types.Time
 	requestHandler := func(response http.Response, request *http.Request) {
 		params := request.GetParams()
 
-		id, ok := params[paramKey]
-		if !ok {
-			response.Error(nativeHttp.StatusNotAcceptable, errors.New(`specie id not provided`))
-			return
-		}
-		parsedId, err := strconv.Atoi(id)
-		if err != nil {
-			response.Error(nativeHttp.StatusUnprocessableEntity, errors.New(`invalid specie id`))
-			return
-		}
+		id := params[paramKey].(int)
 
-		data, err := specie.QuerySelectSpecie(storage, tracker, cacheKey, parsedId)
+		data, err := specie.QuerySelectSpecie(storage, tracker, cacheKey, id)
 		if err != nil {
 			response.Error(nativeHttp.StatusNotFound, err)
 			return
@@ -39,7 +27,13 @@ func ApiGetSpecie(storage types.Storage, logger types.Logger, tracker types.Time
 		}
 	}
 
-	middlewares := http.ChainMiddlewares(middleware.Logger(logger))
+	middlewares := http.ChainMiddlewares(
+		middleware.Logger(logger),
+		middleware.ValidateArgs(
+			specie.ArgValidation,
+			specie.ArgNormalization,
+		),
+	)
 
 	return http.HandlerWithMiddleware{
 		HandleRequest: requestHandler,
