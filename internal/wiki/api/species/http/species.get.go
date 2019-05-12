@@ -40,7 +40,10 @@ func GetSpecies(storage types.Storage, logger types.Logger, tracker types.TimeTr
 		}
 	}
 
-	middlewares := http.ChainMiddlewares(middleware.Logger(logger), middleware.Pagination)
+	middlewares := http.ChainMiddlewares(
+		middleware.Logger(logger),
+		middleware.Pagination,
+	)
 
 	return http.HandlerWithMiddleware{
 		HandleRequest: requestHandler,
