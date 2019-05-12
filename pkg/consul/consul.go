@@ -137,6 +137,8 @@ func registerResources(consul *Consul, definition service.Service) {
 		}
 		if response.StatusCode < 200 && response.StatusCode > 299 {
 			logger.Error(errors.Errorf(`UNABLE TO REGISTER RESOURCE %s`, resource.Type))
+		} else {
+			logger.Info(fmt.Sprintf(`RESOURCE %s SUCCESSFULLY`, resource.Type))
 		}
 	}
 }
@@ -145,6 +147,7 @@ func unregisterResources(consul *Consul, definition service.Service) {
 	logger := consul.Logger
 	resources := definition.Resources
 	for _, resource := range resources {
+		resource.Protocol = definition.Scheme
 		url := consul.Config.Url()
 		url.Path = consulResourceUnregisterPath
 
@@ -169,6 +172,8 @@ func unregisterResources(consul *Consul, definition service.Service) {
 		}
 		if response.StatusCode < 200 && response.StatusCode > 299 {
 			logger.Error(errors.Errorf(`UNABLE TO UNREGISTER RESOURCE %s`, resource.Type))
+		} else {
+			logger.Info(fmt.Sprintf(`RESOURCE %s UNREGISTERED SUCCESSFULLY`, resource.Type))
 		}
 	}
 }
@@ -179,22 +184,24 @@ type Consul struct {
 }
 
 func (consul *Consul) Register(definition service.Service) error {
+	logger := consul.Logger
 	err := registerService(consul, definition)
 	if err != nil {
 		return err
 	}
-
+	logger.Info(fmt.Sprintf(`SERVICE %s REGISTERED SUCCESSFULLY`, definition.Name))
 	registerResources(consul, definition)
 	return nil
 }
 
 func (consul *Consul) Unregister(definition service.Service) error {
+	logger := consul.Logger
+	unregisterResources(consul, definition)
 	err := unregisterService(consul, definition)
 	if err != nil {
 		return err
 	}
-
-	unregisterResources(consul, definition)
+	logger.Info(fmt.Sprintf(`SERVICE %s UNREGISTERED SUCCESSFULLY`, definition.Name))
 	return nil
 }
 
