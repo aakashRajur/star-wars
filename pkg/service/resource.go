@@ -13,14 +13,14 @@ const (
 	keyProtocol    = `protocol`
 )
 
-type ResourceDefinition struct {
+type Resource struct {
 	ApiPattern string `json:"api_pattern" xml:"api_pattern"`
 	HttpVerb   string `json:"http_verb" xml:"http_verb"`
 	Type       string `json:"type" xml:"type"`
 	Protocol   string `json:"protocol" xml:"protocol"`
 }
 
-func (definition *ResourceDefinition) Map() map[string]interface{} {
+func (definition *Resource) Map() map[string]interface{} {
 	mapped := make(map[string]interface{})
 	mapped[keyApiEndpoint] = definition.ApiPattern
 	mapped[keyHttpVerb] = definition.HttpVerb
@@ -29,7 +29,7 @@ func (definition *ResourceDefinition) Map() map[string]interface{} {
 	return mapped
 }
 
-func (definition *ResourceDefinition) JSON() (string, error) {
+func (definition *Resource) JSON() (string, error) {
 	marshaled, err := json.Marshal(definition)
 	if err != nil {
 		return ``, err
@@ -37,8 +37,8 @@ func (definition *ResourceDefinition) JSON() (string, error) {
 	return string(marshaled), nil
 }
 
-func ResourceDefinitionFromMap(mapped map[string]interface{}) (ResourceDefinition, error) {
-	rd := ResourceDefinition{}
+func ResourceDefinitionFromMap(mapped map[string]interface{}) (Resource, error) {
+	rd := Resource{}
 
 	apiEndpoint, ok := mapped[keyApiEndpoint]
 	if !ok {
