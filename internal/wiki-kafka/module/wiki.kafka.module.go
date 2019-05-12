@@ -21,7 +21,6 @@ var WikiKafkaModule = fx.Options(
 	module.HttpModule,
 	HealthcheckModule,
 	module.KafkaModule,
-	module.ResourceDefinitionModule,
 	module.CacheStrategyModule,
 	topics.TopicsModule,
 	SubscriptionModule,
