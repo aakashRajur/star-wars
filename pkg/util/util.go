@@ -9,9 +9,6 @@ import (
 	"time"
 
 	"github.com/juju/errors"
-
-	"github.com/aakashRajur/star-wars/pkg/http"
-	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
 func MapStringFromInterfaces(args []interface{}) ([]string, error) {
@@ -64,24 +61,6 @@ func MapStringFromInterfaces(args []interface{}) ([]string, error) {
 
 func GetType(value interface{}) string {
 	return reflect.TypeOf(value).Kind().String()
-}
-
-func LogRequest(logger types.Logger, request *http.Request) {
-	params := request.Context().Value(http.PARAMS).(map[string]interface{})
-	query := request.URL.Query()
-
-	logger.InfoFields(
-		map[string]interface{}{
-			"METHOD":     request.Method,
-			"URI":        request.RequestURI,
-			"URL":        request.URL.Path,
-			"PARAMS":     params,
-			"QUERY":      query,
-			"REMOTE":     request.RemoteAddr,
-			"REFERER":    request.Referer(),
-			"USER-AGENT": request.UserAgent(),
-		},
-	)
 }
 
 func DurationToString(duration time.Duration) string {

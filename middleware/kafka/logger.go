@@ -10,13 +10,13 @@ func Logger(logger types.Logger) kafka.Middleware {
 		return func(event kafka.Event, kafka *kafka.Kafka) {
 			logger.InfoFields(
 				map[string]interface{}{
-					`TOPIC`:     event.Topic,
-					`TYPE`:      event.Type,
-					`ID`:        event.Id,
-					`SOURCE`:    event.Source,
-					`ARGS`:      event.Args,
-					`DATA`:      event.Data,
-					`TIMESTAMP`: event.Timestamp,
+					`topic`:     event.Topic,
+					`type`:      event.Type,
+					`id`:        event.Id,
+					`source`:    event.Source,
+					`args`:      event.Args,
+					`data`:      event.Data,
+					`timestamp`: event.Timestamp,
 				},
 			)
 
