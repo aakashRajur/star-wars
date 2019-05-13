@@ -2,6 +2,7 @@ package http
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -70,26 +71,57 @@ func NewRequest(config RequestConfig) (*http.Response, error) {
 	return client.Do(req)
 }
 
-func textFromResponse(response *http.Response) (string, error) {
+func NewCanceleableRequest(config RequestConfig, ctx context.Context) (*http.Response, error) {
+	safeCtx := ctx
+	if safeCtx != nil {
+		safeCtx = context.Background()
+	}
+	responseChan := make(chan *http.Response)
+	errorChan := make(chan error)
+
+	go func(config RequestConfig, rChan chan<- *http.Response, eChan chan<- error) {
+		response, err := NewRequest(config)
+		if err != nil {
+			eChan <- err
+			return
+		}
+		rChan <- response
+	}(config, responseChan, errorChan)
+
+	select {
+	case <-ctx.Done():
+		err := ctx.Err()
+		if err != nil {
+			return nil, err
+		}
+	case err := <-errorChan:
+		return nil, err
+	case response := <-responseChan:
+		return response, nil
+	}
+	return nil, errors.New(`INVALID HTTP REQUEST STATE`)
+}
+
+func DataFromResponse(response *http.Response) ([]byte, error) {
 	//noinspection GoUnhandledErrorResult
 	defer response.Body.Close()
 
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return ``, err
+		return []byte{}, err
 	}
 
 	if len(data) < 1 {
-		return `N/A`, nil
+		return []byte(`N/A`), nil
 	}
 
-	return string(data), nil
+	return data, nil
 }
 
 func TextFromResponse(response *http.Response) (string, error) {
 	status := response.StatusCode
 	if status < 200 || status > 299 {
-		body, err := textFromResponse(response)
+		body, err := DataFromResponse(response)
 		if err != nil {
 			return ``, errors.Errorf(
 				`REQUEST STATUS %d, FAILED TO PARSE ERROR BODY: %s`,
@@ -100,7 +132,7 @@ func TextFromResponse(response *http.Response) (string, error) {
 			return ``, errors.Errorf(
 				`REQUEST STATUS %d, ERROR BODY: %s`,
 				status,
-				body,
+				string(body),
 			)
 		}
 	}
@@ -118,7 +150,7 @@ func TextFromResponse(response *http.Response) (string, error) {
 func JsonObjectFromResponse(response *http.Response) (map[string]interface{}, error) {
 	status := response.StatusCode
 	if status < 200 || status > 299 {
-		body, err := textFromResponse(response)
+		body, err := DataFromResponse(response)
 		if err != nil {
 			return nil, errors.Errorf(
 				`REQUEST STATUS %d, FAILED TO PARSE ERROR BODY: %s`,
@@ -153,7 +185,7 @@ func JsonObjectFromResponse(response *http.Response) (map[string]interface{}, er
 func JsonArrayFromResponse(response *http.Response) ([]map[string]interface{}, error) {
 	status := response.StatusCode
 	if status < 200 || status > 299 {
-		body, err := textFromResponse(response)
+		body, err := DataFromResponse(response)
 		if err != nil {
 			return nil, errors.Errorf(
 				`REQUEST STATUS %d, FAILED TO PARSE ERROR BODY: %s`,
@@ -164,7 +196,7 @@ func JsonArrayFromResponse(response *http.Response) ([]map[string]interface{}, e
 			return nil, errors.Errorf(
 				`REQUEST STATUS %d, ERROR BODY: %s`,
 				status,
-				body,
+				string(body),
 			)
 		}
 	}
