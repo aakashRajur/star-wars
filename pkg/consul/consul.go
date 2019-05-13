@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	nativeHttp "net/http"
 	"strconv"
 	"sync"
 	"time"
@@ -84,7 +85,7 @@ func registerService(consul *Consul, definition service.Service) error {
 	if err != nil {
 		return err
 	}
-	if response.StatusCode < 200 && response.StatusCode > 299 {
+	if response.StatusCode < 200 || response.StatusCode > 299 {
 		return errors.Errorf(`FAILED TO REGISTER SERVICE: %s`, response.Status)
 	}
 
@@ -112,7 +113,7 @@ func unregisterService(consul *Consul, definition service.Service) error {
 		return err
 	}
 
-	if response.StatusCode < 200 && response.StatusCode > 299 {
+	if response.StatusCode < 200 || response.StatusCode > 299 {
 		return errors.Errorf(`FAILED TO UNREGISTER SERVICE: %s`, response.Status)
 	}
 
@@ -149,7 +150,7 @@ func registerResources(consul *Consul, definition service.Service) {
 		if err != nil {
 			logger.Error(err)
 		}
-		if response.StatusCode < 200 && response.StatusCode > 299 {
+		if response.StatusCode < 200 || response.StatusCode > 299 {
 			logger.Error(errors.Errorf(`UNABLE TO REGISTER RESOURCE %s`, resource.Type))
 		} else {
 			logger.Info(fmt.Sprintf(`RESOURCE %s SUCCESSFULLY`, resource.Type))
@@ -186,11 +187,27 @@ func unregisterResources(consul *Consul, definition service.Service) {
 		if err != nil {
 			logger.Error(err)
 		}
-		if response.StatusCode < 200 && response.StatusCode > 299 {
+		if response.StatusCode < 200 || response.StatusCode > 299 {
 			logger.Error(errors.Errorf(`UNABLE TO UNREGISTER RESOURCE %s`, resource.Type))
 		} else {
 			logger.Info(fmt.Sprintf(`RESOURCE %s UNREGISTERED SUCCESSFULLY`, resource.Type))
 		}
+	}
+}
+
+func emit(consul *Consul, key string, data interface{}) {
+	logger := consul.logger
+	ctx := consul.ctx
+
+	consul.mux.Lock()
+	observations, ok := consul.observations[key]
+	consul.mux.Unlock()
+	if !ok {
+		logger.Warn(fmt.Sprintf(`NO SUBSCRIPTIONS FOR %s`, key))
+	}
+
+	for _, each := range observations {
+		go each.Handler(data, ctx)
 	}
 }
 
@@ -238,6 +255,15 @@ func watchKV(consul *Consul, subscription service.Subscription) {
 				}
 			}
 
+			if response.StatusCode == nativeHttp.StatusNotFound {
+				emit(consul, subscription.Key, nil)
+				time.Sleep(5 * time.Second)
+			} else if response.StatusCode < 200 || response.StatusCode > 299 {
+				logger.Error(http.TextFromResponse(response))
+				time.Sleep(5 * time.Second)
+				return
+			}
+
 			headers := response.Header
 			index, err := strconv.ParseInt(headers.Get(consulIndexKey), 10, 0)
 			if err != nil {
@@ -265,17 +291,7 @@ func watchKV(consul *Consul, subscription service.Subscription) {
 				continue
 			}
 
-			consul.mux.Lock()
-			observations, ok := consul.observations[subscription.Key]
-			consul.mux.Unlock()
-			if !ok {
-				logger.Warn(fmt.Sprintf(`NO SUBSCRIPTIONS FOR %s`, subscription.Key))
-				continue
-			}
-
-			for _, each := range observations {
-				go each.Handler(marshaled, ctx)
-			}
+			emit(consul, subscription.Key, marshaled)
 		}
 	}
 }
