@@ -33,6 +33,7 @@ const (
 	consulServiceQueryParam      = `service`
 	consulServiceQueryPath       = `/v1/catalog/service/:service`
 	consulServiceAddressKey      = `ServiceAddress`
+	consulKeyPrefix              = `resources`
 	consulResourceKey            = `key`
 	consulResourceRegisterPath   = `/v1/kv/:key`
 	consulResourceUnregisterPath = `/v1/kv/:key`
@@ -137,7 +138,8 @@ func registerResources(consul *Consul, definition service.Service) {
 			Headers: nil,
 			Params: map[string]interface{}{
 				consulResourceKey: fmt.Sprintf(
-					`%s/%s`,
+					`%s/%s/%s`,
+					consulKeyPrefix,
 					resource.Type,
 					definition.Id,
 				),
@@ -174,7 +176,8 @@ func unregisterResources(consul *Consul, definition service.Service) {
 			Headers: nil,
 			Params: map[string]interface{}{
 				consulResourceKey: fmt.Sprintf(
-					`%s/%s`,
+					`%s/%s/%s`,
+					consulKeyPrefix,
 					resource.Type,
 					definition.Id,
 				),
@@ -187,7 +190,8 @@ func unregisterResources(consul *Consul, definition service.Service) {
 		if err != nil {
 			logger.Error(err)
 		}
-		if response.StatusCode < 200 || response.StatusCode > 299 {
+		statusCode := response.StatusCode
+		if (statusCode < 200 || statusCode > 299) && statusCode != nativeHttp.StatusNotFound {
 			logger.Error(errors.Errorf(`UNABLE TO UNREGISTER RESOURCE %s`, resource.Type))
 		} else {
 			logger.Info(fmt.Sprintf(`RESOURCE %s UNREGISTERED SUCCESSFULLY`, resource.Type))
@@ -233,6 +237,7 @@ func watchKV(consul *Consul, subscription service.Subscription) {
 			query := url.Query()
 			query.Add(consulResourceReadIndexKey, indexString)
 			query.Add(consulResourcePollKey, consulResourcePollValue)
+			query.Add(`recurse`, `true`)
 
 			requestConfig := http.RequestConfig{
 				Verb: http.VerbGet,
@@ -255,10 +260,11 @@ func watchKV(consul *Consul, subscription service.Subscription) {
 				}
 			}
 
-			if response.StatusCode == nativeHttp.StatusNotFound {
+			statusCode := response.StatusCode
+			if statusCode == nativeHttp.StatusNotFound {
 				emit(consul, subscription.Key, nil)
 				time.Sleep(5 * time.Second)
-			} else if response.StatusCode < 200 || response.StatusCode > 299 {
+			} else if statusCode < 200 || statusCode > 299 {
 				logger.Error(http.TextFromResponse(response))
 				time.Sleep(5 * time.Second)
 				return
@@ -378,10 +384,12 @@ func (consul *Consul) Resolve(service string) ([]string, error) {
 }
 
 func (consul *Consul) Observe(subscription service.Subscription) error {
-	consul.mux.Lock()
+	mux := consul.mux
+	mux.Lock()
+	defer mux.Unlock()
+
 	observations := consul.observations
 	subscriptions, ok := observations[subscription.Key]
-	consul.mux.Unlock()
 	if ok {
 		subscriptions = append(subscriptions, subscription)
 	} else {
