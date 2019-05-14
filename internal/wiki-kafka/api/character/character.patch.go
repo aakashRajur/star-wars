@@ -11,7 +11,7 @@ import (
 
 var resourcePatch = character.ResourcePatch
 
-func PatchCharacter(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
+func PatchCharacter(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.KafkaSubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
 		response := kafka.Event{
 			Topic: definedTopics[topics.WikiResponseTopic],
@@ -66,7 +66,7 @@ func PatchCharacter(storage types.Storage, logger types.Logger, tracker types.Ti
 		Handler: middlewares(handler),
 	}
 
-	return di.SubscriptionProvider{
+	return di.KafkaSubscriptionProvider{
 		Subscription: &subscription,
 	}
 }

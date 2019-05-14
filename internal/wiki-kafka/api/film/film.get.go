@@ -12,7 +12,7 @@ import (
 
 var resourceGet = film.ResourceGet
 
-func GetFilm(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
+func GetFilm(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.KafkaSubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
 		response := kafka.Event{
 			Topic: definedTopics[topics.WikiResponseTopic],
@@ -59,7 +59,7 @@ func GetFilm(storage types.Storage, logger types.Logger, tracker types.TimeTrack
 		Handler: middlewares(handler),
 	}
 
-	return di.SubscriptionProvider{
+	return di.KafkaSubscriptionProvider{
 		Subscription: &subscription,
 	}
 }

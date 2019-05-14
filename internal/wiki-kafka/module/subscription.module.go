@@ -17,7 +17,7 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/kafka"
 )
 
-func GetSubscriptions(subscriptionGroup di.SubscriptionCompiler) []*kafka.Subscription {
+func GetSubscriptions(subscriptionGroup di.KafkaSubscriptionCompiler) []*kafka.Subscription {
 	return subscriptionGroup.Subscriptions
 }
 

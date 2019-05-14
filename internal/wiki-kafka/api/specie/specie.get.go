@@ -12,7 +12,7 @@ import (
 
 var resourceGet = specie.ResourceGet
 
-func GetSpecie(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.SubscriptionProvider {
+func GetSpecie(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.KafkaSubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
 		response := kafka.Event{
 			Topic: definedTopics[topics.WikiResponseTopic],
@@ -59,7 +59,7 @@ func GetSpecie(storage types.Storage, logger types.Logger, tracker types.TimeTra
 		Handler: middlewares(handler),
 	}
 
-	return di.SubscriptionProvider{
+	return di.KafkaSubscriptionProvider{
 		Subscription: &subscription,
 	}
 }
