@@ -2,8 +2,6 @@ package service
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
 )
 
 const (
@@ -37,35 +35,12 @@ func (definition *Resource) JSON() (string, error) {
 	return string(marshaled), nil
 }
 
-func ResourceDefinitionFromMap(mapped map[string]interface{}) (Resource, error) {
-	rd := Resource{}
-
-	apiEndpoint, ok := mapped[keyApiEndpoint]
-	if !ok {
-		return rd, errors.Errorf(`%s NOT PROVIDED`, keyApiEndpoint)
+func (definition *Resource) WithProtocol(protocol string) *Resource {
+	resource := Resource{
+		ApiPattern: definition.ApiPattern,
+		HttpVerb:   definition.HttpVerb,
+		Type:       definition.Type,
+		Protocol:   protocol,
 	}
-	rd.ApiPattern, ok = apiEndpoint.(string)
-	if !ok {
-		return rd, errors.Errorf(`%s SHOULD BE A STRING`, keyApiEndpoint)
-	}
-
-	httpVerb, ok := mapped[keyHttpVerb]
-	if !ok {
-		return rd, errors.Errorf(`%s NOT PROVIDED`, keyHttpVerb)
-	}
-	rd.ApiPattern, ok = httpVerb.(string)
-	if !ok {
-		return rd, errors.Errorf(`%s SHOULD BE A STRING`, keyHttpVerb)
-	}
-
-	_type, ok := mapped[keyType]
-	if !ok {
-		return rd, errors.Errorf(`%s NOT PROVIDED`, keyType)
-	}
-	rd.ApiPattern, ok = _type.(string)
-	if !ok {
-		return rd, errors.Errorf(`%s SHOULD BE A STRING`, keyType)
-	}
-
-	return rd, nil
+	return &resource
 }
