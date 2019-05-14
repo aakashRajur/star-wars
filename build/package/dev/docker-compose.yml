@@ -93,7 +93,6 @@ services:
       context: .
     ports:
       - "${WIKI_HTTP_PORT?err}:${WIKI_HTTP_PORT?err}"
-      - "${DEBUG_PORT?err}:${DEBUG_PORT?err}"
     env_file:
       - ./build/package/dev/.env
       - ./build/package/dev/wiki-http/.env
@@ -115,8 +114,6 @@ services:
     build:
       dockerfile: ./build/package/dev/wiki-kafka/Dockerfile
       context: .
-    ports:
-      - ${DEBUG_PORT?}:${DEBUG_PORT?}
     env_file:
       - ./build/package/dev/.env
       - ./build/package/dev/wiki-kafka/.env
@@ -143,7 +140,7 @@ services:
       context: .
     ports:
       - "${API_GATEWAY_PORT?err}:${API_GATEWAY_PORT?err}"
-#      - "${DEBUG_PORT?err}:${DEBUG_PORT?err}"
+      - "${DEBUG_PORT?err}:${DEBUG_PORT?err}"
     env_file:
       - ./build/package/dev/.env
       - ./build/package/dev/api-gateway/.env
