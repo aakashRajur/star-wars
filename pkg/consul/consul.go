@@ -378,12 +378,10 @@ func (consul *Consul) Resolve(service string) ([]string, error) {
 }
 
 func (consul *Consul) Observe(subscription service.Subscription) error {
-	mux := consul.mux
-	mux.Lock()
-	defer mux.Unlock()
-
+	consul.mux.Lock()
 	observations := consul.observations
 	subscriptions, ok := observations[subscription.Key]
+	consul.mux.Unlock()
 	if ok {
 		subscriptions = append(subscriptions, subscription)
 	} else {
