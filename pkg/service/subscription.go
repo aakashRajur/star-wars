@@ -8,7 +8,3 @@ type Subscription struct {
 	Key     string
 	Handler HandleEvent
 }
-
-type Observer interface {
-	Observe(subscription Subscription) error
-}
