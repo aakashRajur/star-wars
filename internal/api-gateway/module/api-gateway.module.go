@@ -11,9 +11,12 @@ var ApiGatewayModule = fx.Options(
 	module.EnvModule,
 	module.LogModule,
 	module.InstrumentationModule,
+	ServiceModule,
+	module.ResourceModule,
 	module.ConsulModule,
-	ResourceModule,
 	module.HttpModule,
 	module.HttpProtocolModule,
+	ResourceModule,
 	module.AppModule,
+	module.RegistreeModule,
 )
