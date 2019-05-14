@@ -27,15 +27,6 @@ fi
 export INSTANCE_ID=${INSTANCE_ID};
 echo "export INSTANCE_ID=${INSTANCE_ID};" >> ${ENV_FILE}
 
-# discover kafka brokers
-KAFKA_BROKERS=$(/util/get-service-endpoints.sh -s ${KAFKA_SERVICE} -r 5)
-if [[ -z "${KAFKA_BROKERS}" ]]; then
-    echo "SERVICE DISCOVERY DID NOT PROVIDE KAFKA SERVICE ENDPOINT, SKIPPING CONNECTING TO KAFKA"
-else
-    export KAFKA_BROKERS=${KAFKA_BROKERS};
-    echo "export KAFKA_BROKERS=${KAFKA_BROKERS};" >> ${ENV_FILE}
-fi
-
 source ${ENV_FILE}
 
 # hook up our cleanup function
@@ -51,17 +42,8 @@ else
     (go run ${MAIN}) &
 fi
 
-# register node with consul
-echo "REGISTER NODE TO SERVICE DISCOVERY"
-/util/wait-for.sh -t 180 ${CONTAINER_HOST_NAME}:${CONSUL_HEALTHCHECK_PORT} && /util/register.sh
-
 echo "WAITING FOR CHILD TO EXIT"
 wait
 EXIT_CODE=${?}
+sleep 10
 echo "CHILD EXITED: ${EXIT_CODE}"
-
-echo "UNREGISTER NODE FROM SERVICE DISCOVERY"
-/util/unregister.sh
-
-echo "EXITING"
-exit ${EXIT_CODE}
