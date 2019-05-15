@@ -9,12 +9,12 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/http"
 )
 
-func GetResources(resourceGroup di.HttpResourcesCompiler) []http.Resource {
+func GetHttpResources(resourceGroup di.HttpResourcesCompiler) []http.Resource {
 	return resourceGroup.Resources
 }
 
 var ResourceModule = fx.Provide(
 	stats.Resource,
 	hello.Resource,
-	GetResources,
+	GetHttpResources,
 )
