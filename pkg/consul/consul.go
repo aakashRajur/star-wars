@@ -2,9 +2,9 @@ package consul
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	nativeHttp "net/http"
 	"strconv"
 	"sync"
@@ -30,18 +30,12 @@ const (
 	consulServiceRegisterPath    = `/v1/agent/service/register`
 	consulServiceUnregisterParam = `service_id`
 	consulServiceUnregisterPath  = `/v1/agent/service/deregister/:service_id`
-	consulServiceQueryParam      = `service`
-	consulServiceQueryPath       = `/v1/catalog/service/:service`
-	consulServiceAddressKey      = `ServiceAddress`
-	consulKeyPrefix              = `resources`
-	consulResourceKey            = `key`
-	consulResourceRegisterPath   = `/v1/kv/:key`
-	consulResourceUnregisterPath = `/v1/kv/:key`
-	consulResourceReadPath       = `/v1/kv/:key`
-	consulIndexKey               = `X-Consul-Index`
-	consulResourceReadIndexKey   = `index`
-	consulResourcePollKey        = `wait`
-	consulResourcePollValue      = `5m`
+	consulWatchServicesPath      = `/v1/catalog/services`
+	consulBlockingIndexKey       = `index`
+	consulBlockingWaitKey        = `wait`
+	consulBlockingWaitValue      = `5m`
+	consulBlockingHeaderKey      = `X-Consul-Index`
+	consulGetServicesPath        = `/v1/agent/services`
 	resolveRetry                 = 5
 	resolveWait                  = 5 * time.Second
 )
@@ -79,15 +73,23 @@ func registerService(consul *Consul, definition service.Service) error {
 		Headers: nil,
 		Params:  nil,
 		Body:    body,
-		Timeout: 10 * time.Second,
 	}
+	client := consul.client
 
-	response, err := http.NewRequest(requestConfig)
+	request, err := http.NewRequest(requestConfig)
+	if err != nil {
+		return err
+	}
+	response, err := client.Do(request)
 	if err != nil {
 		return err
 	}
 	if response.StatusCode < 200 || response.StatusCode > 299 {
 		return errors.Errorf(`FAILED TO REGISTER SERVICE: %s`, response.Status)
+	}
+	err = response.Body.Close()
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -105,15 +107,18 @@ func unregisterService(consul *Consul, definition service.Service) error {
 		Params: map[string]interface{}{
 			consulServiceUnregisterParam: definition.Id,
 		},
-		Body:    nil,
-		Timeout: 10 * time.Second,
+		Body: nil,
 	}
+	client := consul.client
 
-	response, err := http.NewRequest(requestConfig)
+	request, err := http.NewRequest(requestConfig)
 	if err != nil {
 		return err
 	}
-
+	response, err := client.Do(request)
+	if err != nil {
+		return err
+	}
 	if response.StatusCode < 200 || response.StatusCode > 299 {
 		return errors.Errorf(`FAILED TO UNREGISTER SERVICE: %s`, response.Status)
 	}
@@ -121,194 +126,144 @@ func unregisterService(consul *Consul, definition service.Service) error {
 	return nil
 }
 
-func registerResources(consul *Consul, definition service.Service) {
-	logger := consul.logger
-	config := consul.config
-	resources := definition.Resources
-
-	for _, resource := range resources {
-		url := config.Url()
-		url.Path = consulResourceRegisterPath
-
-		body := resource.Map()
-
-		requestConfig := http.RequestConfig{
-			Verb:    http.VerbPut,
-			Url:     url,
-			Headers: nil,
-			Params: map[string]interface{}{
-				consulResourceKey: fmt.Sprintf(
-					`%s/%s/%s`,
-					consulKeyPrefix,
-					resource.Type,
-					definition.Id,
-				),
-			},
-			Body:    body,
-			Timeout: 10 * time.Second,
-		}
-
-		response, err := http.NewRequest(requestConfig)
-		if err != nil {
-			logger.Error(err)
-		}
-		if response.StatusCode < 200 || response.StatusCode > 299 {
-			logger.Error(errors.Errorf(`UNABLE TO REGISTER RESOURCE %s`, resource.Type))
-		} else {
-			logger.Info(fmt.Sprintf(`RESOURCE %s SUCCESSFULLY`, resource.Type))
-		}
-	}
-}
-
-func unregisterResources(consul *Consul, definition service.Service) {
-	logger := consul.logger
-	config := consul.config
-	resources := definition.Resources
-
-	for _, resource := range resources {
-		resource.Protocol = definition.Scheme
-		url := config.Url()
-		url.Path = consulResourceUnregisterPath
-
-		requestConfig := http.RequestConfig{
-			Verb:    http.VerbDelete,
-			Url:     url,
-			Headers: nil,
-			Params: map[string]interface{}{
-				consulResourceKey: fmt.Sprintf(
-					`%s/%s/%s`,
-					consulKeyPrefix,
-					resource.Type,
-					definition.Id,
-				),
-			},
-			Body:    nil,
-			Timeout: 10 * time.Second,
-		}
-
-		response, err := http.NewRequest(requestConfig)
-		if err != nil {
-			logger.Error(err)
-		}
-		statusCode := response.StatusCode
-		if (statusCode < 200 || statusCode > 299) && statusCode != nativeHttp.StatusNotFound {
-			logger.Error(errors.Errorf(`UNABLE TO UNREGISTER RESOURCE %s`, resource.Type))
-		} else {
-			logger.Info(fmt.Sprintf(`RESOURCE %s UNREGISTERED SUCCESSFULLY`, resource.Type))
-		}
-	}
-}
-
-func emit(consul *Consul, key string, data interface{}) {
-	logger := consul.logger
-	ctx := consul.ctx
-
-	consul.mux.Lock()
-	observations, ok := consul.observations[key]
-	consul.mux.Unlock()
-	if !ok {
-		logger.Warn(fmt.Sprintf(`NO SUBSCRIPTIONS FOR %s`, key))
-	}
-
-	for _, each := range observations {
-		go each.Handler(data, ctx)
-	}
-}
-
-func watchKV(consul *Consul, subscription service.Subscription) {
+func watchServices(consul *Consul, index int) (int, error) {
 	logger := consul.logger
 	config := consul.config
 	ctx := consul.ctx
+	client := consul.client
 
-	trackIndex := 0
+	requestUrl := config.Url()
+	requestUrl.Path = consulWatchServicesPath
+	query := requestUrl.Query()
+	query.Add(consulBlockingIndexKey, strconv.Itoa(index))
+	query.Add(consulBlockingWaitKey, consulBlockingWaitValue)
 
-	for {
-		select {
-		case <-ctx.Done():
-			err := ctx.Err()
-			if err != nil {
-				logger.Error(err)
-				return
-			}
-		default:
-			indexString := strconv.Itoa(trackIndex)
-			url := config.Url()
-			url.Path = consulResourceRegisterPath
-			query := url.Query()
-			query.Add(consulResourceReadIndexKey, indexString)
-			query.Add(consulResourcePollKey, consulResourcePollValue)
-			query.Add(`recurse`, `true`)
+	requestConfig := http.RequestConfig{
+		Verb:    http.VerbGet,
+		Url:     requestUrl,
+		Headers: nil,
+		Params:  nil,
+		Body:    nil,
+	}
 
-			requestConfig := http.RequestConfig{
-				Verb: http.VerbGet,
-				Url:  url,
-				Headers: map[string]string{
-					consulIndexKey: indexString,
-				},
-				Params: map[string]interface{}{
-					consulResourceReadPath: subscription.Key,
-				},
-				Body: nil,
-			}
+	request, err := http.NewRequest(requestConfig)
+	if err != nil {
+		return -1, err
+	}
 
-			response, err := http.NewCanceleableRequest(requestConfig, ctx)
-			if err != nil {
-				if err == context.Canceled {
-					return
-				} else {
-					logger.Error(err)
-				}
-			}
+	response, err := client.Do(request.WithContext(ctx))
+	if err != nil {
+		return -1, err
+	}
+	defer func() {
+		err := response.Body.Close()
+		if err != nil {
+			logger.Error(err)
+		}
+	}()
 
-			statusCode := response.StatusCode
-			if statusCode == nativeHttp.StatusNotFound {
-				emit(consul, subscription.Key, nil)
-				time.Sleep(5 * time.Second)
-			} else if statusCode < 200 || statusCode > 299 {
-				logger.Error(http.TextFromResponse(response))
-				time.Sleep(5 * time.Second)
-				return
-			}
+	headers := response.Header
+	newIndex, err := strconv.ParseInt(headers.Get(consulBlockingHeaderKey), 10, 0)
+	if err != nil {
+		return -1, err
+	}
 
-			headers := response.Header
-			index, err := strconv.ParseInt(headers.Get(consulIndexKey), 10, 0)
-			if err != nil {
-				logger.Error(err)
-			} else {
-				trackIndex = int(index)
-			}
+	return int(newIndex), nil
+}
 
-			data, err := http.TextFromResponse(response)
-			if err != nil {
-				logger.Error(err)
-				continue
-			}
+func getServices(consul *Consul) (map[string][]string, error) {
+	logger := consul.logger
+	config := consul.config
+	ctx := consul.ctx
+	client := consul.client
 
-			decoded, err := base64.StdEncoding.DecodeString(data)
-			if err != nil {
-				logger.Error(err)
-				continue
-			}
+	requestUrl := config.Url()
+	requestUrl.Path = consulGetServicesPath
+	requestConfig := http.RequestConfig{
+		Verb:    http.VerbGet,
+		Url:     requestUrl,
+		Headers: nil,
+		Params:  nil,
+		Body:    nil,
+	}
 
-			marshaled := make([]map[string]interface{}, 0)
-			err = json.Unmarshal(decoded, &marshaled)
-			if err != nil {
-				logger.Error(err)
-				continue
-			}
+	request, err := http.NewRequest(requestConfig)
+	if err != nil {
+		return nil, err
+	}
 
-			emit(consul, subscription.Key, marshaled)
+	response, err := client.Do(request.WithContext(ctx))
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		err := response.Body.Close()
+		if err != nil {
+			logger.Error(err)
+		}
+	}()
+
+	data, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+	if len(data) < 1 {
+		return nil, errors.New(`NO SERVICES FOUND`)
+	}
+
+	services := make(map[string]interface{})
+	err = json.Unmarshal(data, &services)
+	if err != nil {
+		return nil, err
+	}
+
+	updated := make(map[string][]string)
+	for _, instance := range services {
+		meta, ok := instance.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		serviceRaw, ok := meta[`Service`]
+		if !ok {
+			continue
+		}
+
+		serviceName, ok := serviceRaw.(string)
+		if !ok {
+			continue
+		}
+
+		addressRaw, ok := meta[`Address`]
+		if !ok {
+			continue
+		}
+
+		address, ok := addressRaw.(string)
+		if !ok {
+			continue
+		}
+
+		addresses, ok := updated[serviceName]
+		if !ok {
+			updated[serviceName] = []string{address}
+		} else {
+			updated[serviceName] = append(addresses, address)
 		}
 	}
+
+	return updated, nil
 }
 
 type Consul struct {
-	logger       types.Logger
-	config       Config
-	ctx          context.Context
-	cancel       func()
-	observations map[string][]service.Subscription
-	mux          sync.Mutex
+	logger   types.Logger
+	config   Config
+	client   *nativeHttp.Client
+	ctx      context.Context
+	cancel   func()
+	services map[string][]string
+	ready    chan bool
+	mux      sync.Mutex
 }
 
 func (consul *Consul) Register(definition service.Service) error {
@@ -318,13 +273,11 @@ func (consul *Consul) Register(definition service.Service) error {
 		return err
 	}
 	logger.Info(fmt.Sprintf(`SERVICE %s REGISTERED SUCCESSFULLY`, definition.Name))
-	registerResources(consul, definition)
 	return nil
 }
 
 func (consul *Consul) Unregister(definition service.Service) error {
 	logger := consul.logger
-	unregisterResources(consul, definition)
 	err := unregisterService(consul, definition)
 	if err != nil {
 		return err
@@ -334,69 +287,92 @@ func (consul *Consul) Unregister(definition service.Service) error {
 }
 
 func (consul *Consul) Resolve(service string) ([]string, error) {
+	ready := consul.ready
+
 	var lastErr error = nil
 	for i := 0; i < resolveRetry; i++ {
-		url := consul.config.Url()
-		url.Path = consulServiceQueryPath
-
-		requestConfig := http.RequestConfig{
-			Verb:    http.VerbGet,
-			Url:     url,
-			Headers: nil,
-			Params: map[string]interface{}{
-				consulServiceQueryParam: service,
-			},
-			Body:    nil,
-			Timeout: 10 * time.Second,
-		}
-
-		compiled := make([]string, 0)
-		response, err := http.NewRequest(requestConfig)
-		if err != nil {
-			return compiled, err
-		}
-
-		available, err := http.JsonArrayFromResponse(response)
-		if err != nil {
-			lastErr = err
-			time.Sleep(resolveWait)
+		_, ok := <-ready
+		if ok {
 			continue
 		}
 
-		for _, each := range available {
-			address, ok := (each[consulServiceAddressKey]).(string)
-			if !ok {
-				continue
+		services := consul.services
+		addresses, ok := services[service]
+		if !ok {
+			lastErr = errors.Errorf(`SERVICE %s NOT FOUND`, service)
+			if i+1 != resolveRetry {
+				time.Sleep(resolveWait)
 			}
-			compiled = append(compiled, address)
-		}
-
-		if len(compiled) < 1 {
-			lastErr = errors.Errorf(`NO SERVICES FOUND FOR %s`, service)
-			time.Sleep(resolveWait)
 			continue
 		}
 
-		return compiled, nil
+		if len(addresses) < 1 {
+			lastErr = errors.Errorf(`SERVICE %s HAS NO ADDRESSES`, service)
+			if i+1 != resolveRetry {
+				time.Sleep(resolveWait)
+			}
+			continue
+		}
+
+		return addresses, nil
 	}
 
 	return []string{}, lastErr
 }
 
-func (consul *Consul) Observe(subscription service.Subscription) error {
-	mux := consul.mux
-	mux.Lock()
-	defer mux.Unlock()
+func (consul *Consul) watchServices() {
+	logger := consul.logger
+	ctx := consul.ctx
+	ready := consul.ready
 
-	observations := consul.observations
-	subscriptions, ok := observations[subscription.Key]
-	if ok {
-		subscriptions = append(subscriptions, subscription)
-	} else {
-		subscriptions = []service.Subscription{subscription}
-		go watchKV(consul, subscription)
+	trackIndex := 0
+
+	for {
+		select {
+		case <-ctx.Done():
+			err := ctx.Err()
+			if err != nil && err != context.Canceled {
+				logger.Error(err)
+				return
+			}
+		default:
+			updatedIndex, err := watchServices(consul, trackIndex)
+			if err != nil {
+				if err == context.Canceled {
+					return
+				} else {
+					logger.Error(err)
+					time.Sleep(5 * time.Second)
+					continue
+				}
+			}
+			if updatedIndex == trackIndex {
+				time.Sleep(5 * time.Second)
+				continue
+			}
+
+			if trackIndex == 0 {
+				close(ready)
+			}
+			trackIndex = updatedIndex
+
+			services, err := getServices(consul)
+			if err != nil {
+				if err == context.Canceled {
+					return
+				} else {
+					logger.Error(err)
+					continue
+				}
+			}
+			mux := consul.mux
+			mux.Lock()
+			consul.services = services
+			mux.Unlock()
+
+			logger.Info(fmt.Sprintf("AVAILABLE SERVICES: %+v", consul.services))
+			time.Sleep(5 * time.Second)
+		}
 	}
-	observations[subscription.Key] = subscriptions
 
-	return nil
 }

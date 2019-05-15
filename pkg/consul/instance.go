@@ -2,18 +2,30 @@ package consul
 
 import (
 	"context"
-	"github.com/aakashRajur/star-wars/pkg/service"
+	"net/http"
+	"time"
+
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
 func NewInstance(config Config, logger types.Logger) *Consul {
 	ctx, cancel := context.WithCancel(context.Background())
-	consul := Consul{
-		config:       config,
-		logger:       logger,
-		ctx:          ctx,
-		cancel:       cancel,
-		observations: make(map[string][]service.Subscription),
+	consul := &Consul{
+		logger: logger,
+		config: config,
+		client: &http.Client{
+			Timeout: 10 * time.Second,
+			Transport: &http.Transport{
+				MaxIdleConnsPerHost: 10,
+				MaxIdleConns:        10,
+				IdleConnTimeout:     1 * time.Second,
+			},
+		},
+		ctx:      ctx,
+		cancel:   cancel,
+		services: make(map[string][]string),
+		ready:    make(chan bool),
 	}
-	return &consul
+	go consul.watchServices()
+	return consul
 }
