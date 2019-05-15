@@ -1,7 +1,6 @@
 package module
 
 import (
-	wiki "github.com/aakashRajur/star-wars/internal/wiki/module"
 	"go.uber.org/fx"
 
 	"github.com/aakashRajur/star-wars/internal/common/module"
@@ -17,7 +16,6 @@ var WikiKafkaModule = fx.Options(
 	module.PgModule,
 	module.RedisModule,
 	module.RedisPgModule,
-	wiki.ResourceModule,
 	module.ConsulModule,
 	ResourceModule,
 	module.HttpModule,
