@@ -6,6 +6,5 @@ type Service struct {
 	Scheme      string
 	Hostname    string
 	Port        int
-	Resources   []Resource
 	Healthcheck Healthcheck
 }
