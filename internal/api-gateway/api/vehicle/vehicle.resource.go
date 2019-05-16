@@ -13,6 +13,7 @@ import (
 func HttpResource(resolver service.Resolver, logger types.Logger, tracker types.TimeTracker) di.HttpResourceProvider {
 	resource := http.NewResource(fmt.Sprintf(`%s%s`, httpPrefix, vehicle.HttpURL))
 	resource.Get(GetHttpVehicle(resolver, logger, tracker))
+	resource.Patch(PatchHttpVehicle(resolver, logger, tracker))
 
 	return di.HttpResourceProvider{Resource: resource}
 }
