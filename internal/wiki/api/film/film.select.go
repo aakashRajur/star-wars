@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	FilmQuery = `
+	Query = `
 with
   planet_ids      as (
     select
@@ -135,7 +135,7 @@ func QuerySelectFilm(storage types.Storage, tracker types.TimeTracker, cacheKey 
 	data, err := storage.GetObject(
 		cacheKey,
 		types.Query{
-			QueryString: FilmQuery,
+			QueryString: Query,
 			Args:        []interface{}{id},
 		},
 	)

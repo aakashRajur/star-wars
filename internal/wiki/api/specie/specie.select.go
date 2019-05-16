@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	SpecieQuery = `select * from species where id = $1;`
+	Query = `select * from species where id = $1;`
 )
 
 func QuerySelectSpecie(storage types.Storage, tracker types.TimeTracker, cacheKey string, id int) (map[string]interface{}, error) {
@@ -16,7 +16,7 @@ func QuerySelectSpecie(storage types.Storage, tracker types.TimeTracker, cacheKe
 	data, err := storage.GetObject(
 		cacheKey,
 		types.Query{
-			QueryString: SpecieQuery,
+			QueryString: Query,
 			Args:        []interface{}{id},
 		},
 	)

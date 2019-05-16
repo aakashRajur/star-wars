@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	PlanetsQuery        = `select id, name from planets order by id;`
-	PlanetsPageRecordId = `id`
+	Query        = `select id, name from planets order by id;`
+	PageRecordId = `id`
 )
 
 func QuerySelectPlanets(storage types.Storage, tracker types.TimeTracker, cacheKey string, pagination types.Pagination) ([]map[string]interface{}, *types.Pagination, error) {
@@ -16,11 +16,11 @@ func QuerySelectPlanets(storage types.Storage, tracker types.TimeTracker, cacheK
 	data, page, err := storage.GetPaginatedArray(
 		cacheKey,
 		types.Query{
-			QueryString: PlanetsQuery,
+			QueryString: Query,
 			Args:        []interface{}{},
 		},
 		pagination,
-		PlanetsPageRecordId,
+		PageRecordId,
 	)
 	if err != nil {
 		return nil, nil, err

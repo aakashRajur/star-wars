@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	CharacterQuery = `
+	Query = `
 with
   vehicle_ids   as (
     select
@@ -55,7 +55,7 @@ func QuerySelectCharacter(storage types.Storage, tracker types.TimeTracker, cach
 	data, err := storage.GetObject(
 		cacheKey,
 		types.Query{
-			QueryString: CharacterQuery,
+			QueryString: Query,
 			Args:        []interface{}{id},
 		},
 	)

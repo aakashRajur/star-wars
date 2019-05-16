@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	VehiclesQuery        = `select id, name, model from vehicles order by id;`
-	VehiclesPageRecordId = `id`
+	Query        = `select id, name, model from vehicles order by id;`
+	PageRecordId = `id`
 )
 
 func QuerySelectVehicles(storage types.Storage, tracker types.TimeTracker, cacheKey string, pagination types.Pagination) ([]map[string]interface{}, *types.Pagination, error) {
@@ -17,11 +17,11 @@ func QuerySelectVehicles(storage types.Storage, tracker types.TimeTracker, cache
 	data, page, err := storage.GetPaginatedArray(
 		cacheKey,
 		types.Query{
-			QueryString: VehiclesQuery,
+			QueryString: Query,
 			Args:        []interface{}{},
 		},
 		pagination,
-		VehiclesPageRecordId,
+		PageRecordId,
 	)
 	if err != nil {
 		return nil, nil, err

@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	VehicleQuery = `select * from vehicles where id = $1;`
+	Query = `select * from vehicles where id = $1;`
 )
 
 func QuerySelectVehicle(storage types.Storage, tracker types.TimeTracker, cacheKey string, id int) (map[string]interface{}, error) {
@@ -16,7 +16,7 @@ func QuerySelectVehicle(storage types.Storage, tracker types.TimeTracker, cacheK
 	data, err := storage.GetObject(
 		cacheKey,
 		types.Query{
-			QueryString: VehicleQuery,
+			QueryString: Query,
 			Args:        []interface{}{id},
 		},
 	)

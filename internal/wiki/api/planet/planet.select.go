@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	PlanetQuery = `select * from planets where id = $1;`
+	Query = `select * from planets where id = $1;`
 )
 
 func QuerySelectPlanet(storage types.Storage, tracker types.TimeTracker, cacheKey string, id int) (map[string]interface{}, error) {
@@ -16,7 +16,7 @@ func QuerySelectPlanet(storage types.Storage, tracker types.TimeTracker, cacheKe
 	data, err := storage.GetObject(
 		cacheKey,
 		types.Query{
-			QueryString: PlanetQuery,
+			QueryString: Query,
 			Args:        []interface{}{id},
 		},
 	)
