@@ -8,15 +8,6 @@ import (
 	"net/http"
 )
 
-const (
-	ContentType         = "Content-Type"
-	ContentTypeJSON     = "application/json"
-	ContentTypeText     = "application/text"
-	ContentLength       = `Content-Length`
-	ContentEncoding     = `Content-Encoding`
-	ContentEncodingGzip = `gzip`
-)
-
 type Response struct {
 	http.ResponseWriter
 	compress bool

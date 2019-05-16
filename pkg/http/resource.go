@@ -49,20 +49,20 @@ func (resource Resource) Options(handler HandlerWithMiddleware) Resource {
 
 func (resource Resource) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	resolver := resource.Handlers
-	var resolved = resolver[request.Method]
-	if resolved == nil {
+	resolved, ok := resolver[request.Method]
+	if !ok {
 		http.NotFound(writer, request)
-	} else {
-		var req = Request{*request}
-
-		resolved(
-			Response{
-				ResponseWriter: writer,
-				compress:       req.CanGzip(),
-			},
-			&req,
-		)
+		return
 	}
+	req := Request{*request}
+
+	resolved(
+		Response{
+			ResponseWriter: writer,
+			compress:       req.CanGzip(),
+		},
+		&req,
+	)
 }
 
 func NewResource(pattern string) Resource {
