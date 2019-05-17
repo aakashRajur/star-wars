@@ -27,11 +27,11 @@ var Session http.Middleware = func(next http.HandleRequest) http.HandleRequest {
 			sum := sha256.Sum256(marshaled)
 			hex := fmt.Sprintf(`%x`, sum)
 
-			now.Add(8760 * time.Hour)
+			expires := now.Add(8760 * time.Hour)
 			cookie = &nativeHttp.Cookie{
 				Name:     SESSION_COOKIE,
 				Path:     `/`,
-				Expires:  now.UTC(),
+				Expires:  expires,
 				HttpOnly: true,
 				Value:    hex,
 			}

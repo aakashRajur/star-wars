@@ -36,6 +36,7 @@ func PatchHttpFilm(resolver service.Resolver, logger types.Logger, tracker types
 	}
 	middlewares := http.ChainMiddlewares(
 		middleware.Logger(logger),
+		middleware.Session,
 	)
 	return http.HandlerWithMiddleware{
 		Middlewares:   middlewares,

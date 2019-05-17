@@ -36,6 +36,7 @@ func GetHttpCharacters(resolver service.Resolver, logger types.Logger, tracker t
 	}
 	middlewares := http.ChainMiddlewares(
 		middleware.Logger(logger),
+		middleware.Session,
 	)
 	return http.HandlerWithMiddleware{
 		Middlewares:   middlewares,

@@ -36,6 +36,7 @@ func GetHttpPlanets(resolver service.Resolver, logger types.Logger, tracker type
 	}
 	middlewares := http.ChainMiddlewares(
 		middleware.Logger(logger),
+		middleware.Session,
 	)
 	return http.HandlerWithMiddleware{
 		Middlewares:   middlewares,

@@ -36,6 +36,7 @@ func PatchHttpPlanet(resolver service.Resolver, logger types.Logger, tracker typ
 	}
 	middlewares := http.ChainMiddlewares(
 		middleware.Logger(logger),
+		middleware.Session,
 	)
 	return http.HandlerWithMiddleware{
 		Middlewares:   middlewares,

@@ -36,6 +36,7 @@ func PatchHttpVehicle(resolver service.Resolver, logger types.Logger, tracker ty
 	}
 	middlewares := http.ChainMiddlewares(
 		middleware.Logger(logger),
+		middleware.Session,
 	)
 	return http.HandlerWithMiddleware{
 		Middlewares:   middlewares,

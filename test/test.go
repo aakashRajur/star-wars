@@ -28,11 +28,11 @@ func setup() (string, []string) {
 	return connectionType, brokers
 }
 
-func getLogger() types.Logger {
+func getLogger() types.logger {
 	return log.NewInstance(logrus.DebugLevel, &logrus.TextFormatter{})
 }
 
-func startProducer(wait chan bool, instance *kafka.Kafka, messageTopic string, logger types.Logger) {
+func startProducer(wait chan bool, instance *kafka.Kafka, messageTopic string, logger types.logger) {
 	text := make(chan string)
 	go func(sender chan string) {
 		fmt.Println(`Enter Messages:`)
@@ -72,7 +72,7 @@ func startProducer(wait chan bool, instance *kafka.Kafka, messageTopic string, l
 	}
 }
 
-func startConsumer(wait chan bool, instance *kafka.Kafka, messageTopic string, _ types.Logger) {
+func startConsumer(wait chan bool, instance *kafka.Kafka, messageTopic string, _ types.logger) {
 	err := instance.Subscribe(
 		&kafka.Subscription{
 			Topic: messageTopic,
@@ -101,7 +101,7 @@ func startConsumer(wait chan bool, instance *kafka.Kafka, messageTopic string, _
 	<-wait
 }
 
-func startGreedy(_ chan bool, instance *kafka.Kafka, messageTopic string, logger types.Logger) {
+func startGreedy(_ chan bool, instance *kafka.Kafka, messageTopic string, logger types.logger) {
 	logger.Info(fmt.Sprintf("WILL TRY CONSUMING UPTILL NOW"))
 	events, err := instance.ConsumeFromBeginning(messageTopic)
 	if err != nil {
@@ -119,7 +119,7 @@ func main() {
 	connectionType, brokers := setup()
 
 	kafkaConfig := kafka.Config{
-		Logger:      logger,
+		logger:      logger,
 		Brokers:     brokers,
 		GroupId:     `SAMPLE_GROUP`,
 		ClientId:    `TEST`,
@@ -149,7 +149,7 @@ func main() {
 	}
 }
 
- */
+*/
 
 func main() {
 	e := kafka.Event{
