@@ -1,7 +1,7 @@
 package specie
 
 import (
-	"github.com/aakashRajur/star-wars/pkg/di"
+	"github.com/aakashRajur/star-wars/pkg/di/service-resource"
 	"github.com/aakashRajur/star-wars/pkg/http"
 	"github.com/aakashRajur/star-wars/pkg/service"
 )
@@ -19,8 +19,8 @@ var ResourceGet = service.Resource{
 	Type:       TypeSpecieGet,
 }
 
-func Get() di.ServiceResourceProvider {
-	return di.ServiceResourceProvider{
+func Get() service_resource.ServiceResourceProvider {
+	return service_resource.ServiceResourceProvider{
 		Resource: ResourceGet,
 	}
 }
@@ -31,8 +31,8 @@ var ResourcePatch = service.Resource{
 	Type:       TypeSpeciePatch,
 }
 
-func Patch() di.ServiceResourceProvider {
-	return di.ServiceResourceProvider{
+func Patch() service_resource.ServiceResourceProvider {
+	return service_resource.ServiceResourceProvider{
 		Resource: ResourcePatch,
 	}
 }

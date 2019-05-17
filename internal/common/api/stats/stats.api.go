@@ -1,15 +1,15 @@
 package stats
 
 import (
+	"github.com/aakashRajur/star-wars/pkg/di/http-resource"
 	httpNative "net/http"
 
 	middleware "github.com/aakashRajur/star-wars/middleware/http"
-	"github.com/aakashRajur/star-wars/pkg/di"
 	"github.com/aakashRajur/star-wars/pkg/http"
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-func Resource(logger types.Logger) di.HttpResourceProvider {
+func Resource(logger types.Logger) http_resource.HttpResourceProvider {
 	resource := http.NewResource(`/stats`)
 
 	resource.Get(
@@ -30,5 +30,5 @@ func Resource(logger types.Logger) di.HttpResourceProvider {
 		},
 	)
 
-	return di.HttpResourceProvider{Resource: resource}
+	return http_resource.HttpResourceProvider{Resource: resource}
 }

@@ -2,12 +2,12 @@ package hello
 
 import (
 	middleware "github.com/aakashRajur/star-wars/middleware/http"
-	"github.com/aakashRajur/star-wars/pkg/di"
+	"github.com/aakashRajur/star-wars/pkg/di/http-resource"
 	"github.com/aakashRajur/star-wars/pkg/http"
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-func Resource(logger types.Logger) di.HttpResourceProvider {
+func Resource(logger types.Logger) http_resource.HttpResourceProvider {
 	requestHandler := func(response http.Response, request *http.Request) {
 		_, err := response.WriteText(SayHello())
 		if err != nil {
@@ -22,7 +22,7 @@ func Resource(logger types.Logger) di.HttpResourceProvider {
 			Middlewares:   middlewares,
 		},
 	)
-	return di.HttpResourceProvider{
+	return http_resource.HttpResourceProvider{
 		Resource: resource,
 	}
 }

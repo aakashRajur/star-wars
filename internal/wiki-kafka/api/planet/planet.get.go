@@ -5,14 +5,14 @@ import (
 	"github.com/aakashRajur/star-wars/internal/wiki/api/films"
 	"github.com/aakashRajur/star-wars/internal/wiki/api/planet"
 	middleware "github.com/aakashRajur/star-wars/middleware/kafka"
-	"github.com/aakashRajur/star-wars/pkg/di"
+	"github.com/aakashRajur/star-wars/pkg/di/kafka-subscription"
 	"github.com/aakashRajur/star-wars/pkg/kafka"
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
 var resourceGet = planet.ResourceGet
 
-func GetPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.KafkaSubscriptionProvider {
+func GetPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) kafka_subscription.KafkaSubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
 		response := kafka.Event{
 			Topic: definedTopics[topics.WikiResponseTopic],
@@ -59,7 +59,7 @@ func GetPlanet(storage types.Storage, logger types.Logger, tracker types.TimeTra
 		Handler: middlewares(handler),
 	}
 
-	return di.KafkaSubscriptionProvider{
+	return kafka_subscription.KafkaSubscriptionProvider{
 		Subscription: &subscription,
 	}
 }

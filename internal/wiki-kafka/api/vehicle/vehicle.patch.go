@@ -4,14 +4,14 @@ import (
 	"github.com/aakashRajur/star-wars/internal/topics"
 	"github.com/aakashRajur/star-wars/internal/wiki/api/vehicle"
 	middleware "github.com/aakashRajur/star-wars/middleware/kafka"
-	"github.com/aakashRajur/star-wars/pkg/di"
+	"github.com/aakashRajur/star-wars/pkg/di/kafka-subscription"
 	"github.com/aakashRajur/star-wars/pkg/kafka"
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
 var resourcePatch = vehicle.ResourcePatch
 
-func PatchVehicle(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) di.KafkaSubscriptionProvider {
+func PatchVehicle(storage types.Storage, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) kafka_subscription.KafkaSubscriptionProvider {
 	handler := func(event kafka.Event, instance *kafka.Kafka) {
 		response := kafka.Event{
 			Topic: definedTopics[topics.WikiResponseTopic],
@@ -66,7 +66,7 @@ func PatchVehicle(storage types.Storage, logger types.Logger, tracker types.Time
 		Handler: middlewares(handler),
 	}
 
-	return di.KafkaSubscriptionProvider{
+	return kafka_subscription.KafkaSubscriptionProvider{
 		Subscription: &subscription,
 	}
 }

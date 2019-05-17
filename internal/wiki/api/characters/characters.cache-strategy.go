@@ -1,7 +1,7 @@
 package characters
 
 import (
-	"github.com/aakashRajur/star-wars/pkg/di"
+	"github.com/aakashRajur/star-wars/pkg/di/cache-strategy"
 	"github.com/aakashRajur/star-wars/pkg/redis-pg"
 )
 
@@ -9,13 +9,13 @@ const (
 	CacheKey = `characters`
 )
 
-func CacheStrategy() di.CacheStrategyProvider {
+func CacheStrategy() cache_strategy.CacheStrategyProvider {
 	strategy := redis_pg.CacheStrategy{
 		Channel:  CacheKey,
 		CacheKey: CacheKey,
 	}
 
-	return di.CacheStrategyProvider{
+	return cache_strategy.CacheStrategyProvider{
 		Strategy: strategy,
 	}
 }
