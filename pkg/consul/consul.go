@@ -46,14 +46,12 @@ func registerService(consul *Consul, definition service.Service) error {
 
 	body[keyId] = definition.Id
 	body[keyName] = definition.Name
-	if definition.Port > 0 {
-		body[keyAddress] = fmt.Sprintf(
-			`%s://%s:%d`,
-			definition.Scheme,
-			definition.Hostname,
-			definition.Port,
-		)
-	}
+	body[keyAddress] = fmt.Sprintf(
+		`%s://%s:%d`,
+		definition.Scheme,
+		definition.Hostname,
+		definition.Port,
+	)
 	body[keyPort] = definition.Port
 	healthcheck := definition.Healthcheck
 	body[keyHealthcheck] = map[string]interface{}{
