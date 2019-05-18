@@ -1,6 +1,8 @@
 package app
 
 import (
+	"go.uber.org/fx"
+
 	"github.com/aakashRajur/star-wars/internal/api-gateway/module/resource"
 	"github.com/aakashRajur/star-wars/internal/api-gateway/module/service"
 	"github.com/aakashRajur/star-wars/internal/common/module/app"
@@ -10,8 +12,8 @@ import (
 	"github.com/aakashRajur/star-wars/internal/common/module/http"
 	"github.com/aakashRajur/star-wars/internal/common/module/instrumentation"
 	"github.com/aakashRajur/star-wars/internal/common/module/log"
+	"github.com/aakashRajur/star-wars/internal/common/module/observable"
 	"github.com/aakashRajur/star-wars/internal/common/module/registree"
-	"go.uber.org/fx"
 )
 
 var ApiGatewayModule = fx.Options(
@@ -21,6 +23,7 @@ var ApiGatewayModule = fx.Options(
 	instrumentation.Module,
 	service.Module,
 	consul.Module,
+	observable.Module,
 	http.Module,
 	http.ProtocolModule,
 	resource.Module,
