@@ -227,7 +227,7 @@ func (kafka *Kafka) Unsubscribe(subscription *Subscription) error {
 	return nil
 }
 
-func (kafka *Kafka) SubscribeOnce(subscription *Subscription) error {
+func (kafka *Kafka) SubscribeOnce(subscription *Subscription) (func() error, error) {
 	var unsubscriber *Subscription = nil
 
 	unsubscriber = &Subscription{
@@ -245,7 +245,11 @@ func (kafka *Kafka) SubscribeOnce(subscription *Subscription) error {
 		},
 	}
 
-	return kafka.Subscribe(unsubscriber)
+	unsubscribe := func() error {
+		return kafka.Unsubscribe(unsubscriber)
+	}
+
+	return unsubscribe, kafka.Subscribe(unsubscriber)
 }
 
 func (kafka *Kafka) ConsumeFromBeginning(topic string) ([]Event, error) {
