@@ -25,7 +25,7 @@ func PatchHttpCharacter(resolver service.Resolver, logger types.Logger, tracker 
 	requestHandler := func(response http.Response, request *http.Request) {
 		defer tracker(time.Now())
 
-		hosts, err := resolver.Resolve(downstreamService)
+		hosts, err := resolver.Resolve(downstreamHttp)
 		if err != nil {
 			response.Error(nativeHttp.StatusInternalServerError, err)
 			return
