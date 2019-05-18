@@ -3,6 +3,7 @@ package app
 import (
 	"go.uber.org/fx"
 
+	"github.com/aakashRajur/star-wars/internal/api-gateway/module/kafka"
 	"github.com/aakashRajur/star-wars/internal/api-gateway/module/resource"
 	"github.com/aakashRajur/star-wars/internal/api-gateway/module/service"
 	"github.com/aakashRajur/star-wars/internal/common/module/app"
@@ -14,6 +15,8 @@ import (
 	"github.com/aakashRajur/star-wars/internal/common/module/log"
 	"github.com/aakashRajur/star-wars/internal/common/module/observable"
 	"github.com/aakashRajur/star-wars/internal/common/module/registree"
+	"github.com/aakashRajur/star-wars/internal/common/module/subscription"
+	"github.com/aakashRajur/star-wars/internal/topics/module/topics"
 )
 
 var ApiGatewayModule = fx.Options(
@@ -24,6 +27,9 @@ var ApiGatewayModule = fx.Options(
 	service.Module,
 	consul.Module,
 	observable.Module,
+	topics.Module,
+	subscription.Module,
+	kafka.Module,
 	http.Module,
 	http.ProtocolModule,
 	resource.Module,
