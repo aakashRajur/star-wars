@@ -1,8 +1,10 @@
 package resource
 
 import (
-	"github.com/aakashRajur/star-wars/pkg/di/http-resource"
 	"go.uber.org/fx"
+
+	"github.com/aakashRajur/star-wars/internal/api-gateway/api/async"
+	"github.com/aakashRajur/star-wars/pkg/di/http-resource"
 
 	"github.com/aakashRajur/star-wars/internal/api-gateway/api/character"
 	"github.com/aakashRajur/star-wars/internal/api-gateway/api/characters"
@@ -36,5 +38,6 @@ var Module = fx.Provide(
 	species.HttpResource,
 	vehicle.HttpResource,
 	vehicles.HttpResource,
+	async.HttpResource,
 	GetHttpResources,
 )
