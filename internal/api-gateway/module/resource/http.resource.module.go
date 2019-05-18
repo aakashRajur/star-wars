@@ -29,6 +29,7 @@ var Module = fx.Provide(
 	stats.Resource,
 	hello.Resource,
 	character.HttpResource,
+	character.KafkaResource,
 	characters.HttpResource,
 	film.HttpResource,
 	films.HttpResource,
