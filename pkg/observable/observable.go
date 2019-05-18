@@ -43,6 +43,17 @@ func (o *Observable) Unregister(id string) error {
 	return nil
 }
 
+func (o *Observable) IsRegistered(id string) bool {
+	mux := o.mux
+	mux.Lock()
+	defer mux.Unlock()
+
+	brokers := o.brokers
+	_, ok := brokers[id]
+
+	return ok
+}
+
 func (o *Observable) Purge() {
 	mux := o.mux
 	mux.Lock()
