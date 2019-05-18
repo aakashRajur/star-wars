@@ -184,8 +184,6 @@ func (kafka *Kafka) Subscribe(subscription *Subscription) error {
 	if !listening {
 		return errors.Errorf(`topic: %s not initialized`, topic)
 	}
-	logger := kafka.Config.Logger
-	logger.Info(fmt.Sprintf("subscribed to topic: %s", topic))
 
 	subscribers, ok := kafka.subscriptions[topic]
 	if !ok || len(subscribers) < 1 {
@@ -194,6 +192,8 @@ func (kafka *Kafka) Subscribe(subscription *Subscription) error {
 		subscribers = append(subscribers, subscription)
 	}
 	kafka.subscriptions[topic] = subscribers
+	logger := kafka.Config.Logger
+	logger.Info(fmt.Sprintf("subscribed to topic: %s", topic))
 
 	return nil
 }
@@ -223,6 +223,8 @@ func (kafka *Kafka) Unsubscribe(subscription *Subscription) error {
 
 	subscribers = append(subscribers[:found], subscribers[found+1:]...)
 	kafka.subscriptions[topic] = subscribers
+	logger := kafka.Config.Logger
+	logger.Info(fmt.Sprintf("unsubscribed to topic: %s", topic))
 
 	return nil
 }
