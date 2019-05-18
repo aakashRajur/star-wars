@@ -1,6 +1,7 @@
 package util
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"math"
 	"reflect"
@@ -93,4 +94,15 @@ func DurationToString(duration time.Duration) string {
 	}
 
 	return strings.Join(parts, " ")
+}
+
+func SHA256() (string, error) {
+	now := time.Now().UTC()
+	marshaled, err := now.MarshalBinary()
+	if err != nil {
+		return ``, err
+	}
+	sum := sha256.Sum256(marshaled)
+	hex := fmt.Sprintf(`%x`, sum)
+	return hex, nil
 }

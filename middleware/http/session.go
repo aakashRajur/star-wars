@@ -2,11 +2,11 @@ package http
 
 import (
 	"context"
-	"crypto/sha256"
-	"fmt"
-	"github.com/aakashRajur/star-wars/pkg/http"
 	nativeHttp "net/http"
 	"time"
+
+	"github.com/aakashRajur/star-wars/pkg/http"
+	"github.com/aakashRajur/star-wars/pkg/util"
 )
 
 //noinspection GoSnakeCaseUsage
@@ -18,16 +18,14 @@ var Session http.Middleware = func(next http.HandleRequest) http.HandleRequest {
 	return func(response http.Response, request *http.Request) {
 		cookie, err := request.Cookie(SESSION_COOKIE)
 		if err != nil || cookie.Value == `` {
-			now := time.Now().UTC()
-			marshaled, err := now.MarshalBinary()
+			hex, err := util.SHA256()
 			if err != nil {
 				response.Error(nativeHttp.StatusInternalServerError, err)
 				return
 			}
-			sum := sha256.Sum256(marshaled)
-			hex := fmt.Sprintf(`%x`, sum)
-
+			now := time.Now().UTC()
 			expires := now.Add(8760 * time.Hour)
+
 			cookie = &nativeHttp.Cookie{
 				Name:     SESSION_COOKIE,
 				Path:     `/`,
