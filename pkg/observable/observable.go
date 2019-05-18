@@ -1,12 +1,13 @@
 package observable
 
 import (
-	"github.com/pkg/errors"
 	"sync"
+
+	"github.com/pkg/errors"
 )
 
 type Observable struct {
-	brokers map[string]chan interface{}
+	brokers map[string]chan []byte
 	mux     sync.Mutex
 }
 
@@ -20,7 +21,7 @@ func (o *Observable) Register(id string) error {
 	if ok {
 		return errors.Errorf(`%s IS ALREADY REGISTERED`, id)
 	}
-	brokers[id] = make(chan interface{})
+	brokers[id] = make(chan []byte)
 
 	return nil
 }
@@ -53,7 +54,7 @@ func (o *Observable) Purge() {
 	}
 }
 
-func (o *Observable) SendData(id string, data interface{}) error {
+func (o *Observable) SendData(id string, data []byte) error {
 	mux := o.mux
 
 	brokers := o.brokers
@@ -70,7 +71,7 @@ func (o *Observable) SendData(id string, data interface{}) error {
 	return nil
 }
 
-func (o *Observable) Broker(id string) (<-chan interface{}, error) {
+func (o *Observable) Broker(id string) (<-chan []byte, error) {
 	mux := o.mux
 	mux.Lock()
 	defer mux.Unlock()
