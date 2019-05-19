@@ -37,7 +37,7 @@ func GetCharacters(storage types.Storage, logger types.Logger, tracker types.Tim
 		marshaled, err := json.Marshal(*newPagination)
 		if err != nil {
 			response.Error = map[string]string{
-				`pagination`: err.Error(),
+				types.PAGINATION: err.Error(),
 			}
 			err := instance.Emit(response)
 			if err != nil {
