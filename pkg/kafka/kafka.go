@@ -3,6 +3,7 @@ package kafka
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -420,6 +421,10 @@ func (kafka *Kafka) Cleanup(sarama.ConsumerGroupSession) error {
 
 func (kafka *Kafka) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for message := range claim.Messages() {
+		topic := message.Topic
+		if strings.HasPrefix(topic, `__`) {
+			continue
+		}
 		event, err := fromConsumerMessage(*message, kafka.ctx)
 		if err != nil {
 			kafka.logger.Error(err)
