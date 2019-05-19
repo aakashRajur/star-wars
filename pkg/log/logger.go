@@ -23,15 +23,15 @@ func (logger *Logger) Debug(args ...interface{}) {
 }
 
 func (logger *Logger) Warn(args ...interface{}) {
-	logger.Warningln(args...)
+	withLocation(logrus.NewEntry(logger.Logger)).Warningln(args...)
 }
 
 func (logger *Logger) Error(args ...interface{}) {
-	logger.Logger.Errorln(args...)
+	withLocation(logrus.NewEntry(logger.Logger)).Errorln(args...)
 }
 
 func (logger *Logger) Fatal(args ...interface{}) {
-	logger.Logger.Fatalln(args...)
+	withLocation(logrus.NewEntry(logger.Logger)).Fatalln(args...)
 }
 
 func (logger *Logger) InfoFields(fields map[string]interface{}, args ...interface{}) {
@@ -47,15 +47,15 @@ func (logger *Logger) DebugFields(fields map[string]interface{}, args ...interfa
 }
 
 func (logger *Logger) WarnFields(fields map[string]interface{}, args ...interface{}) {
-	logger.WithFields(fields).Warnln(args...)
+	withLocation(logger.WithFields(fields)).Warnln(args...)
 }
 
 func (logger *Logger) ErrorFields(err error, fields map[string]interface{}, args ...interface{}) {
-	logger.WithError(err).WithFields(fields).Errorln(args...)
+	withLocation(logger.WithError(err).WithFields(fields)).Errorln(args...)
 }
 
 func (logger *Logger) FatalFields(fields map[string]interface{}, args ...interface{}) {
-	logger.WithFields(fields).Fatalln(args...)
+	withLocation(logger.WithFields(fields)).Fatalln(args...)
 }
 
 func (logger *Logger) Out() io.Writer {
