@@ -3,7 +3,6 @@ package planet
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	nativeHttp "net/http"
 	"net/url"
 	"strings"

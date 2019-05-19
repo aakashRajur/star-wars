@@ -1,7 +1,6 @@
 package characters
 
 import (
-	"encoding/json"
 	"github.com/aakashRajur/star-wars/pkg/di/kafka-subscription"
 
 	"github.com/aakashRajur/star-wars/internal/topics"
@@ -34,20 +33,8 @@ func GetCharacters(storage types.Storage, logger types.Logger, tracker types.Tim
 			return
 		}
 
-		marshaled, err := json.Marshal(*newPagination)
-		if err != nil {
-			response.Error = map[string]string{
-				types.PAGINATION: err.Error(),
-			}
-			err := instance.Emit(response)
-			if err != nil {
-				logger.Error(err)
-			}
-			return
-		}
-
 		response.Args = map[string]interface{}{
-			types.PAGINATION: string(marshaled),
+			types.PAGINATION: *newPagination,
 		}
 		response.Data = result
 		err = instance.Emit(response)

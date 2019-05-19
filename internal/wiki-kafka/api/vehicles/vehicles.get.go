@@ -1,7 +1,6 @@
 package vehicles
 
 import (
-	"encoding/json"
 	"github.com/aakashRajur/star-wars/internal/topics"
 	"github.com/aakashRajur/star-wars/internal/wiki/api/vehicles"
 	middleware "github.com/aakashRajur/star-wars/middleware/kafka"
@@ -33,20 +32,8 @@ func GetVehicles(storage types.Storage, logger types.Logger, tracker types.TimeT
 			return
 		}
 
-		marshaled, err := json.Marshal(*newPagination)
-		if err != nil {
-			response.Error = map[string]string{
-				types.PAGINATION: err.Error(),
-			}
-			err := instance.Emit(response)
-			if err != nil {
-				logger.Error(err)
-			}
-			return
-		}
-
 		response.Args = map[string]interface{}{
-			types.PAGINATION: string(marshaled),
+			types.PAGINATION: *newPagination,
 		}
 		response.Data = result
 		err = instance.Emit(response)
