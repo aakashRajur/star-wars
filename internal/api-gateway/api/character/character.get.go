@@ -73,21 +73,9 @@ func GetKafkaCharacter(resolver service.Resolver, kafkaInstance *kafka.Kafka, ob
 			return
 		}
 
-		ctx := request.Context()
-		sessionValue := ctx.Value(middleware.SESSION_COOKIE)
-		if sessionValue == nil {
-			response.Error(
-				nativeHttp.StatusInternalServerError,
-				errors.New(`NO SESSION SET`),
-			)
-			return
-		}
-		session, ok := sessionValue.(string)
-		if !ok {
-			response.Error(
-				nativeHttp.StatusInternalServerError,
-				errors.New(`CORRUPT SESSION`),
-			)
+		session, err := middleware.GetSession(request)
+		if err != nil {
+			response.Error(nativeHttp.StatusInternalServerError, err)
 			return
 		}
 

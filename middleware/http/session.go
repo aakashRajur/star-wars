@@ -5,6 +5,8 @@ import (
 	nativeHttp "net/http"
 	"time"
 
+	"github.com/juju/errors"
+
 	"github.com/aakashRajur/star-wars/pkg/http"
 	"github.com/aakashRajur/star-wars/pkg/util"
 )
@@ -41,4 +43,17 @@ var Session http.Middleware = func(next http.HandleRequest) http.HandleRequest {
 		withSession := context.WithValue(request.Context(), SESSION_COOKIE, value)
 		next(response, request.WithContext(withSession))
 	}
+}
+
+func GetSession(request *http.Request) (string, error) {
+	ctx := request.Context()
+	sessionValue := ctx.Value(SESSION_COOKIE)
+	if sessionValue == nil {
+		return ``, errors.New(`NO SESSION SET`)
+	}
+	session, ok := sessionValue.(string)
+	if !ok {
+		return ``, errors.New(`CORRUPT SESSION`)
+	}
+	return session, nil
 }
