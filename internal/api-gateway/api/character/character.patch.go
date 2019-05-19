@@ -3,7 +3,6 @@ package character
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	nativeHttp "net/http"
 	"net/url"
 	"strings"
@@ -108,7 +107,6 @@ func PatchKafkaCharacter(resolver service.Resolver, kafkaInstance *kafka.Kafka, 
 			Type:  resourcePatch.Type,
 			Id:    hash,
 			Handler: func(event kafka.Event, instance *kafka.Kafka) {
-				fmt.Printf("EVENT:  %+v\n", event)
 				var data interface{}
 
 				errMapped := event.Error

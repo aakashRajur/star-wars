@@ -24,6 +24,7 @@ func HttpResource(resolver service.Resolver, logger types.Logger, tracker types.
 func KafkaResource(resolver service.Resolver, kafkaInstance *kafka.Kafka, observable *observable.Observable, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics) http_resource.HttpResourceProvider {
 	resource := http.NewResource(fmt.Sprintf(`%s%s`, kafkaPrefix, film.HttpURL))
 	resource.Get(GetKafkaFilm(resolver, kafkaInstance, observable, logger, tracker, definedTopics, film.ParamFilmId))
+	resource.Patch(PatchKafkaFilm(resolver, kafkaInstance, observable, logger, tracker, definedTopics, film.ParamFilmId))
 
 	return http_resource.HttpResourceProvider{Resource: resource}
 }
