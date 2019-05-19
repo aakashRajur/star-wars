@@ -82,11 +82,13 @@ func GetAsync(observable *observable.Observable, logger types.Logger, tracker ty
 					logger.Error(err)
 				}
 				break ITERATOR
-			case data := <-broker:
-				if data == nil || len(data) < 1 {
+			case payload := <-broker:
+				if payload.Key == `` {
+					logger.Warn(fmt.Sprintf("GOT `` AS KEY FOR %s, SKIPPING", session))
 					continue
 				}
-				_, err = fmt.Fprintf(nativeResponse, "data: %s\n\n", string(data))
+				_, err = fmt.Fprintf(nativeResponse, "id: %s\n\n", payload.Key)
+				_, err = fmt.Fprintf(nativeResponse, "data: %s\n\n", string(payload.Data))
 				if err != nil {
 					logger.Error(err)
 				}

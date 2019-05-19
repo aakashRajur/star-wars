@@ -7,7 +7,7 @@ import (
 )
 
 type Observable struct {
-	brokers map[string]chan []byte
+	brokers map[string]chan Payload
 	mux     sync.Mutex
 }
 
@@ -21,7 +21,7 @@ func (o *Observable) Register(id string) error {
 	if ok {
 		return errors.Errorf(`%s IS ALREADY REGISTERED`, id)
 	}
-	brokers[id] = make(chan []byte)
+	brokers[id] = make(chan Payload)
 
 	return nil
 }
@@ -65,7 +65,7 @@ func (o *Observable) Purge() {
 	}
 }
 
-func (o *Observable) SendData(id string, data []byte) error {
+func (o *Observable) SendData(id string, payload Payload) error {
 	mux := o.mux
 
 	brokers := o.brokers
@@ -77,12 +77,12 @@ func (o *Observable) SendData(id string, data []byte) error {
 		return errors.Errorf(`%s WAS NEVER REGISTERED`, id)
 	}
 
-	broker <- data
+	broker <- payload
 
 	return nil
 }
 
-func (o *Observable) Broker(id string) (<-chan []byte, error) {
+func (o *Observable) Broker(id string) (<-chan Payload, error) {
 	mux := o.mux
 	mux.Lock()
 	defer mux.Unlock()

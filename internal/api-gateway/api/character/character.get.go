@@ -3,7 +3,6 @@ package character
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	nativeHttp "net/http"
 	"net/url"
 	"strings"
@@ -57,7 +56,7 @@ func GetHttpCharacter(resolver service.Resolver, logger types.Logger, tracker ty
 	}
 }
 
-func GetKafkaCharacter(resolver service.Resolver, kafkaInstance *kafka.Kafka, observable *observable.Observable, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics, paramKey string) http.HandlerWithMiddleware {
+func GetKafkaCharacter(resolver service.Resolver, kafkaInstance *kafka.Kafka, obs *observable.Observable, logger types.Logger, tracker types.TimeTracker, definedTopics kafka.DefinedTopics, paramKey string) http.HandlerWithMiddleware {
 	requestHandler := func(response http.Response, request *http.Request) {
 		defer tracker(time.Now())
 
@@ -92,7 +91,7 @@ func GetKafkaCharacter(resolver service.Resolver, kafkaInstance *kafka.Kafka, ob
 			return
 		}
 
-		isListening := observable.IsRegistered(session)
+		isListening := obs.IsRegistered(session)
 		if !isListening {
 			response.Error(
 				nativeHttp.StatusPreconditionFailed,
@@ -110,7 +109,7 @@ func GetKafkaCharacter(resolver service.Resolver, kafkaInstance *kafka.Kafka, ob
 		params := request.GetParams()
 		id := params[paramKey].(int)
 
-		dataListener := make(chan []byte)
+		payloadListener := make(chan observable.Payload)
 		errListener := make(chan error)
 
 		subscription := kafka.Subscription{
@@ -132,7 +131,10 @@ func GetKafkaCharacter(resolver service.Resolver, kafkaInstance *kafka.Kafka, ob
 					errListener <- err
 					return
 				}
-				dataListener <- marshaled
+				payloadListener <- observable.Payload{
+					Key:  event.Id,
+					Data: marshaled,
+				}
 			},
 		}
 
@@ -155,7 +157,9 @@ func GetKafkaCharacter(resolver service.Resolver, kafkaInstance *kafka.Kafka, ob
 		timeout, timeoutCancel := context.WithTimeout(context.Background(), 10*time.Second)
 		rollbackListener, rollback := context.WithCancel(context.Background())
 		go func() {
-			var data []byte
+			payload := observable.Payload{
+				Key: hash,
+			}
 			select {
 			case <-rollbackListener.Done():
 				timeoutCancel()
@@ -175,31 +179,26 @@ func GetKafkaCharacter(resolver service.Resolver, kafkaInstance *kafka.Kafka, ob
 				}
 				err = timeout.Err()
 				if err != nil && err != context.DeadlineExceeded {
-					data, err = json.Marshal(err.Error())
+					payload.Data, err = json.Marshal(err.Error())
 					if err != nil {
 						logger.Error(err)
-						data = []byte(nativeHttp.StatusText(nativeHttp.StatusInternalServerError))
+						payload.Data = []byte(nativeHttp.StatusText(nativeHttp.StatusInternalServerError))
 					}
 				}
 				break
-			case data = <-dataListener:
+			case payload = <-payloadListener:
 				timeoutCancel()
 				break
 			case err := <-errListener:
 				timeoutCancel()
-				data, err = json.Marshal(err.Error())
+				payload.Data, err = json.Marshal(err.Error())
 				if err != nil {
 					logger.Error(err)
-					data = []byte(nativeHttp.StatusText(nativeHttp.StatusInternalServerError))
+					payload.Data = []byte(nativeHttp.StatusText(nativeHttp.StatusInternalServerError))
 				}
 			}
 
-			err = observable.SendData(session, []byte(fmt.Sprintf(`id: %s`, session)))
-			if err != nil {
-				logger.Error(err)
-				return
-			}
-			err = observable.SendData(session, data)
+			err = obs.SendData(session, payload)
 			if err != nil {
 				logger.Error(err)
 			}
@@ -212,7 +211,7 @@ func GetKafkaCharacter(resolver service.Resolver, kafkaInstance *kafka.Kafka, ob
 			return
 		}
 
-		err = response.WriteJSON(id, nil)
+		err = response.WriteJSON(hash, nil)
 		if err != nil {
 			logger.Error(err)
 		}
