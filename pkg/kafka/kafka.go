@@ -225,7 +225,7 @@ func (kafka *Kafka) Unsubscribe(subscription *Subscription) error {
 	subscribers = append(subscribers[:found], subscribers[found+1:]...)
 	kafka.subscriptions[topic] = subscribers
 	logger := kafka.Config.Logger
-	logger.Info(fmt.Sprintf("unsubscribed to topic: %s", topic))
+	logger.Info(fmt.Sprintf("unsubscribed from topic: %s", topic))
 
 	return nil
 }
@@ -438,7 +438,23 @@ func (kafka *Kafka) ConsumeClaim(session sarama.ConsumerGroupSession, claim sara
 			continue
 		}
 
-		kafka.logger.Info(event)
+		id := event.Id
+		topic = event.Topic
+		eventType := event.Type
+		source := event.Source
+		timestamp := event.Timestamp
+		args := event.Args
+
+		kafka.logger.InfoFields(
+			map[string]interface{}{
+				`id`:        id,
+				`topic`:     topic,
+				`type`:      eventType,
+				`source`:    source,
+				`timestamp`: timestamp.String(),
+				`args`:      args,
+			},
+		)
 
 		for _, subscriber := range subscribers {
 			if kafka.Config.ClientId != event.Source && subscriber.HasSubscribed(event) {
