@@ -1,7 +1,8 @@
 package films
 
 const (
-	httpPrefix  = `/http`
-	kafkaPrefix = `/api`
-	downstreamService  = `wiki-http`
+	httpPrefix      = `/http`
+	kafkaPrefix     = `/api`
+	downstreamHttp  = `wiki-http`
+	downstreamKafka = `wiki-kafka`
 )
