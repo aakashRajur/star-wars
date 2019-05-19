@@ -31,6 +31,7 @@ var Module = fx.Provide(
 	character.HttpResource,
 	character.KafkaResource,
 	characters.HttpResource,
+	characters.KafkaResource,
 	film.HttpResource,
 	film.KafkaResource,
 	films.HttpResource,
