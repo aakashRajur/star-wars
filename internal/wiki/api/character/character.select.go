@@ -51,16 +51,11 @@ where characters.id = $1;
 
 func QuerySelectCharacter(storage types.Storage, tracker types.TimeTracker, cacheKey string, id int) (map[string]interface{}, error) {
 	defer tracker(time.Now())
-
-	data, err := storage.GetObject(
+	return storage.GetObject(
 		cacheKey,
 		types.Query{
 			QueryString: Query,
 			Args:        []interface{}{id},
 		},
 	)
-	if err != nil {
-		return nil, err
-	}
-	return data, nil
 }

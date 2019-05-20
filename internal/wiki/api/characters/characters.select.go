@@ -13,7 +13,7 @@ const (
 
 func QuerySelectCharacters(storage types.Storage, tracker types.TimeTracker, cacheKey string, pagination types.Pagination) ([]map[string]interface{}, *types.Pagination, error) {
 	defer tracker(time.Now())
-	data, page, err := storage.GetPaginatedArray(
+	return storage.GetPaginatedArray(
 		cacheKey,
 		types.Query{
 			QueryString: Query,
@@ -22,8 +22,4 @@ func QuerySelectCharacters(storage types.Storage, tracker types.TimeTracker, cac
 		pagination,
 		PageRecordId,
 	)
-	if err != nil {
-		return nil, nil, err
-	}
-	return data, page, nil
 }
