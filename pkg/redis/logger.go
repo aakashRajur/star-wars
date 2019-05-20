@@ -7,7 +7,6 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/util"
 )
 
-
 func NewLogger(logger types.Logger) func(func(redis.Cmder) error) func(redis.Cmder) error {
 	return func(oldProcess func(redis.Cmder) error) func(redis.Cmder) error {
 		return func(cmd redis.Cmder) error {

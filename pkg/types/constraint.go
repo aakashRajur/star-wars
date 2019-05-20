@@ -1,7 +1,7 @@
 package types
 
 type Constraint struct {
-	Field   string
+	Field    string
 	Value    interface{}
 	Relation string
 }

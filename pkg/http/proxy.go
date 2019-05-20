@@ -19,7 +19,6 @@ func updateHeaders(header http.Header, additional map[string][]string) http.Head
 	return header
 }
 
-
 type Proxy struct {
 	downstreamUrl func(url *url.URL, host *url.URL) *url.URL
 	hosts         map[string]int

@@ -2,8 +2,6 @@ package types
 
 type UpdateListener func(storage Storage, notification Notification)
 
-
-
 type Storage interface {
 	Close() error
 	GetDatabase() Database
