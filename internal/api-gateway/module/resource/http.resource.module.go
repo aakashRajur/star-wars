@@ -4,6 +4,11 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/aakashRajur/star-wars/internal/api-gateway/api/async"
+	"github.com/aakashRajur/star-wars/internal/api-gateway/api/options/climate"
+	"github.com/aakashRajur/star-wars/internal/api-gateway/api/options/eye-color"
+	"github.com/aakashRajur/star-wars/internal/api-gateway/api/options/hair-color"
+	"github.com/aakashRajur/star-wars/internal/api-gateway/api/options/skin-color"
+	"github.com/aakashRajur/star-wars/internal/api-gateway/api/options/terrain"
 	"github.com/aakashRajur/star-wars/pkg/di/http-resource"
 
 	"github.com/aakashRajur/star-wars/internal/api-gateway/api/character"
@@ -49,5 +54,10 @@ var Module = fx.Provide(
 	vehicles.HttpResource,
 	vehicles.KafkaResource,
 	async.HttpResource,
+	climate.HttpResource,
+	eye_color.HttpResource,
+	hair_color.HttpResource,
+	skin_color.HttpResource,
+	terrain.HttpResource,
 	GetHttpResources,
 )
