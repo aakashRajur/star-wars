@@ -12,13 +12,13 @@ const (
 	ENV_TYPE_BOOL   = `BOOL`
 )
 
-type Env struct {
+type env struct {
 	EnvType  string
 	EnvKey   string
 	EnvValue interface{}
 }
 
-var fakeStringEnvs = []Env{
+var fakeStringEnvs = []env{
 	{
 		EnvKey:   `PG_URI`,
 		EnvType:  ENV_TYPE_STRING,
@@ -91,7 +91,7 @@ var fakeStringEnvs = []Env{
 	},
 }
 
-var fakeIntEnvs = []Env{
+var fakeIntEnvs = []env{
 	{
 		EnvKey:   `PG_POOL_LIMIT`,
 		EnvType:  ENV_TYPE_INT,
@@ -119,7 +119,7 @@ var fakeIntEnvs = []Env{
 	},
 }
 
-var fakeBoolEnvs = []Env{
+var fakeBoolEnvs = []env{
 	{
 		EnvKey:   `BOOL_TRUE`,
 		EnvType:  ENV_TYPE_BOOL,
