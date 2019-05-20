@@ -1,8 +1,14 @@
 package resource
 
 import (
-	"github.com/aakashRajur/star-wars/pkg/di/http-resource"
 	"go.uber.org/fx"
+
+	"github.com/aakashRajur/star-wars/internal/wiki-http/api/options/climate"
+	eye_color "github.com/aakashRajur/star-wars/internal/wiki-http/api/options/eye-color"
+	hair_color "github.com/aakashRajur/star-wars/internal/wiki-http/api/options/hair-color"
+	skin_color "github.com/aakashRajur/star-wars/internal/wiki-http/api/options/skin-color"
+	"github.com/aakashRajur/star-wars/internal/wiki-http/api/options/terrain"
+	"github.com/aakashRajur/star-wars/pkg/di/http-resource"
 
 	"github.com/aakashRajur/star-wars/internal/common/api/hello"
 	"github.com/aakashRajur/star-wars/internal/common/api/stats"
@@ -36,5 +42,10 @@ var Module = fx.Provide(
 	character.Resource,
 	films.Resource,
 	film.Resource,
+	climate.Resource,
+	eye_color.Resource,
+	hair_color.Resource,
+	skin_color.Resource,
+	terrain.Resource,
 	GetResources,
 )
