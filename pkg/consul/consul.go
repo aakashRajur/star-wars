@@ -7,11 +7,13 @@ import (
 	"io/ioutil"
 	nativeHttp "net/http"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/pkg/errors"
 
+	"github.com/aakashRajur/star-wars/pkg/env"
 	"github.com/aakashRajur/star-wars/pkg/http"
 	"github.com/aakashRajur/star-wars/pkg/service"
 	"github.com/aakashRajur/star-wars/pkg/types"
@@ -286,36 +288,43 @@ func (consul *Consul) Unregister(definition service.Service) error {
 
 func (consul *Consul) Resolve(service string) ([]string, error) {
 	ready := consul.ready
-
+	var resolved []string
 	var lastErr error = nil
-	for i := 0; i < resolveRetry; i++ {
-		_, ok := <-ready
-		if ok {
-			continue
-		}
-
-		services := consul.services
-		addresses, ok := services[service]
-		if !ok {
-			lastErr = errors.Errorf(`SERVICE %s NOT FOUND`, service)
-			if i+1 != resolveRetry {
-				time.Sleep(resolveWait)
+	envResolution := env.GetString(service)
+	if envResolution != `` {
+		resolved = strings.Split(envResolution, `,`)
+	} else {
+		for i := 0; i < resolveRetry; i++ {
+			_, ok := <-ready
+			if ok {
+				continue
 			}
-			continue
-		}
 
-		if len(addresses) < 1 {
-			lastErr = errors.Errorf(`SERVICE %s HAS NO ADDRESSES`, service)
-			if i+1 != resolveRetry {
-				time.Sleep(resolveWait)
+			services := consul.services
+			addresses, ok := services[service]
+			if !ok {
+				lastErr = errors.Errorf(`SERVICE %s NOT FOUND`, service)
+				if i+1 != resolveRetry {
+					time.Sleep(resolveWait)
+				}
+				continue
 			}
-			continue
-		}
 
-		return addresses, nil
+			if len(addresses) < 1 {
+				lastErr = errors.Errorf(`SERVICE %s HAS NO ADDRESSES`, service)
+				if i+1 != resolveRetry {
+					time.Sleep(resolveWait)
+				}
+				continue
+			}
+
+			resolved = addresses
+			lastErr = nil
+			break
+		}
 	}
 
-	return []string{}, lastErr
+	return resolved, lastErr
 }
 
 func (consul *Consul) watchServices() {
