@@ -21,12 +21,12 @@ func MapStringFromInterfaces(args []interface{}) ([]string, error) {
 		switch t := each.(type) {
 		case float64:
 			{
-				compiled = append(compiled, strconv.FormatFloat(t, 'f', 64, -1))
+				compiled = append(compiled, strconv.FormatFloat(t, 'f', -1, 64))
 				break
 			}
 		case float32:
 			{
-				compiled = append(compiled, strconv.FormatFloat(float64(t), 'f', 64, -1))
+				compiled = append(compiled, strconv.FormatFloat(float64(t), 'f', -1, 64))
 				break
 			}
 		case int64:
