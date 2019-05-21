@@ -21,7 +21,7 @@ func ValidateIndex() types.Validator {
 		parsed := value.(float64)
 		whole, fraction := math.Modf(parsed)
 		if fraction > 0 || whole < 0 {
-			return errors.Errorf(`%d is not a valid index for %s`, parsed, key)
+			return errors.Errorf(`%f is not a valid index for %s`, parsed, key)
 		}
 		return nil
 	}
