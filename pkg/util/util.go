@@ -3,13 +3,16 @@ package util
 import (
 	"crypto/sha256"
 	"fmt"
+	"github.com/juju/errors"
 	"math"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
+)
 
-	"github.com/juju/errors"
+var (
+	ErrorUnsupportedType = errors.New(`TYPE NOT SUPPORTED`)
 )
 
 func MapStringFromInterfaces(args []interface{}) ([]string, error) {
@@ -51,10 +54,10 @@ func MapStringFromInterfaces(args []interface{}) ([]string, error) {
 			}
 		case []byte:
 			{
-				compiled = append(compiled, string(t[:]))
+				compiled = append(compiled, string(t))
 			}
 		default:
-			return nil, errors.New(`type not supported`)
+			return []string{}, ErrorUnsupportedType
 		}
 	}
 	return compiled, nil
@@ -96,7 +99,7 @@ func DurationToString(duration time.Duration) string {
 	return strings.Join(parts, " ")
 }
 
-func SHA256() (string, error) {
+func RandomSHA256() (string, error) {
 	now := time.Now().UTC()
 	marshaled, err := now.MarshalBinary()
 	if err != nil {

@@ -20,7 +20,7 @@ var Session http.Middleware = func(next http.HandleRequest) http.HandleRequest {
 	return func(response http.Response, request *http.Request) {
 		cookie, err := request.Cookie(SESSION_COOKIE)
 		if err != nil || cookie.Value == `` {
-			hex, err := util.SHA256()
+			hex, err := util.RandomSHA256()
 			if err != nil {
 				response.Error(nativeHttp.StatusInternalServerError, err)
 				return

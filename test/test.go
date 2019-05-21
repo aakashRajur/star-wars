@@ -1,10 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-
-	"github.com/aakashRajur/star-wars/pkg/kafka"
+	"github.com/aakashRajur/star-wars/pkg/util"
+	"time"
 )
 
 /*
@@ -152,20 +151,6 @@ func main() {
 */
 
 func main() {
-	e := kafka.Event{
-		Topic:  `star-wars_wiki-request`,
-		Type:   `CHARACTER_GET`,
-		Id:     `asdf`,
-		Source: `GATEWAY`,
-		Args: map[string]interface{}{
-			`id`: 1,
-		},
-	}
-
-	marshaled, err := json.Marshal(e)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("%+v\n", string(marshaled))
+	elapsed := 24*time.Hour + 5*time.Minute + 7*time.Second
+	fmt.Println(util.DurationToString(elapsed))
 }

@@ -87,7 +87,7 @@ func PatchKafkaPlanet(resolver service.Resolver, kafkaInstance *kafka.Kafka, obs
 			return
 		}
 
-		hash, err := util.SHA256()
+		hash, err := util.RandomSHA256()
 		if err != nil {
 			response.Error(nativeHttp.StatusInternalServerError, err)
 			return

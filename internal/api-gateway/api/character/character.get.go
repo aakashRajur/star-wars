@@ -88,7 +88,7 @@ func GetKafkaCharacter(resolver service.Resolver, kafkaInstance *kafka.Kafka, ob
 			return
 		}
 
-		hash, err := util.SHA256()
+		hash, err := util.RandomSHA256()
 		if err != nil {
 			response.Error(nativeHttp.StatusInternalServerError, err)
 			return
