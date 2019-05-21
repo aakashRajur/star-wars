@@ -7,22 +7,22 @@ import (
 )
 
 type testCase struct {
-	Args  []string
-	Value string
+	Args     []string
+	Expected string
 }
 
-var conditions = map[string]testCase{
+var testCases = map[string]testCase{
 	`DEFAULT`: {
-		Value: `dev`,
-		Args:  []string{"cmd"},
+		Expected: `dev`,
+		Args:     []string{"cmd"},
 	},
 	`DEV`: {
-		Value: `dev`,
-		Args:  []string{"cmd", "-env=dev"},
+		Expected: `dev`,
+		Args:     []string{"cmd", "-env=dev"},
 	},
 	`PROD`: {
-		Value: `prod`,
-		Args:  []string{"cmd", "-env=prod"},
+		Expected: `prod`,
+		Args:     []string{"cmd", "-env=prod"},
 	},
 }
 
@@ -30,15 +30,15 @@ func TestLoadArgs(t *testing.T) {
 	oldArgs := os.Args
 	defer func() { os.Args = oldArgs }()
 
-	for name, tc := range conditions {
+	for name, tc := range testCases {
 		flag.CommandLine = flag.NewFlagSet(tc.Args[0], flag.ContinueOnError)
 		flag.CommandLine.Usage = flag.Usage
 		os.Args = tc.Args
 
 		LoadArgs()
 		value := os.Getenv(`env`)
-		if value != tc.Value {
-			t.Errorf(`%s failed, got: %s, expected: %s`, name, value, tc.Value)
+		if value != tc.Expected {
+			t.Errorf(`%s failed, got: %s, expected: %s`, name, value, tc.Expected)
 		} else {
 			t.Logf(`✔ %s`, name)
 		}

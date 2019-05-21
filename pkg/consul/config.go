@@ -9,7 +9,6 @@ type Config struct {
 	Address      string
 	Scheme       string
 	WatchTimeout time.Duration
-	Datacenter   string
 	Username     string
 	Password     string
 }
