@@ -2,8 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/aakashRajur/star-wars/pkg/util"
-	"time"
+	"reflect"
 )
 
 /*
@@ -151,6 +150,6 @@ func main() {
 */
 
 func main() {
-	elapsed := 24*time.Hour + 5*time.Minute + 7*time.Second
-	fmt.Println(util.DurationToString(elapsed))
+	var value = int64(2)
+	fmt.Println(reflect.TypeOf(value).Name())
 }

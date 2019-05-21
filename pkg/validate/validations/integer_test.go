@@ -6,7 +6,7 @@ import (
 	"github.com/juju/errors"
 )
 
-func TestValidateFloat(t *testing.T) {
+func TestValidateInteger(t *testing.T) {
 	type arg struct {
 		Key    string
 		Value  interface{}
@@ -18,13 +18,29 @@ func TestValidateFloat(t *testing.T) {
 	}
 
 	testCases := map[string]testCase{
+		`INDEX_1`: {
+			Args: arg{
+				Key:    `key`,
+				Value:  4.0,
+				Exists: true,
+			},
+			Expected: nil,
+		},
+		`INDEX_2`: {
+			Args: arg{
+				Key:    `key`,
+				Value:  5,
+				Exists: true,
+			},
+			Expected: nil,
+		},
 		`FLOAT`: {
 			Args: arg{
 				Key:    `key1`,
 				Value:  10.5,
 				Exists: true,
 			},
-			Expected: nil,
+			Expected: errors.Errorf(IntegerError, `10.5`, `key1`),
 		},
 		`INT`: {
 			Args: arg{
@@ -32,7 +48,7 @@ func TestValidateFloat(t *testing.T) {
 				Value:  16,
 				Exists: true,
 			},
-			Expected: errors.Errorf(FloatError, `16`, `key1`),
+			Expected: nil,
 		},
 		`STRING`: {
 			Args: arg{
@@ -40,7 +56,7 @@ func TestValidateFloat(t *testing.T) {
 				Value:  `445.98`,
 				Exists: true,
 			},
-			Expected: errors.Errorf(FloatError, `445.98`, `key2`),
+			Expected: errors.Errorf(IntegerError, `445.98`, `key2`),
 		},
 		`BOOL`: {
 			Args: arg{
@@ -48,7 +64,7 @@ func TestValidateFloat(t *testing.T) {
 				Value:  true,
 				Exists: true,
 			},
-			Expected: errors.Errorf(FloatError, true, `key3`),
+			Expected: errors.Errorf(IntegerError, true, `key3`),
 		},
 		`EXISTS`: {
 			Args: arg{
@@ -60,7 +76,7 @@ func TestValidateFloat(t *testing.T) {
 		},
 	}
 
-	validator := ValidateFloat()
+	validator := ValidateInteger()
 
 	for name, test := range testCases {
 		args := test.Args
@@ -78,7 +94,7 @@ func TestValidateFloat(t *testing.T) {
 		}
 
 		if e1 != e2 {
-			t.Errorf("ValidateFloat() = %+v, want %+v", e1, e2)
+			t.Errorf("ValidateInteger() = %+v, want %+v", e1, e2)
 		} else {
 			t.Logf(`✔ %s`, name)
 		}

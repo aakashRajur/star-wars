@@ -6,6 +6,10 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
+const (
+	ShapeError = `%s SHOULD BE AN OBJECT`
+)
+
 func ValidateShape(shape map[string][]types.Validator) types.Validator {
 	return func(key string, value interface{}, exists bool) error {
 		if !exists || value == nil {
@@ -14,13 +18,13 @@ func ValidateShape(shape map[string][]types.Validator) types.Validator {
 
 		object, ok := value.(map[string]interface{})
 		if !ok {
-			return errors.Errorf(`%s should be an object`, key)
+			return errors.Errorf(ShapeError, key)
 		}
 
-		for k, v := range object {
-			validators := shape[k]
+		for key, validators := range shape {
+			value, ok := object[key]
 			for _, validator := range validators {
-				err := validator(k, v, true)
+				err := validator(key, value, ok)
 				if err != nil {
 					return err
 				}

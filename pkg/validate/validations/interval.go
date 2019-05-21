@@ -9,24 +9,28 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
+const (
+	IntervalError = `%s is not allowed`
+)
+
+var intervalShapeValidator = ValidateShape(
+	map[string][]types.Validator{
+		`year`:  {ValidateInteger()},
+		`month`: {ValidateInteger()},
+		`day`:   {ValidateInteger()},
+		`hour`:  {ValidateInteger()},
+		`min`:   {ValidateInteger()},
+		`sec`:   {ValidateInteger()},
+	},
+)
+
 func ValidateInterval() types.Validator {
 	return func(key string, value interface{}, exists bool) error {
 		if !exists || value == nil {
 			return nil
 		}
 
-		shapeValidator := ValidateShape(
-			map[string][]types.Validator{
-				`year`:  {ValidateInteger()},
-				`month`: {ValidateInteger()},
-				`day`:   {ValidateInteger()},
-				`hour`:  {ValidateInteger()},
-				`min`:   {ValidateInteger()},
-				`sec`:   {ValidateInteger()},
-			},
-		)
-
-		err := shapeValidator(key, value, exists)
+		err := intervalShapeValidator(key, value, exists)
 		if err != nil {
 			return err
 		}
@@ -45,7 +49,7 @@ func ValidateInterval() types.Validator {
 		for key := range interval {
 			_, ok := allowedKeys[key]
 			if !ok {
-				errs[key] = fmt.Sprintf(`%s is not allowed`, key)
+				errs[key] = fmt.Sprintf(IntervalError, key)
 			}
 		}
 

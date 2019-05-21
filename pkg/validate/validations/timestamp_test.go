@@ -6,7 +6,7 @@ import (
 	"github.com/juju/errors"
 )
 
-func TestValidateFloat(t *testing.T) {
+func TestValidateTimestamp(t *testing.T) {
 	type arg struct {
 		Key    string
 		Value  interface{}
@@ -18,49 +18,25 @@ func TestValidateFloat(t *testing.T) {
 	}
 
 	testCases := map[string]testCase{
-		`FLOAT`: {
+		`VALID_TIMESTAMP`: {
 			Args: arg{
 				Key:    `key1`,
-				Value:  10.5,
+				Value:  `2019-05-21T16:17:51.062Z`,
 				Exists: true,
 			},
 			Expected: nil,
 		},
-		`INT`: {
-			Args: arg{
-				Key:    `key1`,
-				Value:  16,
-				Exists: true,
-			},
-			Expected: errors.Errorf(FloatError, `16`, `key1`),
-		},
-		`STRING`: {
+		`INVALID_TIMESTAMP`: {
 			Args: arg{
 				Key:    `key2`,
-				Value:  `445.98`,
+				Value:  `hello_world`,
 				Exists: true,
 			},
-			Expected: errors.Errorf(FloatError, `445.98`, `key2`),
-		},
-		`BOOL`: {
-			Args: arg{
-				Key:    `key3`,
-				Value:  true,
-				Exists: true,
-			},
-			Expected: errors.Errorf(FloatError, true, `key3`),
-		},
-		`EXISTS`: {
-			Args: arg{
-				Key:    `key4`,
-				Value:  nil,
-				Exists: false,
-			},
-			Expected: nil,
+			Expected: errors.New(`parsing time "hello_world" as "2006-01-02T15:04:05Z0700": cannot parse "hello_world" as "2006"`),
 		},
 	}
 
-	validator := ValidateFloat()
+	validator := ValidateTimestamp()
 
 	for name, test := range testCases {
 		args := test.Args
@@ -78,7 +54,7 @@ func TestValidateFloat(t *testing.T) {
 		}
 
 		if e1 != e2 {
-			t.Errorf("ValidateFloat() = %+v, want %+v", e1, e2)
+			t.Errorf("ValidateTimestamp() = %+v, want %+v", e1, e2)
 		} else {
 			t.Logf(`✔ %s`, name)
 		}

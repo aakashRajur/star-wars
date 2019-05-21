@@ -3,10 +3,10 @@ package validations
 import (
 	"testing"
 
-	"github.com/juju/errors"
+	"github.com/pkg/errors"
 )
 
-func TestValidateFloat(t *testing.T) {
+func TestRequired(t *testing.T) {
 	type arg struct {
 		Key    string
 		Value  interface{}
@@ -18,49 +18,32 @@ func TestValidateFloat(t *testing.T) {
 	}
 
 	testCases := map[string]testCase{
-		`FLOAT`: {
+		`DOES_NOT_EXIST`: {
 			Args: arg{
 				Key:    `key1`,
-				Value:  10.5,
-				Exists: true,
-			},
-			Expected: nil,
-		},
-		`INT`: {
-			Args: arg{
-				Key:    `key1`,
-				Value:  16,
-				Exists: true,
-			},
-			Expected: errors.Errorf(FloatError, `16`, `key1`),
-		},
-		`STRING`: {
-			Args: arg{
-				Key:    `key2`,
-				Value:  `445.98`,
-				Exists: true,
-			},
-			Expected: errors.Errorf(FloatError, `445.98`, `key2`),
-		},
-		`BOOL`: {
-			Args: arg{
-				Key:    `key3`,
-				Value:  true,
-				Exists: true,
-			},
-			Expected: errors.Errorf(FloatError, true, `key3`),
-		},
-		`EXISTS`: {
-			Args: arg{
-				Key:    `key4`,
 				Value:  nil,
 				Exists: false,
+			},
+			Expected: errors.Errorf(RequiredError, `key1`),
+		},
+		`NIL`: {
+			Args: arg{
+				Key:    `key2`,
+				Value:  nil,
+				Exists: true,
+			},
+			Expected: errors.Errorf(RequiredError, `key2`),
+		},
+		`VALID`: {
+			Args: arg{
+				Key:    `key3`,
+				Value:  `hello_world`,
+				Exists: true,
 			},
 			Expected: nil,
 		},
 	}
-
-	validator := ValidateFloat()
+	validator := ValidateRequired()
 
 	for name, test := range testCases {
 		args := test.Args
@@ -78,7 +61,7 @@ func TestValidateFloat(t *testing.T) {
 		}
 
 		if e1 != e2 {
-			t.Errorf("ValidateFloat() = %+v, want %+v", e1, e2)
+			t.Errorf("ValidateRequired() = %+v, want %+v", e1, e2)
 		} else {
 			t.Logf(`✔ %s`, name)
 		}

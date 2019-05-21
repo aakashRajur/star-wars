@@ -1,11 +1,16 @@
 package validations
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/juju/errors"
 
 	"github.com/aakashRajur/star-wars/pkg/types"
+)
+
+const (
+	ArrayError = `%s SHOULD BE A VALID ARRAY`
 )
 
 func ValidateArray(elementValidator types.Validator) types.Validator {
@@ -19,7 +24,7 @@ func ValidateArray(elementValidator types.Validator) types.Validator {
 		kind := string(k)
 
 		if kind != `array` && kind != `slice` {
-			return errors.Errorf(`%s should be a valid array`, key)
+			return errors.Errorf(ArrayError, key)
 		}
 
 		safeArray := value.([]interface{})
@@ -27,8 +32,8 @@ func ValidateArray(elementValidator types.Validator) types.Validator {
 			return nil
 		}
 
-		for _, each := range safeArray {
-			err := elementValidator(key, each, true)
+		for i, each := range safeArray {
+			err := elementValidator(fmt.Sprintf(`%s[%d]`, key, i), each, true)
 			if err != nil {
 				return err
 			}

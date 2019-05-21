@@ -6,10 +6,14 @@ import (
 	"github.com/aakashRajur/star-wars/pkg/types"
 )
 
-func Required() types.Validator {
+const (
+	RequiredError = `%s is required`
+)
+
+func ValidateRequired() types.Validator {
 	return func(key string, value interface{}, exists bool) error {
 		if !exists || value == nil {
-			return errors.Errorf(`%s is required`, key)
+			return errors.Errorf(RequiredError, key)
 		}
 		return nil
 	}

@@ -6,7 +6,7 @@ import (
 )
 
 var ArgValidation = map[string][]types.Validator{
-	`id`: {validations.Required(), validations.ValidateIndex()},
+	`id`: {validations.ValidateRequired(), validations.ValidateIndex()},
 }
 
 var BodyValidation = map[string][]types.Validator{

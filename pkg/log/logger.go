@@ -19,7 +19,7 @@ func (logger *Logger) Trace(args ...interface{}) {
 }
 
 func (logger *Logger) Debug(args ...interface{}) {
-	logger.Debugln(args)
+	logger.Debugln(args...)
 }
 
 func (logger *Logger) Warn(args ...interface{}) {

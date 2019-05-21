@@ -69,7 +69,7 @@ func (resourceDefinition Definition) GetArgValidators() map[string][]types.Valid
 	for _, each := range resourceDefinition.Args {
 		compiled := make([]types.Validator, 0)
 		if each.Required {
-			compiled = append(compiled, validations.Required())
+			compiled = append(compiled, validations.ValidateRequired())
 		}
 		switch each.Type {
 		case TypeString:
