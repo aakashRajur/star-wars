@@ -19,7 +19,7 @@ function cleanup() {
 /util/env.sh && source ${ENV_FILE} || exit 1
 
 # wait for consul and copy over zookeeper configuration file
-(/util/wait-for.sh ${SERVICE_DISCOVERY_HOST}:${SERVICE_DISCOVERY_PORT}) || exit 1
+(/util/wait-for.sh -t 180 ${SERVICE_DISCOVERY_HOST}:${SERVICE_DISCOVERY_PORT}) || exit 1
 
 # hook up our cleanup function
 trap 'cleanup' INT SIGINT SIGTERM

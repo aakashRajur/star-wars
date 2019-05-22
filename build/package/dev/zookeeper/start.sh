@@ -16,7 +16,7 @@ function cleanup() {
 /util/env.sh && source ${ENV_FILE} || exit 1
 
 # wait for consul and copy over zookeeper configuration file
-(/util/wait-for.sh ${SERVICE_DISCOVERY_HOST}:${SERVICE_DISCOVERY_PORT} && cp /conf/zoo_sample.cfg /conf/zoo.cfg) || exit 1
+(/util/wait-for.sh -t 180 ${SERVICE_DISCOVERY_HOST}:${SERVICE_DISCOVERY_PORT} && cp /conf/zoo_sample.cfg /conf/zoo.cfg) || exit 1
 
 # hook up our cleanup function
 trap 'cleanup' INT SIGINT SIGTERM
@@ -28,12 +28,12 @@ echo "STARTING ZOOKEEPER"
 # start healthcheck server in background
 echo "STARTING SERVICE DISCOVERY HEALTHCHECK SERVER"
 (/util/server.sh -p ${CONSUL_HEALTHCHECK_PORT} \
--w "/util/wait-for.sh -t 30 ${CONTAINER_HOST_NAME}:${CONTAINER_PORT}" \
--e  "echo status \| nc ${CONTAINER_HOST_NAME} ${CONTAINER_PORT}") &
+-w "/util/wait-for.sh -t 180 ${CONTAINER_HOST_NAME}:${CONTAINER_PORT}" \
+-e  "echo status || nc ${CONTAINER_HOST_NAME} ${CONTAINER_PORT}") &
 
 # register node with consul
 echo "REGISTER NODE TO SERVICE DISCOVERY"
-/util/wait-for.sh -t 30 ${CONTAINER_HOST_NAME}:${CONSUL_HEALTHCHECK_PORT} && /util/register.sh
+/util/wait-for.sh -t 180 ${CONTAINER_HOST_NAME}:${CONSUL_HEALTHCHECK_PORT} && /util/register.sh
 
 echo "WAITING FOR CHILD TO EXIT"
 wait

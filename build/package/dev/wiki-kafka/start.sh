@@ -16,7 +16,7 @@ function cleanup() {
 /util/env.sh && source ${ENV_FILE} || exit 1
 
 # wait for consul
-(/util/wait-for.sh ${SERVICE_DISCOVERY_HOST}:${SERVICE_DISCOVERY_PORT}) || exit 1
+(/util/wait-for.sh -t 180 ${SERVICE_DISCOVERY_HOST}:${SERVICE_DISCOVERY_PORT}) || exit 1
 
 # set instance id of this instance
 INSTANCE_ID="${CONTAINER_HOST_NAME}"
